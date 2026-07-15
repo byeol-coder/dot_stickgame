@@ -8,12 +8,10 @@
     html, body { width: 100%; height: 100%; margin: 0; background: #050b07; color: #eaf3e8; }
     body { display: grid; place-items: center; font-family: system-ui, sans-serif; }
     #boot { padding: 20px; text-align: center; }
-    #source-file { position: fixed; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   </style>
 </head>
 <body>
   <p id="boot" role="status">닷 스틱 게임을 불러오는 중입니다.</p>
-  <a id="source-file" href="game-source.html" tabindex="-1" aria-hidden="true">게임 원본</a>
   <script>
   (async function bootGame() {
     'use strict';
@@ -35,6 +33,13 @@
 
       if (html.indexOf('embed-overrides.css') === -1) {
         html = html.replace('</head>', earlyEmbed + '\n</head>');
+      }
+
+      if (html.indexOf('id="source-file-link"') === -1) {
+        html = html.replace(
+          '</body>',
+          '<a id="source-file-link" href="game-source.html" style="position:fixed;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden" tabindex="-1" aria-hidden="true">게임 원본 파일</a>\n</body>'
+        );
       }
 
       var embedAnchor = "    var IS_EMBED = params.get('embed') === '1';";
