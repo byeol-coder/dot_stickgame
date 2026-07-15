@@ -33,6 +33,24 @@
       --pin-off:   #223528;   /* 내려간 핀 */
       --font-display: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
             --font-body: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-7: 40px;
+      --space-8: 48px;
+      --intro-pad-x: clamp(var(--space-5), 4vw, var(--space-8));
+      --intro-pad-y: clamp(var(--space-4), 3vh, var(--space-6));
+      --intro-content-w: clamp(360px, 32vw, 520px);
+      --button-h: 44px;
+      --button-radius: 12px;
+      --focus-ring: 3px solid var(--amber);
+      --type-display: clamp(48px, 6.1vw, 76px);
+      --type-headline: clamp(17px, 1.35vw, 21px);
+      --type-body: clamp(14px, 1vw, 16px);
+      --type-label: 13px;
     }
 
     * { box-sizing: border-box; }
@@ -698,6 +716,371 @@
       .choice { min-height: 76px; }
       .control-guide { font-size: 12px; gap: 4px 12px; padding: 8px 12px; }
     }
+
+    /* ── Layout system v2: intro grid, shared controls, and compact modes ── */
+    html, body, #app { min-height: 100dvh; }
+    #app { height: 100dvh; overflow: auto; }
+    body.is-title #app { overflow: hidden; }
+    body.is-title .wrap > header { visibility: hidden; pointer-events: none; }
+    button { font-family: var(--font-body); }
+    button:focus-visible, [role="radio"]:focus-visible {
+      outline: var(--focus-ring); outline-offset: 3px;
+    }
+
+    .ui-btn {
+      min-height: var(--button-h); display: inline-flex; align-items: center; justify-content: center;
+      gap: var(--space-2); padding: 0 var(--space-4); border: 1px solid var(--line);
+      border-radius: var(--button-radius); color: var(--ink); background: rgba(16,28,20,.72);
+      font-size: 14px; font-weight: 800; line-height: 1; cursor: pointer;
+      transition: border-color .15s ease, background .15s ease, color .15s ease, filter .15s ease, box-shadow .15s ease;
+    }
+    .ui-btn:hover { border-color: rgba(126,227,138,.72); background: rgba(23,43,29,.82); }
+    .ui-btn:active { filter: brightness(.93); }
+    .ui-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .ui-btn--secondary { background: rgba(10,19,13,.58); color: var(--ink); }
+    .ui-btn--ghost { background: transparent; color: var(--ink-dim); }
+    .ui-btn--utility { min-height: 38px; padding-inline: var(--space-3); border-radius: 999px; font-size: 12px; }
+    .keycap {
+      display: inline-flex; align-items: center; justify-content: center; min-height: 22px;
+      padding: 0 var(--space-2); border: 1px solid rgba(6,33,15,.16);
+      border-radius: 7px; background: rgba(6,33,15,.10); color: rgba(6,33,15,.72);
+      font-size: 12px; font-weight: 900; line-height: 1; vertical-align: middle;
+    }
+
+    .intro-screen {
+      min-height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: clip; background: #050b07;
+    }
+    #introParticles { overflow: clip; }
+    .intro-hero img { object-position: 66% center; }
+    .intro-hero::after {
+      background:
+        linear-gradient(90deg, rgba(3,9,6,.94) 0%, rgba(3,9,6,.82) 30%, rgba(3,9,6,.40) 56%, rgba(3,9,6,.22) 100%),
+        linear-gradient(180deg, rgba(3,9,6,.20) 0%, rgba(3,9,6,.10) 45%, rgba(3,9,6,.72) 100%);
+    }
+    .intro-topbar {
+      display: flex; align-items: center; justify-content: space-between; min-height: 64px;
+      padding: var(--space-3) var(--intro-pad-x) 0; gap: var(--space-4); margin: 0;
+    }
+    .intro-brand.badge {
+      min-height: 36px; padding: 0 var(--space-3) 0 var(--space-2); gap: var(--space-2);
+      border-radius: 999px; letter-spacing: 0; font-size: 12px; line-height: 1;
+    }
+    .intro-device {
+      margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-2);
+      min-height: 38px; padding: var(--space-1); border: 1px solid rgba(126,227,138,.22);
+      border-radius: 999px; background: rgba(4,12,7,.62); backdrop-filter: blur(12px);
+    }
+    .device-status { display: inline-flex; align-items: center; gap: var(--space-2); padding-left: var(--space-2); color: var(--ink-dim); font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .device-status__dot { width: 8px; height: 8px; border-radius: 50%; background: #7d8e7b; box-shadow: 0 0 0 3px rgba(125,142,123,.16); }
+    .device-status.is-connected .device-status__dot { background: var(--glow); box-shadow: 0 0 0 3px rgba(126,227,138,.18); }
+    .device-status.is-connecting .device-status__dot { background: var(--amber); box-shadow: 0 0 0 3px rgba(255,207,92,.18); }
+    .device-status.is-error .device-status__dot { background: var(--lose); box-shadow: 0 0 0 3px rgba(239,155,130,.18); }
+    .intro-device .btn, .intro-device .ui-btn { min-height: 32px; border-radius: 999px; font-size: 12px; padding-inline: var(--space-3); }
+
+    .intro-shell {
+      position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, var(--intro-content-w)) minmax(280px, 1fr);
+      align-items: end; gap: clamp(var(--space-6), 6vw, 96px);
+      width: 100%; min-height: 0; padding: var(--space-4) var(--intro-pad-x) var(--space-5);
+    }
+    .intro-content {
+      width: min(100%, var(--intro-content-w)); max-width: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 0;
+    }
+    .intro-visual-space { min-height: 1px; }
+    .intro-eyebrow {
+      margin: 0 0 var(--space-2); color: var(--glow-soft); font-size: var(--type-label);
+      font-weight: 900; line-height: 1.25; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .intro-title { margin: 0; display: grid; gap: var(--space-1); line-height: 1; }
+    .intro-title__ko {
+      font-size: var(--type-display); line-height: .94; letter-spacing: 0; font-weight: 900;
+      text-shadow: 0 0 24px rgba(255,207,92,.24); animation: none;
+    }
+    .intro-title__en {
+      margin: 0; font-size: clamp(12px, 1vw, 15px); line-height: 1; letter-spacing: .24em;
+      font-weight: 900; color: rgba(221,232,218,.72);
+    }
+    .intro-tagline {
+      margin: var(--space-4) 0 0; max-width: 28ch; color: var(--glow-soft);
+      font-size: var(--type-headline); font-weight: 800; line-height: 1.45;
+    }
+    .intro-summary {
+      margin: var(--space-2) 0 0; max-width: 38ch; color: #bed0bb;
+      font-size: var(--type-body); line-height: 1.68;
+    }
+    .intro-start {
+      width: 100%; max-width: none; min-height: 54px; margin-top: var(--space-5);
+      padding: 0 var(--space-5); border-radius: 14px; font-size: clamp(19px, 1.6vw, 23px);
+      font-weight: 900; gap: var(--space-3); box-shadow: 0 0 0 4px rgba(126,227,138,.10), 0 10px 24px rgba(0,0,0,.28);
+      transform: none;
+    }
+    .intro-start:hover { transform: none; filter: brightness(1.04); box-shadow: 0 0 0 4px rgba(126,227,138,.16), 0 12px 28px rgba(0,0,0,.32); }
+    .intro-start:active { transform: none; filter: brightness(.96); }
+    .intro-start .key-hint { all: unset; }
+    .intro-start .keycap { margin-left: var(--space-1); }
+    .intro-start::after { display: none; }
+
+    .intro-difficulty {
+      width: 100%; max-width: none; margin: var(--space-5) 0 0; padding: 0; border: 0;
+    }
+    .intro-difficulty__legend {
+      width: 100%; display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3);
+      margin: 0 0 var(--space-3); padding: 0; color: var(--ink); font-size: var(--type-label);
+      font-weight: 900; line-height: 1.3; letter-spacing: 0;
+    }
+    .intro-difficulty__hint { color: #b5c8b1; font-size: 12px; font-weight: 700; }
+    .intro-difficulty__options {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2);
+      width: 100%; padding: var(--space-1); border: 1px solid rgba(126,227,138,.24);
+      border-radius: 16px; background: rgba(4,12,7,.62);
+    }
+    .intro-difficulty__button {
+      position: relative; min-height: 58px; display: grid; grid-template-columns: 20px 1fr; align-items: center;
+      gap: var(--space-2); padding: 0 var(--space-3); border-radius: 12px; border: 1px solid transparent;
+      background: transparent; color: #c7d5c3; font-size: 14px; font-weight: 900; line-height: 1;
+      box-shadow: none; transform: none;
+    }
+    .intro-difficulty__button .ico { font-size: 18px; line-height: 1; }
+    .intro-difficulty__button:hover { transform: none; border-color: rgba(126,227,138,.45); color: var(--ink); background: rgba(126,227,138,.06); }
+    .intro-difficulty__button[aria-checked="true"] {
+      color: var(--amber-hot); border-color: var(--amber); background: rgba(255,207,92,.13);
+      box-shadow: inset 0 -3px 0 rgba(255,207,92,.86);
+    }
+    .intro-difficulty__button[aria-checked="true"]::after {
+      content: '선택'; position: absolute; top: 6px; right: 7px; color: #07140b;
+      background: var(--amber); border-radius: 999px; padding: 2px 5px; font-size: 9px; font-weight: 900;
+    }
+
+    .intro-actions {
+      display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-4); flex-wrap: wrap;
+    }
+    .intro-utility { min-height: var(--button-h); padding-inline: var(--space-4); border-radius: var(--button-radius); font-size: 14px; }
+    .accessibility-panel {
+      margin-top: var(--space-3); padding: var(--space-3); border: 1px solid rgba(126,227,138,.24);
+      border-radius: 16px; background: rgba(3,12,7,.82); box-shadow: 0 16px 32px rgba(0,0,0,.24);
+    }
+    .accessibility-panel[hidden] { display: none !important; }
+    .accessibility-panel__title { margin: 0 0 var(--space-2); color: var(--ink); font-size: 13px; font-weight: 900; }
+    .accessibility-panel .voice-controls {
+      position: static; width: 100%; max-width: none; padding: 0; border: 0; background: transparent;
+      box-shadow: none; backdrop-filter: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2);
+    }
+    .voice-control { min-height: var(--button-h); border-radius: var(--button-radius); font-size: 13px; font-weight: 800; }
+
+    .intro-controls {
+      z-index: 2; display: block; margin: 0; padding: 0 var(--intro-pad-x) var(--space-4);
+    }
+    .intro-controls__hints {
+      display: flex; align-items: center; gap: var(--space-3); max-width: min(100%, 680px);
+      margin: 0; padding: var(--space-2) var(--space-3); border-radius: 14px;
+      font-size: 12px; line-height: 1.45; color: #b4c7b0; background: rgba(4,12,7,.56);
+    }
+    .intro-controls__hints code, .control-guide code, .result-controls kbd {
+      min-height: 20px; display: inline-flex; align-items: center; border-radius: 6px;
+      padding: 0 var(--space-2); line-height: 1; letter-spacing: 0;
+    }
+
+    #screenPlay:not(.hidden) {
+      display: grid; place-items: center; width: 100%; min-height: calc(100dvh - 104px);
+    }
+    .stage {
+      display: grid; grid-template-rows: auto minmax(180px, 1fr) auto auto auto auto;
+      justify-items: center; align-items: center; gap: var(--space-3);
+      width: min(100%, 680px); max-height: calc(100dvh - 112px); margin-inline: auto;
+      padding-block: var(--space-3);
+    }
+    .preview-wrap {
+      height: 100%; min-height: 180px; max-height: min(34vh, 280px);
+      display: grid; place-items: center; padding: var(--space-5) var(--space-3) var(--space-2);
+      overflow: hidden;
+    }
+    canvas#pins {
+      width: auto; height: 100%; max-width: 100%; max-height: 100%; margin-top: 0;
+      aspect-ratio: 3 / 2; object-fit: contain;
+    }
+    .count-big { font-size: clamp(36px, 8vh, 66px); }
+    .choices { gap: var(--space-3); max-width: 420px; }
+    .choice { min-height: clamp(64px, 10vh, 82px); padding: var(--space-3) var(--space-2); }
+    .choice .n { font-size: clamp(28px, 4.8vh, 34px); }
+    .choice, .confirm-btn, .result-action, .result-button {
+      border-radius: var(--button-radius);
+    }
+    .confirm-btn { min-height: 54px; font-size: 21px; }
+    .status-line { margin: 0; min-height: 24px; }
+    #screenPlay .control-guide {
+      margin-top: 0; max-width: 680px; justify-content: center;
+      font-size: 12px; border-radius: 14px;
+    }
+    @media (max-height: 820px) {
+      #screenPlay .control-guide { display: none; }
+      .stage { grid-template-rows: auto minmax(160px, 1fr) auto auto auto; max-height: calc(100dvh - 96px); }
+      .preview-wrap { min-height: 160px; max-height: min(32vh, 240px); }
+      .confirm-btn { min-height: 50px; }
+    }
+    @media (max-height: 700px) {
+      .stage { grid-template-rows: auto minmax(130px, 1fr) auto auto auto; gap: var(--space-2); }
+      .preview-wrap { min-height: 130px; max-height: 28vh; }
+      .choice { min-height: 58px; }
+      .count-cap { display: none; }
+    }
+    .result-layout { gap: var(--space-5); }
+    .result-description { margin-top: var(--space-5); }
+    .result-secret { margin-top: var(--space-5); }
+    .result-actions { gap: var(--space-3); }
+    .result-action { min-height: 64px; }
+    .result-controls { border-radius: 14px; }
+    @media (max-height: 820px) and (min-width: 781px) {
+      .result-screen { overflow: hidden; }
+      .result-layout {
+        width: min(calc(100% - 64px), 1080px); height: 100dvh; min-height: 0;
+        grid-template-columns: minmax(300px,.9fr) minmax(340px,1fr);
+        column-gap: var(--space-6); row-gap: var(--space-4);
+        align-content: center; padding: var(--space-6) 0 var(--space-6);
+      }
+      .result-story { max-width: 420px; }
+      .result-moon { display: none; }
+      .result-story__eyebrow { margin-bottom: var(--space-2); }
+      .result-title { font-size: clamp(46px, 5vw, 64px); line-height: 1.02; letter-spacing: 0; }
+      .result-description { margin-top: var(--space-3); font-size: 14px; line-height: 1.55; }
+      .result-secret {
+        margin-top: var(--space-3); padding: var(--space-3); gap: var(--space-3);
+        border-radius: var(--button-radius);
+      }
+      .result-secret__symbol { width: 34px; height: 34px; flex-basis: 34px; font-size: 18px; }
+      .result-secret strong { font-size: 14px; }
+      .result-secret p { font-size: 12px; line-height: 1.45; }
+      .result-tactile {
+        max-width: 440px; padding: var(--space-3); border-radius: 18px;
+      }
+      .result-tactile__header { margin-bottom: var(--space-2); }
+      .result-tactile__display { max-height: 286px; }
+      .result-tactile > p { margin-top: var(--space-2); font-size: 12px; line-height: 1.35; }
+      .result-actions { max-width: 420px; gap: var(--space-2); }
+      .result-action { min-height: 54px; padding: var(--space-2) var(--space-3); }
+      .result-action--primary { min-height: 62px; }
+      .result-action--primary strong { font-size: 21px; }
+      .result-action--quiet { min-height: 38px; }
+      .result-controls { display: none; }
+    }
+    @media (max-height: 700px) and (min-width: 781px) {
+      .result-layout { padding-block: var(--space-4); }
+      .result-description { display: none; }
+      .result-secret { margin-top: var(--space-2); }
+      .result-tactile { max-width: 390px; }
+      .result-action--quiet { display: none; }
+    }
+    @media (max-width: 780px) {
+      .result-screen { overflow: auto; }
+      .result-layout {
+        width: 100%; min-height: 100dvh; grid-template-columns: 1fr;
+        grid-template-areas: "story" "tactile" "actions";
+        align-content: center; gap: var(--space-3); padding: var(--space-5) var(--space-4);
+      }
+      .result-story, .result-actions, .result-tactile { width: 100%; max-width: none; }
+      .result-moon { display: none; }
+      .result-story__badge { min-height: 30px; padding: var(--space-1) var(--space-3); }
+      .result-story__eyebrow { margin: var(--space-2) 0; }
+      .result-title { font-size: clamp(40px, 11vw, 54px); line-height: 1.02; letter-spacing: 0; }
+      .result-description { margin-top: var(--space-2); font-size: 13px; line-height: 1.45; }
+      .result-secret {
+        margin-top: var(--space-2); padding: var(--space-3); gap: var(--space-2);
+        border-radius: var(--button-radius);
+      }
+      .result-secret__symbol { width: 32px; height: 32px; flex-basis: 32px; font-size: 17px; }
+      .result-secret strong { font-size: 13px; }
+      .result-secret p { font-size: 12px; line-height: 1.35; }
+      .result-tactile { padding: var(--space-3); border-radius: 18px; }
+      .result-tactile__header { margin-bottom: var(--space-2); }
+      .result-tactile__display { max-height: 220px; }
+      .result-tactile > p { display: none; }
+      .result-actions { grid-template-columns: 1fr; gap: var(--space-2); }
+      .result-action, .result-action--primary, .result-action--quiet { grid-column: auto; min-height: 48px; padding: var(--space-2) var(--space-3); }
+      .result-action--primary { min-height: 56px; }
+      .result-action--primary strong { font-size: 20px; }
+      .result-action small { display: none; }
+      .result-controls { display: none; }
+    }
+    @media (max-width: 420px) and (max-height: 760px) {
+      .result-description, .result-secret { display: none; }
+      .result-tactile__display { max-height: 190px; }
+    }
+
+    @media (max-height: 820px) and (min-width: 760px) {
+      :root {
+        --intro-pad-y: var(--space-3);
+        --type-display: clamp(44px, 5.2vw, 62px);
+        --type-headline: clamp(16px, 1.2vw, 19px);
+        --type-body: 14px;
+      }
+      .intro-topbar { min-height: 56px; padding-top: var(--space-2); }
+      .intro-shell { padding-top: var(--space-2); padding-bottom: var(--space-3); align-items: end; }
+      .intro-tagline { margin-top: var(--space-3); }
+      .intro-summary { line-height: 1.55; }
+      .intro-start { min-height: 50px; margin-top: var(--space-4); }
+      .intro-difficulty { margin-top: var(--space-4); }
+      .intro-difficulty__button { min-height: 50px; }
+      .intro-actions { margin-top: var(--space-3); }
+      .intro-controls { padding-bottom: var(--space-3); }
+      .intro-controls__hints { display: none; }
+    }
+    @media (max-height: 740px) and (min-width: 760px) {
+      .intro-summary { display: none; }
+      .intro-start { margin-top: var(--space-3); }
+      .intro-difficulty { margin-top: var(--space-3); }
+      .intro-actions { margin-top: var(--space-3); }
+    }
+    @media (max-width: 900px) {
+      :root { --intro-content-w: min(100%, 560px); --intro-pad-x: var(--space-5); }
+      .intro-screen { overflow-y: auto; }
+      .intro-shell { grid-template-columns: 1fr; align-items: end; padding-top: var(--space-4); }
+      .intro-visual-space { display: none; }
+      .intro-hero img { object-position: 62% center; }
+      .intro-hero::after {
+        background:
+          linear-gradient(90deg, rgba(3,9,6,.92) 0%, rgba(3,9,6,.70) 58%, rgba(3,9,6,.28) 100%),
+          linear-gradient(180deg, rgba(3,9,6,.16) 0%, rgba(3,9,6,.28) 46%, rgba(3,9,6,.88) 100%);
+      }
+      .intro-topbar { min-height: 58px; }
+      .intro-device .dp-status { max-width: 96px; overflow: hidden; text-overflow: ellipsis; }
+      .intro-content { width: 100%; }
+      .intro-controls__hints { max-width: none; }
+    }
+    @media (max-width: 560px) {
+      :root {
+        --intro-pad-x: var(--space-4);
+        --type-display: clamp(38px, 12vw, 48px);
+        --type-headline: 16px;
+      }
+      .intro-topbar { align-items: flex-start; min-height: auto; padding-top: var(--space-3); }
+      .intro-brand.badge { max-width: 152px; overflow: hidden; white-space: nowrap; }
+      .intro-device { flex-shrink: 0; }
+      .device-status { max-width: 76px; overflow: hidden; text-overflow: ellipsis; }
+      .intro-shell { padding-bottom: var(--space-4); }
+      .intro-summary { max-width: 32ch; }
+      .intro-start { min-height: 50px; padding-inline: var(--space-4); }
+      .intro-difficulty__legend { flex-direction: column; align-items: flex-start; gap: var(--space-1); }
+      .intro-difficulty__button { min-height: 56px; grid-template-columns: 1fr; justify-items: center; padding-inline: var(--space-2); }
+      .intro-difficulty__button[aria-checked="true"]::after { display: none; }
+      .intro-actions { display: grid; grid-template-columns: 1fr 1fr; }
+      .intro-actions .ui-btn { width: 100%; }
+      .accessibility-panel .voice-controls { grid-template-columns: 1fr; }
+      .intro-controls { padding-bottom: var(--space-3); }
+      .intro-controls__hints { display: none; }
+    }
+    @media (max-width: 380px) {
+      .intro-actions { grid-template-columns: 1fr; }
+      .intro-device .dp-status { display: none; }
+    }
+    html.embed-mode .intro-screen { overflow: hidden; }
+    html.embed-mode .intro-topbar { min-height: 54px; padding-top: var(--space-2); }
+    html.embed-mode .intro-shell { padding-top: var(--space-2); padding-bottom: var(--space-3); }
+    html.embed-mode .intro-controls { padding-bottom: var(--space-3); }
+    html.embed-mode .intro-controls__hints { max-width: min(100%, 680px); }
+    html.embed-mode .accessibility-panel .voice-controls { width: 100%; }
+    @media (max-height: 740px) {
+      html.embed-mode .intro-controls__hints { display: none; }
+    }
     @media (prefers-reduced-motion: reduce) {
       .fly { animation: none; display: none; }
       * { scroll-behavior: auto; }
@@ -740,38 +1123,55 @@
             <span class="dots" aria-hidden="true"><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i></span>
             DOT INC. · 닷게임즈
           </span>
-          <span class="intro-device">
-            <span class="dp-status" id="introDpStatus">닷패드 미연결</span>
-            <button class="btn small" id="introConnectBtn" type="button">닷패드 연결</button>
+          <span class="intro-device" aria-label="닷패드 연결 상태">
+            <span class="device-status is-disconnected" aria-live="polite">
+              <span class="device-status__dot" aria-hidden="true"></span>
+              <span class="dp-status" id="introDpStatus">미연결</span>
+            </span>
+            <button class="ui-btn ui-btn--utility" id="introConnectBtn" type="button">연결</button>
           </span>
         </header>
 
-        <div class="intro-content">
-          <p class="intro-eyebrow">전략 놀이 · 촉각 게임</p>
-          <h1 class="intro-title" id="titleH1">
-            <span class="intro-title__ko">닷 스틱</span>
-            <span class="intro-title__en">DOT STICK</span>
-          </h1>
-          <p class="intro-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</p>
-          <p class="intro-summary">탐험가 닷과 번갈아 스틱을 가져가며 마지막 빛을 차지하는 단순한 전략 놀이예요.</p>
+        <main class="intro-shell">
+          <div class="intro-content">
+            <p class="intro-eyebrow">전략 놀이 · 촉각 게임</p>
+            <h1 class="intro-title" id="titleH1">
+              <span class="intro-title__ko">닷 스틱</span>
+              <span class="intro-title__en">DOT STICK</span>
+            </h1>
+            <p class="intro-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</p>
+            <p class="intro-summary">탐험가 닷과 번갈아 스틱을 가져가며 마지막 빛을 차지하는 단순한 전략 놀이예요.</p>
 
-          <button class="intro-start" id="startBtn" type="button">
-            게임 시작 <span class="key-hint">Enter</span>
-          </button>
+            <button class="intro-start" id="startBtn" type="button">
+              게임 시작 <span class="keycap" aria-hidden="true">Enter</span>
+            </button>
 
-          <div class="intro-difficulty">
-            <div class="intro-difficulty__legend">난이도 — 화살표로 바꾸고 엔터로 시작</div>
-            <div class="intro-difficulty__options" role="radiogroup" aria-label="난이도 선택">
-              <button class="diff intro-difficulty__button" data-diff="easy"   type="button" role="radio" aria-checked="false" tabindex="-1"><span class="ico" aria-hidden="true">🌱</span>연습</button>
-              <button class="diff intro-difficulty__button" data-diff="normal" type="button" role="radio" aria-checked="true"  tabindex="0"><span class="ico" aria-hidden="true">⚔️</span>대결</button>
-              <button class="diff intro-difficulty__button" data-diff="hard"   type="button" role="radio" aria-checked="false" tabindex="-1"><span class="ico" aria-hidden="true">🔥</span>고수</button>
+            <fieldset class="intro-difficulty">
+              <legend class="intro-difficulty__legend">
+                <span>난이도 선택</span>
+                <span class="intro-difficulty__hint">화살표로 변경</span>
+              </legend>
+              <div class="intro-difficulty__options" role="radiogroup" aria-label="난이도 선택">
+                <button class="diff intro-difficulty__button" data-diff="easy"   type="button" role="radio" aria-checked="false"><span class="ico" aria-hidden="true">🌱</span><span>연습</span></button>
+                <button class="diff intro-difficulty__button" data-diff="normal" type="button" role="radio" aria-checked="true"><span class="ico" aria-hidden="true">⚔️</span><span>대결</span></button>
+                <button class="diff intro-difficulty__button" data-diff="hard"   type="button" role="radio" aria-checked="false"><span class="ico" aria-hidden="true">🔥</span><span>고수</span></button>
+              </div>
+            </fieldset>
+
+            <div class="intro-actions" aria-label="보조 메뉴">
+              <button class="ui-btn ui-btn--secondary intro-utility" id="introHelpBtn" type="button">게임 방법</button>
+              <button class="ui-btn ui-btn--ghost intro-utility" id="accessibilityToggleBtn" type="button" aria-expanded="false" aria-controls="introAccessibilityPanel">접근성 설정</button>
+            </div>
+
+            <div class="accessibility-panel" id="introAccessibilityPanel" hidden>
+              <p class="accessibility-panel__title">접근성 설정</p>
+              <button class="ui-btn ui-btn--ghost intro-utility" id="introReplayBtn" type="button">안내 다시 듣기</button>
             </div>
           </div>
-        </div>
+          <div class="intro-visual-space" aria-hidden="true"></div>
+        </main>
 
         <div class="intro-controls">
-          <button class="intro-utility" id="introHelpBtn" type="button">게임 방법</button>
-          <button class="intro-utility" id="introReplayBtn" type="button">안내 다시 듣기</button>
           <span class="control-guide intro-controls__hints">
             <span><b>키보드</b> <code>← →</code> 난이도 · <code>Enter</code> 시작 · <code>F3</code> 도움말</span>
             <span><b>닷패드</b> 패닝키 좌·우로 선택 · 기능키 3으로 시작</span>
@@ -992,7 +1392,9 @@
         announceLive(options.liveText || text);
         return Promise.resolve();
       }
-      if (options.liveText) announceLive(options.liveText);
+      // 게임 음성(TW_TTS)이 켜져 있으면 음성으로만 안내한다. 여기서 aria-live까지
+      // 채우면 스크린리더가 TW_TTS와 같은 문장을 한 번 더 읽어 이중 발화가 된다.
+      // 라이브 영역은 게임 음성을 껐을 때만 사용한다(위 분기 참고).
       var generation = speechGeneration;
       var task = function () { return playSpeech(text, generation); };
       speechQueue = speechQueue.then(task, task);
@@ -1215,11 +1617,17 @@
       );
     }
     function setDpStatus(on, label) {
+      var state = on ? 'connected' : (label && label.indexOf('연결 중') !== -1 ? 'connecting' : (label && label.indexOf('실패') !== -1 ? 'error' : 'disconnected'));
       ['dpStatus', 'introDpStatus'].forEach(function (id) {
         var el = document.getElementById(id);
         if (!el) return;
-        el.textContent = label || (on ? '닷패드 연결됨' : '닷패드 미연결');
+        el.textContent = label || (on ? '연결됨' : '미연결');
         el.className = 'dp-status' + (on ? ' on' : '');
+        var status = el.closest && el.closest('.device-status');
+        if (status) {
+          status.className = 'device-status is-' + state;
+          status.setAttribute('aria-label', '닷패드 ' + el.textContent);
+        }
       });
     }
     async function connectDot() {
@@ -1279,9 +1687,8 @@
       var controls = document.querySelector('.voice-controls');
       if (!controls) return;
       if (screen === 'title') {
-        var introControls = document.querySelector('.intro-controls');
-        var guide = introControls && introControls.querySelector('.control-guide');
-        if (introControls) introControls.insertBefore(controls, guide || null);
+        var accessibilityPanel = document.getElementById('introAccessibilityPanel');
+        if (accessibilityPanel) accessibilityPanel.appendChild(controls);
       } else if (screen === 'play') {
         if (!IS_EMBED) {
           voiceControlsHome.appendChild(controls);
@@ -1302,9 +1709,16 @@
 
     function show(screen) {
       S.screen = screen;
+      document.body.classList.toggle('is-title', screen === 'title');
       elTitle.classList.toggle('hidden', screen !== 'title');
       elPlay.classList.toggle('hidden', screen !== 'play');
       elResult.classList.toggle('hidden', screen !== 'result');
+      var outerConnect = document.getElementById('connectBtn');
+      if (outerConnect) {
+        outerConnect.tabIndex = screen === 'title' ? -1 : 0;
+        outerConnect.setAttribute('aria-hidden', String(screen === 'title'));
+      }
+      if (screen !== 'title') setAccessibilityPanel(false);
       placeVoiceControls(screen);
       if (IS_EMBED) requestAnimationFrame(function () {
         var activeScreen = screen === 'title' ? elTitle : screen === 'play' ? elPlay : elResult;
@@ -1520,7 +1934,7 @@
         var checked = b.dataset.diff === d;
         b.setAttribute('aria-checked', String(checked));
         b.setAttribute('aria-pressed', String(checked)); // 이전 CSS 선택자 호환용
-        b.tabIndex = checked ? 0 : -1;
+        b.tabIndex = 0;
         if (checked) focusTarget = b;
       });
       if (!silent) speak('난이도 ' + DIFF_NAME[d] + '.', { interrupt: true, liveText: '난이도 ' + DIFF_NAME[d] });
@@ -1545,6 +1959,22 @@
     // 인트로(타이틀) 화면 첫 안내 음성. 안내 다시 듣기 버튼에서도 재사용.
     function speakIntro() {
       speak('닷 스틱 게임. 깊은 숲 속, 빛나는 닷 스틱 ' + START_COUNT + '개가 놓여 있어요. 당신과 탐험가 닷이 번갈아, 한 번에 1개 또는 2개를 가져가요. 마지막 스틱을 가져가는 사람이 이겨요. 화살표로 난이도를 고르고 엔터로 시작하세요.', { interrupt: true, liveText: '닷 스틱 게임 시작 화면. 난이도를 고르고 게임 시작 버튼을 누르세요.' });
+    }
+
+    function setAccessibilityPanel(open) {
+      var panel = document.getElementById('introAccessibilityPanel');
+      var button = document.getElementById('accessibilityToggleBtn');
+      if (!panel || !button) return;
+      panel.hidden = !open;
+      button.setAttribute('aria-expanded', String(open));
+    }
+
+    function toggleAccessibilityPanel() {
+      var panel = document.getElementById('introAccessibilityPanel');
+      if (!panel) return;
+      var open = panel.hidden;
+      setAccessibilityPanel(open);
+      if (open) announceLive('접근성 설정을 열었습니다.');
     }
 
     // ── 키 입력 ────────────────────────────────────────────────────────────
@@ -1597,6 +2027,8 @@
     if (introHelpBtnEl) introHelpBtnEl.addEventListener('click', function () { speak(helpText(), { interrupt: true }); });
     var introReplayBtnEl = document.getElementById('introReplayBtn');
     if (introReplayBtnEl) introReplayBtnEl.addEventListener('click', speakIntro);
+    var accessibilityToggleBtnEl = document.getElementById('accessibilityToggleBtn');
+    if (accessibilityToggleBtnEl) accessibilityToggleBtnEl.addEventListener('click', toggleAccessibilityPanel);
     document.getElementById('startBtn').addEventListener('click', startGame);
     document.getElementById('takeBtn').addEventListener('click', playerTake);
     document.getElementById('againBtn').addEventListener('click', startGame);
@@ -1642,8 +2074,8 @@
       for (var i = 0; i < 18; i++) {
         var p = document.createElement('span');
         p.className = 'intro-particle';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.top = (Math.random() * 100) + '%';
+        p.style.left = (4 + Math.random() * 92) + '%';
+        p.style.top = (6 + Math.random() * 88) + '%';
         p.style.animationDuration = (5 + Math.random() * 6) + 's';
         p.style.animationDelay = (Math.random() * 6) + 's';
         box.appendChild(p);
