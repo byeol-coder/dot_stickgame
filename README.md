@@ -31,7 +31,7 @@
 - 모든 상태 변화는 TW_TTS 음성으로도 안내
 
 ## 기술 규격 (닷게임즈 준수)
-- `index.html` 하나로 동작 (닷패드 SDK 3.0.0 인라인)
+- `index.html` 중심의 정적 구성 (`hero.jpg` 이미지 에셋, 닷패드 SDK 3.0.0 인라인)
 - `?embed=1` 임베드 모드 · `postMessage({source:'dotarcade', type:'ready'|'resize'|'exit'})`
 - 음성: 공용 `TW_TTS`(dot-games-host `tts.js`), 실패 시에만 브라우저 음성 폴백
 - 지원 해상도: **60×40 (dotpad320)**

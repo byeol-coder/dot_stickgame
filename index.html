@@ -97,13 +97,29 @@
     .btn.small { font-size: 13px; padding: 8px 12px; min-height: 38px; }
     .btn[aria-pressed="true"] { border-color: var(--glow); background: #1b2c22; color: var(--glow-soft); }
 
+    .hero {
+      position: relative; min-height: 260px; margin: 10px 0 20px; overflow: hidden;
+      border: 1px solid var(--line); border-radius: 20px; background: #07101c;
+      box-shadow: 0 18px 48px rgba(0,0,0,0.28);
+    }
+    .hero::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(90deg, rgba(3,9,15,0.94) 0%, rgba(3,9,15,0.72) 31%, rgba(3,9,15,0.08) 67%, rgba(3,9,15,0.18) 100%);
+    }
+    .hero img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center;
+    }
+    .hero-copy {
+      position: relative; z-index: 1; min-height: 260px; padding: 38px 34px;
+      display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
+    }
     h1.title {
       font-family: var(--font-display); font-weight: 400;
-      font-size: clamp(34px, 8vw, 58px); line-height: 1.02; margin: 10px 0 6px;
+      font-size: clamp(38px, 8vw, 62px); line-height: 1.02; margin: 0 0 6px;
       color: var(--amber-hot); text-shadow: 0 0 22px rgba(255,207,92,0.28);
       letter-spacing: .01em;
     }
-    .lede { color: var(--ink-dim); font-size: 16px; max-width: 52ch; margin: 0 0 16px; }
+    .lede { color: var(--glow-soft); font-size: 17px; max-width: 28ch; margin: 0; }
     .story { color: var(--ink); font-size: 16px; max-width: 54ch; margin: 0 0 20px; line-height: 1.7; }
     .story b { color: var(--glow-soft); font-weight: 700; }
 
@@ -189,6 +205,11 @@
 
     @media (max-width: 480px) {
       .wrap { padding: 16px 14px 22px; }
+      .hero, .hero-copy { min-height: 240px; }
+      .hero { border-radius: 16px; }
+      .hero img { object-position: center; }
+      .hero::after { background: linear-gradient(90deg, rgba(3,9,15,0.92) 0%, rgba(3,9,15,0.55) 52%, rgba(3,9,15,0.10) 100%); }
+      .hero-copy { padding: 28px 22px; }
       .choice { min-height: 76px; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -214,8 +235,13 @@
 
       <!-- ── 시작 화면 ─────────────────────────────────────────────── -->
       <section id="screenTitle" aria-labelledby="titleH1">
-        <h1 class="title" id="titleH1">닷 스틱</h1>
-        <p class="lede">마지막 빛을 가져오는 사람이 이깁니다.</p>
+        <div class="hero">
+          <img src="hero.jpg" alt="밤 숲에서 탐험가와 로봇이 빛나는 스틱 열 개를 발견한 모습" />
+          <div class="hero-copy">
+            <h1 class="title" id="titleH1">닷 스틱</h1>
+            <p class="lede">마지막 빛을 가져오는 사람이 이깁니다.</p>
+          </div>
+        </div>
         <p class="story">
           깊은 숲속에 빛나는 <b>닷 스틱 10개</b>가 놓여 있어요.
           당신과 탐험가 닷이 <b>번갈아</b> 스틱을 가져가요.
