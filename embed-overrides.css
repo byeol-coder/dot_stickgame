@@ -28,9 +28,41 @@ html.embed-mode .wrap {
   overflow: hidden;
 }
 
+/* The intro has its own device controls. The outer header/footer are redundant in embed mode. */
 html.embed-mode .wrap > header,
 html.embed-mode .wrap > footer { display: none !important; }
 html.embed-mode .fireflies { position: absolute; }
+
+/* Keep long keyboard/DotPad instructions available to screen readers without using layout space. */
+html.embed-mode #screenPlay .control-guide,
+html.embed-mode .play-screen .control-guide,
+html.embed-mode .intro-controls > .control-guide,
+html.embed-mode .result-controls {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Compact voice controls remain operable on every game screen. */
+html.embed-mode .voice-controls {
+  min-height: 0;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 12px;
+}
+
+html.embed-mode .voice-control {
+  min-height: clamp(34px, 5.5vh, 40px);
+  padding: 5px 8px;
+  font-size: 11px;
+}
 
 /* Intro */
 html.embed-mode .intro-screen {
@@ -39,6 +71,7 @@ html.embed-mode .intro-screen {
   height: 100%;
   min-height: 0;
   max-height: 100%;
+  overflow: hidden;
 }
 
 html.embed-mode .intro-topbar {
@@ -49,14 +82,14 @@ html.embed-mode .intro-topbar {
 html.embed-mode .intro-content {
   min-height: 0;
   max-width: min(640px, 100%);
-  padding: 0 clamp(14px, 3vw, 32px) clamp(10px, 1.8vh, 18px);
+  padding: 0 clamp(14px, 3vw, 32px) clamp(8px, 1.5vh, 15px);
 }
 
 html.embed-mode .intro-title__ko { font-size: clamp(34px, 8vh, 58px); }
 html.embed-mode .intro-tagline { margin: 5px 0 2px; }
 
 html.embed-mode .intro-summary {
-  margin-bottom: clamp(8px, 1.5vh, 14px);
+  margin-bottom: clamp(7px, 1.3vh, 12px);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -75,10 +108,24 @@ html.embed-mode .intro-difficulty__button {
 }
 
 html.embed-mode .intro-controls {
+  position: relative;
+  z-index: 2;
   flex: 0 0 auto;
-  padding: clamp(7px, 1.2vh, 11px) clamp(12px, 2.5vw, 28px);
+  padding: clamp(5px, .9vh, 9px) clamp(10px, 2vw, 22px);
+  gap: 4px 6px;
   font-size: 11px;
-  line-height: 1.35;
+  line-height: 1.3;
+}
+
+html.embed-mode .intro-controls .intro-utility {
+  min-height: 34px;
+  padding: 5px 9px;
+  font-size: 11px;
+}
+
+html.embed-mode .intro-controls .voice-controls {
+  flex: 1 1 320px;
+  width: auto;
 }
 
 /* Play */
@@ -101,16 +148,18 @@ html.embed-mode .play-screen .stage {
   min-height: 0;
   margin: 0 auto;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto auto auto;
+  /* turn, tactile preview, count, choices, confirm, status, voice controls */
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto;
   align-content: stretch;
-  gap: clamp(4px, .8vh, 9px);
+  gap: clamp(3px, .65vh, 7px);
 }
 
+html.embed-mode #screenPlay .preview-wrap,
 html.embed-mode .play-screen .preview-wrap {
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: 20px 8px 6px;
+  padding: 18px 8px 5px;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -126,8 +175,8 @@ html.embed-mode canvas#pins {
   aspect-ratio: 3 / 2;
 }
 
-html.embed-mode .count-big { font-size: clamp(32px, 7.2vh, 62px); }
-html.embed-mode .count-cap { margin-top: 0; font-size: 12px; line-height: 1.2; }
+html.embed-mode .count-big { font-size: clamp(30px, 6.8vh, 58px); }
+html.embed-mode .count-cap { margin-top: 0; font-size: 12px; line-height: 1.15; }
 
 html.embed-mode .choices {
   max-width: 520px;
@@ -135,29 +184,35 @@ html.embed-mode .choices {
 }
 
 html.embed-mode .choice {
-  min-height: clamp(54px, 9.5vh, 76px);
-  padding: 7px 6px;
+  min-height: clamp(50px, 8.5vh, 70px);
+  padding: 6px;
   gap: 2px;
 }
 
-html.embed-mode .choice .n { font-size: clamp(25px, 4.5vh, 32px); }
+html.embed-mode .choice .n { font-size: clamp(24px, 4.2vh, 31px); }
 
 html.embed-mode .confirm-btn {
   max-width: 520px;
-  min-height: clamp(44px, 7vh, 52px);
-  padding: 8px 12px;
-  font-size: clamp(18px, 3vh, 21px);
+  min-height: clamp(42px, 6.5vh, 50px);
+  padding: 7px 12px;
+  font-size: clamp(18px, 2.8vh, 21px);
 }
 
 html.embed-mode .status-line {
-  min-height: 18px;
+  min-height: 16px;
   margin: 0;
-  font-size: 13px;
-  line-height: 1.25;
+  font-size: 12px;
+  line-height: 1.2;
   text-align: center;
 }
 
-html.embed-mode .play-screen .control-guide { display: none !important; }
+html.embed-mode #screenPlay .voice-controls,
+html.embed-mode .play-screen .voice-controls {
+  width: min(100%, 520px);
+  justify-self: center;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
 
 /* Result */
 html.embed-mode #screenResult,
@@ -174,7 +229,7 @@ html.embed-mode .result-layout {
   height: 100%;
   min-height: 0;
   margin: 0 auto;
-  padding: clamp(8px, 1.5vh, 16px) clamp(8px, 1.5vw, 18px);
+  padding: clamp(7px, 1.2vh, 13px) clamp(8px, 1.5vw, 18px);
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(220px, .85fr);
   grid-template-areas:
@@ -183,7 +238,7 @@ html.embed-mode .result-layout {
   grid-template-rows: minmax(0, 1fr) auto;
   align-items: center;
   align-content: stretch;
-  gap: clamp(7px, 1.2vw, 16px);
+  gap: clamp(6px, 1vw, 13px);
 }
 
 html.embed-mode .result-story {
@@ -198,7 +253,7 @@ html.embed-mode .result-tactile {
   min-width: 0;
   max-height: 100%;
   margin: 0;
-  padding: clamp(8px, 1.2vw, 14px);
+  padding: clamp(7px, 1vw, 12px);
   align-self: center;
   overflow: hidden;
 }
@@ -208,7 +263,14 @@ html.embed-mode .result-actions {
   width: 100%;
   max-width: none;
   margin: 0;
-  gap: 7px;
+  gap: 5px;
+}
+
+html.embed-mode .result-actions > .voice-controls {
+  grid-column: 1 / -1;
+  width: 100%;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
 
 html.embed-mode .result-moon { display: none; }
@@ -216,27 +278,27 @@ html.embed-mode .result-story__eyebrow { margin-bottom: 3px; }
 
 html.embed-mode .result-title {
   margin: 0 0 5px;
-  font-size: clamp(34px, 7.2vh, 60px);
+  font-size: clamp(32px, 6.8vh, 56px);
   line-height: .98;
 }
 
 html.embed-mode .result-description {
   margin: 0;
-  font-size: clamp(12px, 1.9vh, 15px);
-  line-height: 1.45;
+  font-size: clamp(12px, 1.8vh, 15px);
+  line-height: 1.4;
 }
 
 html.embed-mode .result-secret {
-  margin-top: clamp(6px, 1.1vh, 11px);
-  padding: 8px 10px;
+  margin-top: clamp(5px, .9vh, 9px);
+  padding: 7px 9px;
 }
 
-html.embed-mode .result-secret p { line-height: 1.35; }
-html.embed-mode .result-tactile__header { padding-bottom: 7px; }
+html.embed-mode .result-secret p { line-height: 1.3; }
+html.embed-mode .result-tactile__header { padding-bottom: 6px; }
 
 html.embed-mode .result-tactile__display {
   width: 100%;
-  max-height: min(42vh, 330px);
+  max-height: min(40vh, 310px);
   aspect-ratio: 3 / 2;
 }
 
@@ -248,29 +310,27 @@ html.embed-mode canvas#pinsR {
 }
 
 html.embed-mode .result-tactile > p {
-  margin: 6px 0 0;
+  margin: 5px 0 0;
   font-size: 12px;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 html.embed-mode .result-action {
-  min-height: clamp(42px, 6.5vh, 52px);
-  padding: 7px 10px;
+  min-height: clamp(38px, 5.8vh, 48px);
+  padding: 6px 9px;
 }
 
-html.embed-mode .result-action--primary { min-height: clamp(48px, 7.5vh, 58px); }
+html.embed-mode .result-action--primary { min-height: clamp(44px, 6.8vh, 54px); }
 html.embed-mode .result-action small { font-size: 10px; }
-html.embed-mode .result-controls { display: none !important; }
 
 @media (max-height: 640px) {
   html.embed-mode .intro-eyebrow,
-  html.embed-mode .intro-title__en,
-  html.embed-mode .intro-controls { display: none !important; }
+  html.embed-mode .intro-title__en { display: none !important; }
   html.embed-mode .intro-summary { display: none; }
-  html.embed-mode .intro-content { padding-bottom: 10px; }
+  html.embed-mode .intro-content { padding-bottom: 7px; }
   html.embed-mode .result-story__eyebrow,
   html.embed-mode .result-tactile > p { display: none; }
-  html.embed-mode .result-secret { margin-top: 5px; }
+  html.embed-mode .result-secret { margin-top: 4px; }
 }
 
 @media (max-width: 700px) {
@@ -280,11 +340,11 @@ html.embed-mode .result-controls { display: none !important; }
       "story tactile"
       "actions actions";
     grid-template-rows: minmax(0, 1fr) auto;
-    padding: 7px;
-    gap: 7px;
+    padding: 6px;
+    gap: 6px;
   }
 
-  html.embed-mode .result-title { font-size: clamp(30px, 9vw, 46px); }
+  html.embed-mode .result-title { font-size: clamp(28px, 8.5vw, 43px); }
   html.embed-mode .result-description { font-size: 12px; }
   html.embed-mode .result-secret { display: none; }
   html.embed-mode .result-tactile__header span:not(.result-tactile__resolution) { display: none; }
@@ -293,16 +353,44 @@ html.embed-mode .result-controls { display: none !important; }
   html.embed-mode .result-action--quiet { grid-column: 1 / -1; }
 }
 
+@media (max-width: 520px) {
+  html.embed-mode .intro-device .dp-status { display: none; }
+  html.embed-mode .intro-controls { flex-wrap: wrap; }
+  html.embed-mode .intro-controls .voice-controls { flex-basis: 100%; }
+  html.embed-mode #screenPlay .voice-control,
+  html.embed-mode .result-actions .voice-control { padding-inline: 6px; font-size: 10px; }
+}
+
 @media (max-height: 520px) {
-  html.embed-mode .intro-topbar { display: none; }
+  html.embed-mode .intro-topbar { padding-block: 5px; }
   html.embed-mode .intro-title__ko { font-size: clamp(30px, 8vh, 42px); }
   html.embed-mode .intro-tagline { display: none; }
-  html.embed-mode .intro-difficulty { margin-top: 6px; }
-  html.embed-mode .play-screen .preview-wrap { padding-top: 16px; }
+  html.embed-mode .intro-difficulty { margin-top: 5px; }
+  html.embed-mode #screenPlay .preview-wrap,
+  html.embed-mode .play-screen .preview-wrap { padding-top: 15px; }
   html.embed-mode .count-cap,
   html.embed-mode .result-description,
   html.embed-mode .result-secret,
   html.embed-mode .result-tactile > p { display: none; }
-  html.embed-mode .choice { min-height: 48px; }
-  html.embed-mode .result-title { font-size: clamp(28px, 8vh, 40px); }
+  html.embed-mode .choice { min-height: 44px; }
+  html.embed-mode .result-title { font-size: clamp(26px, 7.5vh, 38px); }
+}
+
+@media (max-height: 400px) {
+  html.embed-mode .intro-summary,
+  html.embed-mode .intro-eyebrow,
+  html.embed-mode .intro-title__en { display: none; }
+  html.embed-mode .intro-content { padding-bottom: 4px; }
+  html.embed-mode .intro-title__ko { font-size: 30px; }
+  html.embed-mode .intro-start { min-height: 40px; padding: 6px 10px; }
+  html.embed-mode .intro-difficulty__button { min-height: 40px; }
+  html.embed-mode .intro-controls { padding-block: 3px; }
+  html.embed-mode .intro-controls .intro-utility { min-height: 30px; }
+  html.embed-mode .voice-control { min-height: 30px; padding-block: 3px; }
+  html.embed-mode #screenPlay .stage,
+  html.embed-mode .play-screen .stage { gap: 2px; }
+  html.embed-mode .turn-tag { padding-block: 3px; }
+  html.embed-mode .choice { min-height: 38px; }
+  html.embed-mode .confirm-btn { min-height: 36px; }
+  html.embed-mode .status-line { min-height: 12px; }
 }
