@@ -77,7 +77,8 @@
     header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
     .badge {
       display: inline-flex; align-items: center; gap: 7px;
-      background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+      background: rgba(20,32,26,0.55); backdrop-filter: blur(10px);
+      border: 1px solid var(--line); border-radius: 999px;
       padding: 5px 12px 5px 8px; font-size: 13px; color: var(--ink-dim); letter-spacing: .02em;
     }
     .badge .dots { display: grid; grid-template-columns: repeat(2, 5px); gap: 2px; }
@@ -96,30 +97,97 @@
     .btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
     .btn.small { font-size: 13px; padding: 8px 12px; min-height: 38px; }
     .btn[aria-pressed="true"] { border-color: var(--glow); background: #1b2c22; color: var(--glow-soft); }
+    #connectBtn.btn.small { border-radius: 999px; background: rgba(20,32,26,0.55); backdrop-filter: blur(10px); }
 
-    .hero {
-      position: relative; min-height: 260px; margin: 10px 0 20px; overflow: hidden;
-      border: 1px solid var(--line); border-radius: 20px; background: #07101c;
-      box-shadow: 0 18px 48px rgba(0,0,0,0.28);
+    /* ── 오프닝(타이틀) 화면 — 키아트 카드 ──────────────────────────────── */
+    .opening {
+      position: relative; margin: 4px 0 18px; overflow: hidden; isolation: isolate;
+      border: 1px solid var(--line); border-radius: 24px; background: #050b07;
+      box-shadow: 0 20px 56px rgba(0,0,0,0.35);
     }
-    .hero::after {
-      content: ''; position: absolute; inset: 0; pointer-events: none;
-      background: linear-gradient(90deg, rgba(3,9,15,0.94) 0%, rgba(3,9,15,0.72) 31%, rgba(3,9,15,0.08) 67%, rgba(3,9,15,0.18) 100%);
+    .opening__art { position: absolute; inset: 0; z-index: 0; }
+    .opening__art img { width: 100%; height: 100%; object-fit: cover; object-position: 68% center; display: block; }
+    .opening::before {
+      content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(180deg, rgba(3,9,6,0.08) 0%, rgba(3,9,6,0.18) 42%, rgba(3,9,6,0.94) 84%, rgba(3,9,6,0.99) 100%);
     }
-    .hero img {
-      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center;
+    .opening__content {
+      position: relative; z-index: 2; min-height: 360px;
+      padding: clamp(28px, 6vw, 44px) clamp(20px, 5vw, 40px) clamp(22px, 4vw, 32px);
+      display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end;
     }
-    .hero-copy {
-      position: relative; z-index: 1; min-height: 260px; padding: 38px 34px;
-      display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
+    .game-title {
+      margin: 0 0 4px; font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(40px, 9vw, 64px); line-height: 1; color: var(--amber-hot);
+      text-shadow: 0 0 26px rgba(255,207,92,0.35); letter-spacing: .01em;
+      animation: title-glow 3.6s ease-in-out infinite;
     }
+    .game-tagline { margin: 0 0 22px; color: var(--glow-soft); font-size: clamp(15px, 2vw, 18px); font-weight: 600; }
+    @keyframes title-glow {
+      0%, 100% { filter: brightness(1); }
+      50%      { filter: brightness(1.12) drop-shadow(0 0 10px rgba(255,222,124,0.3)); }
+    }
+
+    .start-button {
+      position: relative; overflow: hidden; width: 100%; max-width: 420px;
+      font-family: var(--font-display); font-size: clamp(22px, 3vw, 26px); font-weight: 400;
+      color: #06210f; background: linear-gradient(180deg, #bff5c8 0%, var(--glow) 60%, #57c96a 100%);
+      border: none; border-radius: 16px; padding: 16px; min-height: 60px; cursor: pointer;
+      box-shadow: 0 0 0 5px rgba(126,227,138,0.10), 0 10px 26px rgba(0,0,0,0.3);
+      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+    }
+    .start-button::after {
+      content: ''; position: absolute; top: -60%; left: -40%; width: 30%; height: 220%;
+      transform: rotate(20deg); pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      animation: button-shine 4.4s ease-in-out infinite;
+    }
+    @keyframes button-shine { 0%, 60% { left: -40%; } 80%, 100% { left: 130%; } }
+    .start-button:hover  { transform: translateY(-2px); filter: brightness(1.06); }
+    .start-button:active { transform: translateY(1px); }
+    .start-button:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+    .difficulty { margin-top: 18px; }
+    .difficulty__label {
+      display: flex; align-items: center; gap: 10px; margin: 0 0 10px;
+      color: var(--ink-dim); font-size: 13px; font-weight: 700; letter-spacing: .02em;
+    }
+    .difficulty__label::before, .difficulty__label::after { content: ''; height: 1px; flex: 1; background: var(--line); }
+    .difficulty__options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 420px; }
+    .difficulty-button {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      min-height: 64px; padding: 10px 6px; color: var(--ink-dim);
+      background: rgba(10,19,13,0.6); border: 1px solid var(--line); border-radius: 14px;
+      font-family: var(--font-body); font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: transform .12s ease, border-color .12s ease, color .12s ease, background .12s ease, box-shadow .12s ease;
+    }
+    .difficulty-button .ico { font-size: 18px; line-height: 1; }
+    .difficulty-button:hover { transform: translateY(-1px); border-color: var(--glow); color: var(--ink); }
+    .difficulty-button[aria-pressed="true"] {
+      color: var(--amber-hot); border-color: var(--amber); background: rgba(255,207,92,0.12);
+      box-shadow: 0 0 0 3px rgba(255,207,92,0.16);
+    }
+    .difficulty-button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+    /* ── 조작 안내 캐줌 (키보드 + 닷패드 함께 표기) ────────────── */
+    .control-guide {
+      display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 18px;
+      padding: 10px 16px; background: rgba(4,10,6,0.5); border: 1px solid var(--line);
+      border-radius: 18px; color: var(--ink-dim); font-size: 13px; line-height: 1.6;
+    }
+    .control-guide b { color: var(--ink); margin-right: 2px; }
+    .control-guide code {
+      background: #10190f; border: 1px solid var(--line); border-radius: 6px;
+      padding: 1px 6px; font-size: 12px; color: var(--glow-soft);
+    }
+
     h1.title {
       font-family: var(--font-display); font-weight: 400;
-      font-size: clamp(38px, 8vw, 62px); line-height: 1.02; margin: 0 0 6px;
+      font-size: clamp(34px, 8vw, 58px); line-height: 1.02; margin: 10px 0 6px;
       color: var(--amber-hot); text-shadow: 0 0 22px rgba(255,207,92,0.28);
       letter-spacing: .01em;
     }
-    .lede { color: var(--glow-soft); font-size: 17px; max-width: 28ch; margin: 0; }
+    .lede { color: var(--ink-dim); font-size: 16px; max-width: 52ch; margin: 0 0 16px; }
     .story { color: var(--ink); font-size: 16px; max-width: 54ch; margin: 0 0 20px; line-height: 1.7; }
     .story b { color: var(--glow-soft); font-weight: 700; }
 
@@ -205,12 +273,11 @@
 
     @media (max-width: 480px) {
       .wrap { padding: 16px 14px 22px; }
-      .hero, .hero-copy { min-height: 240px; }
-      .hero { border-radius: 16px; }
-      .hero img { object-position: center; }
-      .hero::after { background: linear-gradient(90deg, rgba(3,9,15,0.92) 0%, rgba(3,9,15,0.55) 52%, rgba(3,9,15,0.10) 100%); }
-      .hero-copy { padding: 28px 22px; }
       .choice { min-height: 76px; }
+      .opening__content { padding: 20px 16px 18px; min-height: 300px; }
+      .difficulty__options { gap: 6px; }
+      .difficulty-button { min-height: 56px; font-size: 12px; }
+      .control-guide { font-size: 12px; gap: 4px 12px; padding: 8px 12px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .fly { animation: none; display: none; }
@@ -235,11 +302,32 @@
 
       <!-- ── 시작 화면 ─────────────────────────────────────────────── -->
       <section id="screenTitle" aria-labelledby="titleH1">
-        <div class="hero">
-          <img src="hero.jpg" alt="밤 숲에서 탐험가와 로봇이 빛나는 스틱 열 개를 발견한 모습" />
-          <div class="hero-copy">
-            <h1 class="title" id="titleH1">닷 스틱</h1>
-            <p class="lede">마지막 빛을 가져오는 사람이 이깁니다.</p>
+        <div class="opening">
+          <div class="opening__art" aria-hidden="true">
+            <picture>
+              <source media="(max-width: 640px)" srcset="assets/dot-stick-opening-mobile.jpg" />
+              <img src="assets/dot-stick-opening-desktop.jpg" alt="밤 숲에서 탐험가와 로봇이 빛나는 스틱 열 개를 사이에 두고 마주보는 모습" />
+            </picture>
+          </div>
+          <div class="opening__content">
+            <h1 class="game-title" id="titleH1">닷 스틱</h1>
+            <p class="game-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</p>
+
+            <button class="start-button" id="startBtn" type="button">게임 시작</button>
+
+            <div class="difficulty">
+              <div class="difficulty__label">난이도 — 화살표로 바꾸고 엔터로 시작</div>
+              <div class="difficulty__options">
+                <button class="diff difficulty-button" data-diff="easy"   type="button" aria-pressed="false"><span class="ico" aria-hidden="true">🌱</span>연습</button>
+                <button class="diff difficulty-button" data-diff="normal" type="button" aria-pressed="true"><span class="ico" aria-hidden="true">⚔️</span>대결</button>
+                <button class="diff difficulty-button" data-diff="hard"   type="button" aria-pressed="false"><span class="ico" aria-hidden="true">🔥</span>고수</button>
+              </div>
+            </div>
+
+            <div class="control-guide">
+              <span><b>키보드</b> <code>← →</code> 난이도 · <code>Enter</code> 시작 · <code>F3</code> 도움말</span>
+              <span><b>닷패드</b> 패닝키 좌·우로 선택 · 기능키 3으로 시작</span>
+            </div>
           </div>
         </div>
         <p class="story">
@@ -247,22 +335,6 @@
           당신과 탐험가 닷이 <b>번갈아</b> 스틱을 가져가요.
           한 번에 <b>1개 또는 2개</b>를 가져갈 수 있어요.
           <b>마지막 스틱</b>에는 특별한 빛의 힘이 담겨 있어요 — 그것을 손에 넣는 사람이 승리합니다.
-        </p>
-
-        <div class="card">
-          <div class="row">
-            <span class="field-label">난이도 — 화살표로 바꾸고 엔터로 시작</span>
-            <button class="btn diff" data-diff="easy"   type="button" aria-pressed="false">연습 (닷이 마음대로)</button>
-            <button class="btn diff" data-diff="normal" type="button" aria-pressed="true">대결 (닷이 똑똑하게)</button>
-            <button class="btn diff" data-diff="hard"   type="button" aria-pressed="false">고수 (닷이 최선을)</button>
-          </div>
-        </div>
-
-        <button class="confirm-btn" id="startBtn" type="button">게임 시작</button>
-
-        <p class="keyhint">
-          <b>키보드</b> — <code>← →</code> 난이도 선택 · <code>Enter</code> 시작 · <code>F3</code> 도움말<br>
-          <b>닷패드</b> — 패닝키 좌·우로 선택, 기능키 3으로 시작
         </p>
       </section>
 
@@ -298,9 +370,10 @@
 
           <p class="status-line" id="statusLine" role="status"></p>
 
-          <p class="keyhint" style="text-align:center">
-            <code>← →</code> 개수 · <code>Enter</code> 가져가기 · <code>F1</code> 다시 듣기 · <code>F2</code> 촉각 다시 · <code>F3</code> 도움말 · <code>F4</code> 새 게임
-          </p>
+          <div class="control-guide" style="justify-content:center">
+            <span><b>키보드</b> <code>← →</code> 개수 · <code>Enter</code> 가져가기 · <code>F1</code> 다시 듣기 · <code>F2</code> 촉각 다시 · <code>F3</code> 도움말 · <code>F4</code> 새 게임</span>
+            <span><b>닷패드</b> 패닝키 좌·우 개수 · 기능키 3 가져가기 · 기능키 4 다시 듣기</span>
+          </div>
         </div>
       </section>
 
@@ -314,7 +387,10 @@
           </div>
           <p class="story" id="resultText" style="text-align:center"></p>
           <button class="confirm-btn" id="againBtn" type="button">다시 하기 (Enter)</button>
-          <p class="keyhint" style="text-align:center"><code>Enter</code> 다시 하기 · <code>F1</code> 다시 듣기</p>
+          <div class="control-guide" style="justify-content:center">
+            <span><b>키보드</b> <code>Enter</code> 다시 하기 · <code>F1</code> 다시 듣기</span>
+            <span><b>닷패드</b> 기능키 3 다시 하기 · 기능키 4 다시 듣기</span>
+          </div>
         </div>
       </section>
 
