@@ -676,6 +676,13 @@
     }
     html.embed-mode #screenPlay .voice-controls { margin-top: 4px; }
     html.embed-mode .result-actions > .voice-controls { grid-column: 1 / -1; }
+    /* 결과 화면에서는 음성 컨트롤을 결과 버튼 목록 안(문서 흐름)에 배치해, 떠 있는
+       고정 패널이 '난이도 바꾸기'·'결과 다시 듣기' 버튼을 가리는 문제를 없앤다(공통). */
+    .result-actions > .voice-controls {
+      position: static; z-index: auto; left: auto; right: auto; bottom: auto;
+      grid-column: 1 / -1; width: 100%; max-width: none; margin: 0;
+      justify-content: center; box-shadow: none; backdrop-filter: none;
+    }
     html.embed-mode .result-layout { padding-bottom: 28px; }
     html.embed-mode .result-controls {
       position: static; width: min(calc(100% - 32px), 880px); margin: 0 auto 18px;
@@ -1245,6 +1252,7 @@
               <p class="accessibility-panel__title">접근성 설정</p>
               <button class="ui-btn ui-btn--ghost intro-utility" id="introReplayBtn" type="button">안내 다시 듣기</button>
               <button class="ui-btn ui-btn--ghost intro-utility" id="highContrastBtn" type="button" aria-pressed="false">고대비 모드 켜기</button>
+              <button class="ui-btn ui-btn--ghost intro-utility" id="voiceDetailBtn" type="button" aria-pressed="false">안내: 자세히</button>
             </div>
           </div>
           <div class="intro-visual-space" aria-hidden="true"></div>
@@ -1439,6 +1447,8 @@
     var voiceRateIndex = 1;
     var VOICE_RATES = [0.82, 1.0, 1.18];
     var VOICE_RATE_NAMES = ['느리게', '보통', '빠르게'];
+    var voiceDetail = 'full'; // 'full'(자세히) | 'brief'(간단히) — 반복 안내의 조작 힌트 꼬리말을 제어
+    function hint(text) { return voiceDetail === 'full' ? text : ''; }
     var speechQueue = Promise.resolve();
     var speechGeneration = 0;
     var activeSpeechFinish = null;
@@ -1540,6 +1550,28 @@
       stopSpeech(false);
       if (gameVoiceEnabled) speak('음성 속도 ' + VOICE_RATE_NAMES[voiceRateIndex] + '.', { interrupt: true });
       else announceLive('게임 음성 속도 ' + VOICE_RATE_NAMES[voiceRateIndex]);
+    }
+
+    // ── 음성 안내 상세도 (자세히 / 간단히) ────────────────────────────────
+    var VD_KEY = 'dotstick.voiceDetail';
+    function applyVoiceDetail(mode) {
+      voiceDetail = (mode === 'brief') ? 'brief' : 'full';
+      var btn = document.getElementById('voiceDetailBtn');
+      if (btn) {
+        btn.setAttribute('aria-pressed', String(voiceDetail === 'brief'));
+        btn.textContent = voiceDetail === 'brief' ? '안내: 간단히' : '안내: 자세히';
+      }
+    }
+    function toggleVoiceDetail() {
+      applyVoiceDetail(voiceDetail === 'full' ? 'brief' : 'full');
+      try { localStorage.setItem(VD_KEY, voiceDetail); } catch (e) {}
+      var msg = voiceDetail === 'brief' ? '간단히 안내합니다. 핵심 상태만 알려요.' : '자세히 안내합니다. 조작 방법까지 알려요.';
+      speak(msg, { interrupt: true, liveText: msg });
+    }
+    function initVoiceDetail() {
+      var saved = 'full';
+      try { saved = localStorage.getItem(VD_KEY) || 'full'; } catch (e) {}
+      applyVoiceDetail(saved);
     }
 
     // ── 60×40 그리드 → 300바이트 → 600 HEX (닷패드 GRAPHIC, 2×4 셀 컬럼우선) ─
@@ -1822,12 +1854,10 @@
         var playGuide = stage && stage.querySelector('.control-guide');
         if (stage) stage.insertBefore(controls, playGuide || null);
       } else if (screen === 'result') {
-        if (!IS_EMBED) {
-          voiceControlsHome.appendChild(controls);
-          return;
-        }
+        // 임베드·비임베드 모두 결과 버튼 목록 안(흐름)에 배치 → 고정 패널 겹침 제거.
         var actions = document.querySelector('#screenResult .result-actions');
         if (actions) actions.appendChild(controls);
+        else voiceControlsHome.appendChild(controls);
       }
     }
 
@@ -1913,7 +1943,7 @@
       S.sticks = START_COUNT; S.turn = 'you'; S.choice = 1; S.winner = null; S.busy = false; S.tactileMode = '';
       show('play'); renderPlay();
       requestAnimationFrame(function () { document.getElementById('playH').focus(); });
-      speak('게임을 시작해요. 빛나는 닷 스틱이 ' + START_COUNT + '개 있어요. 당신이 먼저예요. 화살표로 1개 또는 2개를 고르고, 엔터를 눌러 가져가세요.', { interrupt: true, liveText: '게임 시작. 스틱 ' + START_COUNT + '개, 당신 차례.' });
+      speak('게임을 시작해요. 빛나는 닷 스틱이 ' + START_COUNT + '개 있어요. 당신이 먼저예요.' + hint(' 화살표로 1개 또는 2개를 고르고, 엔터를 눌러 가져가세요.'), { interrupt: true, liveText: '게임 시작. 스틱 ' + START_COUNT + '개, 당신 차례.' });
     }
 
     function setChoice(n) {
@@ -1953,7 +1983,7 @@
       }
       S.turn = 'you'; S.busy = false; S.choice = 1; renderPlay();
       setStatus('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 당신 차례예요.');
-      speak('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 이제 당신 차례예요. 1개 또는 2개를 고르세요.', { liveText: '닷이 ' + take + '개 가져감. ' + S.sticks + '개 남음. 당신 차례.' });
+      speak('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 이제 당신 차례예요.' + hint(' 1개 또는 2개를 고르세요.'), { liveText: '닷이 ' + take + '개 가져감. ' + S.sticks + '개 남음. 당신 차례.' });
     }
 
     function waitForTactileReading() {
@@ -2261,6 +2291,8 @@
     if (accessibilityToggleBtnEl) accessibilityToggleBtnEl.addEventListener('click', toggleAccessibilityPanel);
     var highContrastBtnEl = document.getElementById('highContrastBtn');
     if (highContrastBtnEl) highContrastBtnEl.addEventListener('click', toggleHighContrast);
+    var voiceDetailBtnEl = document.getElementById('voiceDetailBtn');
+    if (voiceDetailBtnEl) voiceDetailBtnEl.addEventListener('click', toggleVoiceDetail);
     var helpCloseBtnEl = document.getElementById('helpCloseBtn');
     if (helpCloseBtnEl) helpCloseBtnEl.addEventListener('click', closeHelp);
     var helpDoneBtnEl = document.getElementById('helpDoneBtn');
@@ -2325,6 +2357,7 @@
     // ── 시작 ───────────────────────────────────────────────────────────────
     initSdk();
     initHighContrast();
+    initVoiceDetail();
     loadTactileAssets();
     show('title');
     setDiff('normal', true);
