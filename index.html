@@ -5,77 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>닷 스틱 — 마지막 빛을 가져라</title>
   <style>
-    html, body { width: 100%; height: 100%; margin: 0; background: #050b07; color: #eaf3e8; }
-    body { display: grid; place-items: center; font-family: system-ui, sans-serif; }
-    #boot { padding: 20px; text-align: center; }
+    html, body, iframe { width: 100%; height: 100%; margin: 0; border: 0; }
+    body { background: #050b07; overflow: hidden; }
+    iframe { display: block; }
   </style>
 </head>
 <body>
-  <p id="boot" role="status">닷 스틱 게임을 불러오는 중입니다.</p>
-  <script>
-  (async function bootGame() {
-    'use strict';
-
-    try {
-      var response = await fetch('./game-source.html', { cache: 'no-store' });
-      if (!response.ok) throw new Error('HTTP ' + response.status);
-      var html = await response.text();
-      var isEmbed = new URLSearchParams(location.search).get('embed') === '1';
-
-      var earlyEmbed = [
-        '<script>',
-        "if (new URLSearchParams(location.search).get('embed') === '1') {",
-        "  document.documentElement.classList.add('embed-mode');",
-        '}',
-        '<\\/script>',
-        '<link rel="stylesheet" href="embed-overrides.css?v=20260715" />'
-      ].join('\n');
-
-      if (html.indexOf('embed-overrides.css') === -1) {
-        html = html.replace('</head>', earlyEmbed + '\n</head>');
-      }
-
-      var embedAnchor = "    var IS_EMBED = params.get('embed') === '1';";
-      if (html.indexOf("if (IS_EMBED) document.documentElement.classList.add('embed-mode');") === -1) {
-        html = html.replace(
-          embedAnchor,
-          embedAnchor + "\n    if (IS_EMBED) document.documentElement.classList.add('embed-mode');"
-        );
-      }
-
-      if (isEmbed && html.indexOf('Embed mode follows the iframe viewport') === -1) {
-        var resizeFunction = [
-          '    function watchResize() {',
-          '      if (window.self === window.top) return;',
-          '      var last = 0;',
-          '      var report = function () {',
-          '        // Embed mode follows the iframe viewport instead of expanding to scrollHeight.',
-          '        var h = IS_EMBED',
-          '          ? Math.max(1, Math.round(window.innerHeight))',
-          '          : Math.ceil(document.documentElement.scrollHeight);',
-          "        if (h !== last) { last = h; post({ type: 'resize', height: h, fixed: IS_EMBED }); }",
-          '      };',
-          '      if (window.ResizeObserver) { new ResizeObserver(report).observe(document.body); }',
-          "      window.addEventListener('resize', report, { passive: true });",
-          '      report();',
-          '    }'
-        ].join('\n');
-
-        html = html.replace(
-          /    function watchResize\(\) \{[\s\S]*?\n    \}/,
-          resizeFunction
-        );
-      }
-
-      document.open();
-      document.write(html);
-      document.close();
-    } catch (error) {
-      console.error('게임 로드 실패', error);
-      var boot = document.getElementById('boot');
-      boot.textContent = '게임을 불러오지 못했습니다. 페이지를 새로고침해 주세요.';
-    }
-  })();
-  </script>
+  <!-- 게임 본문을 브라우저가 직접 문서로 로드한다. 동적 document.write 로더의
+       실패가 첫 화면 전체를 비우는 문제를 피한다. -->
+  <iframe src="game-source.html" title="닷 스틱 게임" allow="autoplay"></iframe>
 </body>
 </html>
