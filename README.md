@@ -37,6 +37,7 @@
 ## 기술 규격 (닷게임즈 준수)
 - `index.html` 중심의 정적 구성 (`assets/` 이미지 에셋, 닷패드 SDK 3.0.0 인라인)
 - `?embed=1` 임베드 모드 · `postMessage({source:'dotarcade', type:'ready'|'resize'|'exit'})`
+- 임베드 모드에서는 음성·결과 조작 패널을 문서 흐름 안에 배치하고 낮은 iframe 높이에서는 내부 스크롤로 겹침 방지
 - 음성: 공용 `TW_TTS`(dot-games-host `tts.js`), 실패 시에만 브라우저 음성 폴백
 - 지원 해상도: **60×40 (dotpad320)**
 - 키보드(방향키·Enter·F1~F4) 전용 조작 · 화면 전환 포커스 관리 · `aria-live` 실시간 안내
