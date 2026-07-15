@@ -99,77 +99,123 @@
     .btn[aria-pressed="true"] { border-color: var(--glow); background: #1b2c22; color: var(--glow-soft); }
     #connectBtn.btn.small { border-radius: 999px; background: rgba(20,32,26,0.55); backdrop-filter: blur(10px); }
 
-    /* ── 오프닝(타이틀) 화면 — 키아트 카드 ──────────────────────────────── */
-    .opening {
-      position: relative; margin: 4px 0 18px; overflow: hidden; isolation: isolate;
-      border: 1px solid var(--line); border-radius: 24px; background: #050b07;
-      box-shadow: 0 20px 56px rgba(0,0,0,0.35);
+        /* ── 인트로(타이틀) 화면 — 전체 화면 오프닝 ──────────────────────── */
+    .intro-screen {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      background: #050b07;
+      overflow: hidden; isolation: isolate;
     }
-    .opening__art { position: absolute; inset: 0; z-index: 0; }
-    .opening__art img { width: 100%; height: 100%; object-fit: cover; object-position: 68% center; display: block; }
-    .opening::before {
-      content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-      background: linear-gradient(180deg, rgba(3,9,6,0.08) 0%, rgba(3,9,6,0.18) 42%, rgba(3,9,6,0.94) 84%, rgba(3,9,6,0.99) 100%);
+    .intro-screen.hidden { display: none !important; }
+    .intro-hero { position: absolute; inset: 0; z-index: 0; }
+    .intro-hero img { width: 100%; height: 100%; object-fit: cover; object-position: 68% center; display: block; }
+    .intro-hero::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(3,9,6,0.15) 0%, rgba(3,9,6,0.30) 38%, rgba(3,9,6,0.92) 78%, rgba(3,9,6,0.99) 100%);
     }
-    .opening__content {
-      position: relative; z-index: 2; min-height: 360px;
-      padding: clamp(28px, 6vw, 44px) clamp(20px, 5vw, 40px) clamp(22px, 4vw, 32px);
-      display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end;
+    #introParticles { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+    .intro-particle {
+      position: absolute; width: 3px; height: 3px; border-radius: 50%;
+      background: var(--glow); box-shadow: 0 0 8px 2px rgba(126,227,138,0.7);
+      animation: drift linear infinite;
     }
-    .game-title {
-      margin: 0 0 4px; font-family: var(--font-display); font-weight: 400;
-      font-size: clamp(40px, 9vw, 64px); line-height: 1; color: var(--amber-hot);
+    .intro-topbar {
+      position: relative; z-index: 2; display: flex; align-items: center; gap: 10px;
+      padding: 14px clamp(16px, 4vw, 32px); color: var(--ink-dim); font-size: 13px;
+    }
+    .intro-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+    .intro-device { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .intro-content {
+      position: relative; z-index: 2; flex: 1;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 0 clamp(20px, 5vw, 48px) clamp(20px, 4vw, 32px);
+      max-width: 640px; width: 100%;
+    }
+    .intro-eyebrow {
+      margin: 0 0 6px; color: var(--glow-soft); font-size: 13px; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+    }
+    .intro-title { margin: 0 0 6px; line-height: 1; }
+    .intro-title__ko {
+      display: block; font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(40px, 9vw, 64px); color: var(--amber-hot);
       text-shadow: 0 0 26px rgba(255,207,92,0.35); letter-spacing: .01em;
       animation: title-glow 3.6s ease-in-out infinite;
     }
-    .game-tagline { margin: 0 0 22px; color: var(--glow-soft); font-size: clamp(15px, 2vw, 18px); font-weight: 600; }
+    .intro-title__en {
+      display: block; margin-top: 2px; font-size: clamp(13px, 1.6vw, 16px);
+      font-weight: 700; letter-spacing: .28em; color: var(--ink-dim);
+    }
     @keyframes title-glow {
       0%, 100% { filter: brightness(1); }
       50%      { filter: brightness(1.12) drop-shadow(0 0 10px rgba(255,222,124,0.3)); }
     }
+    .intro-tagline { margin: 10px 0 4px; color: var(--glow-soft); font-size: clamp(15px, 2vw, 18px); font-weight: 600; }
+    .intro-summary { margin: 0 0 20px; color: var(--ink-dim); font-size: 14px; line-height: 1.6; max-width: 46ch; }
 
-    .start-button {
+    .intro-start {
       position: relative; overflow: hidden; width: 100%; max-width: 420px;
       font-family: var(--font-display); font-size: clamp(22px, 3vw, 26px); font-weight: 400;
       color: #06210f; background: linear-gradient(180deg, #bff5c8 0%, var(--glow) 60%, #57c96a 100%);
       border: none; border-radius: 16px; padding: 16px; min-height: 60px; cursor: pointer;
       box-shadow: 0 0 0 5px rgba(126,227,138,0.10), 0 10px 26px rgba(0,0,0,0.3);
       transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
     }
-    .start-button::after {
+    .intro-start .key-hint {
+      font-size: 12px; font-weight: 700; color: rgba(6,33,15,0.6);
+      background: rgba(6,33,15,0.12); border-radius: 6px; padding: 2px 8px;
+    }
+    .intro-start::after {
       content: ''; position: absolute; top: -60%; left: -40%; width: 30%; height: 220%;
       transform: rotate(20deg); pointer-events: none;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
       animation: button-shine 4.4s ease-in-out infinite;
     }
     @keyframes button-shine { 0%, 60% { left: -40%; } 80%, 100% { left: 130%; } }
-    .start-button:hover  { transform: translateY(-2px); filter: brightness(1.06); }
-    .start-button:active { transform: translateY(1px); }
-    .start-button:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+    .intro-start:hover  { transform: translateY(-2px); filter: brightness(1.06); }
+    .intro-start:active { transform: translateY(1px); }
+    .intro-start:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 
-    .difficulty { margin-top: 18px; }
-    .difficulty__label {
+    .intro-difficulty { margin-top: 18px; }
+    .intro-difficulty__legend {
       display: flex; align-items: center; gap: 10px; margin: 0 0 10px;
       color: var(--ink-dim); font-size: 13px; font-weight: 700; letter-spacing: .02em;
     }
-    .difficulty__label::before, .difficulty__label::after { content: ''; height: 1px; flex: 1; background: var(--line); }
-    .difficulty__options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 420px; }
-    .difficulty-button {
+    .intro-difficulty__legend::before, .intro-difficulty__legend::after { content: ''; height: 1px; flex: 1; background: var(--line); }
+    .intro-difficulty__options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 420px; }
+    .intro-difficulty__button {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
       min-height: 64px; padding: 10px 6px; color: var(--ink-dim);
       background: rgba(10,19,13,0.6); border: 1px solid var(--line); border-radius: 14px;
       font-family: var(--font-body); font-size: 14px; font-weight: 700; cursor: pointer;
       transition: transform .12s ease, border-color .12s ease, color .12s ease, background .12s ease, box-shadow .12s ease;
     }
-    .difficulty-button .ico { font-size: 18px; line-height: 1; }
-    .difficulty-button:hover { transform: translateY(-1px); border-color: var(--glow); color: var(--ink); }
-    .difficulty-button[aria-pressed="true"] {
+    .intro-difficulty__button .ico { font-size: 18px; line-height: 1; }
+    .intro-difficulty__button:hover { transform: translateY(-1px); border-color: var(--glow); color: var(--ink); }
+    .intro-difficulty__button[aria-checked="true"] {
       color: var(--amber-hot); border-color: var(--amber); background: rgba(255,207,92,0.12);
       box-shadow: 0 0 0 3px rgba(255,207,92,0.16);
     }
-    .difficulty-button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+    .intro-difficulty__button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 
-    /* ── 조작 안내 캐줌 (키보드 + 닷패드 함께 표기) ────────────── */
+    .intro-controls {
+      position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center;
+      gap: 8px 14px; padding: 14px clamp(20px, 5vw, 48px) 18px; color: var(--ink-dim); font-size: 12px;
+    }
+    .intro-utility {
+      background: rgba(10,19,13,0.6); border: 1px solid var(--line); border-radius: 999px;
+      color: var(--ink-dim); font-size: 12px; font-weight: 700; padding: 6px 14px; cursor: pointer;
+    }
+    .intro-utility:hover { color: var(--ink); border-color: var(--glow); }
+
+    @media (max-width: 720px) {
+      .intro-content { max-width: 100%; }
+      .intro-difficulty__options { max-width: 100%; }
+      .intro-start { max-width: 100%; }
+    }
+
+    /* ── 조작 안내 캐줌/* ── 조작 안내 캐줌 (키보드 + 닷패드 함께 표기) ────────────── */
     .control-guide {
       display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 18px;
       padding: 10px 16px; background: rgba(4,10,6,0.5); border: 1px solid var(--line);
@@ -190,72 +236,6 @@
     .lede { color: var(--ink-dim); font-size: 16px; max-width: 52ch; margin: 0 0 16px; }
     .story { color: var(--ink); font-size: 16px; max-width: 54ch; margin: 0 0 20px; line-height: 1.7; }
     .story b { color: var(--glow-soft); font-weight: 700; }
-
-    /* 플레이 화면 — 중앙의 빈 숲길을 실제 게임판으로 사용 */
-    .play-screen {
-      position: relative;
-      width: 100vw;
-      min-height: 100dvh;
-      margin-left: calc(50% - 50vw);
-      padding: clamp(24px, 4vw, 48px) max(20px, calc((100vw - 760px) / 2));
-      overflow: hidden;
-      isolation: isolate;
-      background: #03100b;
-    }
-    .play-screen__background {
-      position: absolute;
-      inset: 0;
-      z-index: -3;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      pointer-events: none;
-      user-select: none;
-    }
-    .play-screen::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: -2;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at center 58%, rgba(255,197,74,0.08), transparent 35%),
-        linear-gradient(180deg, rgba(0,0,0,0.16), rgba(0,0,0,0.42));
-    }
-    .play-screen::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      box-shadow:
-        inset 0 0 120px rgba(0,0,0,0.58),
-        inset 0 -100px 120px rgba(0,0,0,0.34);
-    }
-    .play-screen .stage {
-      position: relative;
-      z-index: 0;
-      width: min(100%, 760px);
-      margin: 0 auto;
-    }
-    .play-screen .preview-wrap {
-      background: rgba(7,18,11,0.88);
-      border-color: rgba(126,227,138,0.32);
-      box-shadow: 0 20px 54px rgba(0,0,0,0.34);
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-    }
-    .play-screen .turn-tag,
-    .play-screen .choice {
-      -webkit-backdrop-filter: blur(8px);
-      backdrop-filter: blur(8px);
-    }
-    .play-screen .turn-tag.you { background: rgba(35,31,13,0.82); }
-    .play-screen .turn-tag.dot { background: rgba(10,34,20,0.82); }
-    .play-screen .choice { background: rgba(10,19,13,0.88); }
-    .play-screen .count-cap,
-    .play-screen .control-guide { color: #c2d2c0; text-shadow: 0 1px 3px rgba(0,0,0,0.85); }
 
     .card {
       background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
@@ -647,9 +627,6 @@
     @media (max-width: 480px) {
       .wrap { padding: 16px 14px 22px; }
       .choice { min-height: 76px; }
-      .opening__content { padding: 20px 16px 18px; min-height: 300px; }
-      .difficulty__options { gap: 6px; }
-      .difficulty-button { min-height: 56px; font-size: 12px; }
       .control-guide { font-size: 12px; gap: 4px 12px; padding: 8px 12px; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -674,51 +651,61 @@
       </header>
 
       <!-- ── 시작 화면 ─────────────────────────────────────────────── -->
-      <section id="screenTitle" aria-labelledby="titleH1">
-        <div class="opening">
-          <div class="opening__art" aria-hidden="true">
-            <picture>
-              <source media="(max-width: 640px)" srcset="assets/dot-stick-opening-mobile.jpg" />
-              <img src="assets/dot-stick-opening-desktop.jpg" alt="밤 숲에서 탐험가와 로봇이 빛나는 스틱 열 개를 사이에 두고 마주보는 모습" />
-            </picture>
-          </div>
-          <div class="opening__content">
-            <h1 class="game-title" id="titleH1">닷 스틱</h1>
-            <p class="game-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</p>
+      <section id="screenTitle" class="intro-screen" aria-labelledby="titleH1">
+        <div class="intro-hero" aria-hidden="true">
+          <picture>
+            <source media="(max-width: 640px)" srcset="assets/dot-stick-opening-mobile.jpg" />
+            <img src="assets/dot-stick-opening-desktop.jpg" alt="밤 숲에서 탐험가와 로봇이 빛나는 스틱 열 개를 사이에 두고 마주보는 모습" />
+          </picture>
+        </div>
+        <div id="introParticles" aria-hidden="true"></div>
 
-            <button class="start-button" id="startBtn" type="button">게임 시작</button>
+        <header class="intro-topbar">
+          <span class="intro-brand badge">
+            <span class="dots" aria-hidden="true"><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i></span>
+            DOT INC. · 닷게임즈
+          </span>
+          <span class="intro-device">
+            <span class="dp-status" id="introDpStatus">닷패드 미연결</span>
+            <button class="btn small" id="introConnectBtn" type="button">닷패드 연결</button>
+          </span>
+        </header>
 
-            <div class="difficulty">
-              <div class="difficulty__label">난이도 — 화살표로 바꾸고 엔터로 시작</div>
-              <div class="difficulty__options">
-                <button class="diff difficulty-button" data-diff="easy"   type="button" aria-pressed="false"><span class="ico" aria-hidden="true">🌱</span>연습</button>
-                <button class="diff difficulty-button" data-diff="normal" type="button" aria-pressed="true"><span class="ico" aria-hidden="true">⚔️</span>대결</button>
-                <button class="diff difficulty-button" data-diff="hard"   type="button" aria-pressed="false"><span class="ico" aria-hidden="true">🔥</span>고수</button>
-              </div>
-            </div>
+        <div class="intro-content">
+          <p class="intro-eyebrow">전략 놀이 · 촉각 게임</p>
+          <h1 class="intro-title" id="titleH1">
+            <span class="intro-title__ko">닷 스틱</span>
+            <span class="intro-title__en">DOT STICK</span>
+          </h1>
+          <p class="intro-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</p>
+          <p class="intro-summary">탐험가 닷과 번갈아 스틱을 가져가며 마지막 빛을 차지하는 단순한 전략 놀이예요.</p>
 
-            <div class="control-guide">
-              <span><b>키보드</b> <code>← →</code> 난이도 · <code>Enter</code> 시작 · <code>F3</code> 도움말</span>
-              <span><b>닷패드</b> 패닝키 좌·우로 선택 · 기능키 3으로 시작</span>
+          <button class="intro-start" id="startBtn" type="button">
+            게임 시작 <span class="key-hint">Enter</span>
+          </button>
+
+          <div class="intro-difficulty">
+            <div class="intro-difficulty__legend">난이도 — 화살표로 바꾸고 엔터로 시작</div>
+            <div class="intro-difficulty__options" role="radiogroup" aria-label="난이도 선택">
+              <button class="diff intro-difficulty__button" data-diff="easy"   type="button" role="radio" aria-checked="false" tabindex="-1"><span class="ico" aria-hidden="true">🌱</span>연습</button>
+              <button class="diff intro-difficulty__button" data-diff="normal" type="button" role="radio" aria-checked="true"  tabindex="0"><span class="ico" aria-hidden="true">⚔️</span>대결</button>
+              <button class="diff intro-difficulty__button" data-diff="hard"   type="button" role="radio" aria-checked="false" tabindex="-1"><span class="ico" aria-hidden="true">🔥</span>고수</button>
             </div>
           </div>
         </div>
-        <p class="story">
-          깊은 숲속에 빛나는 <b>닷 스틱 10개</b>가 놓여 있어요.
-          당신과 탐험가 닷이 <b>번갈아</b> 스틱을 가져가요.
-          한 번에 <b>1개 또는 2개</b>를 가져갈 수 있어요.
-          <b>마지막 스틱</b>에는 특별한 빛의 힘이 담겨 있어요 — 그것을 손에 넣는 사람이 승리합니다.
-        </p>
+
+        <div class="intro-controls">
+          <button class="intro-utility" id="introHelpBtn" type="button">게임 방법</button>
+          <button class="intro-utility" id="introReplayBtn" type="button">안내 다시 듣기</button>
+          <span class="control-guide" style="margin:0;">
+            <span><b>키보드</b> <code>← →</code> 난이도 · <code>Enter</code> 시작 · <code>F3</code> 도움말</span>
+            <span><b>닷패드</b> 패닝키 좌·우로 선택 · 기능키 3으로 시작</span>
+          </span>
+        </div>
       </section>
 
       <!-- ── 플레이 화면 ───────────────────────────────────────────── -->
-      <section id="screenPlay" class="play-screen hidden" aria-labelledby="playH">
-        <img
-          src="assets/dot-stick-play-bg.jpg"
-          alt=""
-          class="play-screen__background"
-          aria-hidden="true"
-        />
+<section id="screenPlay" class="hidden" aria-labelledby="playH">
         <h2 id="playH" class="sr-only">닷 스틱 놀이 진행</h2>
         <div class="stage">
           <div style="text-align:center">
@@ -988,9 +975,12 @@
       );
     }
     function setDpStatus(on) {
-      var el = document.getElementById('dpStatus');
-      el.textContent = on ? '닷패드 연결됨' : '닷패드 미연결';
-      el.className = 'dp-status' + (on ? ' on' : '');
+      ['dpStatus', 'introDpStatus'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = on ? '닷패드 연결됨' : '닷패드 미연결';
+        el.className = 'dp-status' + (on ? ' on' : '');
+      });
     }
     async function connectDot() {
       if (!('bluetooth' in navigator) || !window.isSecureContext) {
@@ -1195,13 +1185,24 @@
     function setDiff(d) {
       S.diff = d;
       var btns = document.querySelectorAll('.diff');
-      btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.diff === d)); });
+      var focusTarget = null;
+      btns.forEach(function (b) {
+        var checked = b.dataset.diff === d;
+        b.setAttribute('aria-checked', String(checked));
+        b.setAttribute('aria-pressed', String(checked)); // 이전 CSS 선택자 호환용
+        b.tabIndex = checked ? 0 : -1;
+        if (checked) focusTarget = b;
+      });
       speak('난이도 ' + DIFF_NAME[d] + '.');
     }
     function cycleDiff(dir) {
       var i = DIFFS.indexOf(S.diff);
       i = (i + dir + DIFFS.length) % DIFFS.length;
       setDiff(DIFFS[i]);
+      if (S.screen === 'title') {
+        var active = document.querySelector('.diff[aria-checked="true"]');
+        if (active) active.focus();
+      }
     }
 
     // ── 도움말 ─────────────────────────────────────────────────────────────
@@ -1209,6 +1210,11 @@
       return '닷 스틱 놀이. 빛나는 스틱 ' + START_COUNT + '개에서 시작해요. 당신과 탐험가 닷이 번갈아, 한 번에 1개 또는 2개를 가져가요. 마지막 스틱을 가져가는 사람이 이겨요. '
         + '조작 방법. 왼쪽 오른쪽 화살표로 가져갈 개수를 정하고, 엔터로 가져가요. 에프원은 지금 상태 다시 듣기, 에프투는 닷패드에 촉각을 다시 보내기, 에프쓰리는 도움말, 에프포는 새 게임이에요. '
         + '닷패드에서는 패닝키 좌우로 개수를 정하고 기능키 3으로 가져가요.';
+    }
+
+    // 인트로(타이틀) 화면 첫 안내 음성. 안내 다시 듣기 버튼에서도 재사용.
+    function speakIntro() {
+      speak('닷 스틱 게임. 깊은 숲 속, 빛나는 닷 스틱 ' + START_COUNT + '개가 놓여 있어요. 당신과 탐험가 닷이 번갈아, 한 번에 1개 또는 2개를 가져가요. 마지막 스틱을 가져가는 사람이 이겨요. 화살표로 난이도를 고르고 엔터로 시작하세요.');
     }
 
     // ── 키 입력 ────────────────────────────────────────────────────────────
@@ -1248,6 +1254,12 @@
 
     // ── 버튼(마우스/터치) ─────────────────────────────────────────────────
     document.getElementById('connectBtn').addEventListener('click', connectDot);
+    var introConnectBtnEl = document.getElementById('introConnectBtn');
+    if (introConnectBtnEl) introConnectBtnEl.addEventListener('click', connectDot);
+    var introHelpBtnEl = document.getElementById('introHelpBtn');
+    if (introHelpBtnEl) introHelpBtnEl.addEventListener('click', function () { speak(helpText()); });
+    var introReplayBtnEl = document.getElementById('introReplayBtn');
+    if (introReplayBtnEl) introReplayBtnEl.addEventListener('click', speakIntro);
     document.getElementById('startBtn').addEventListener('click', startGame);
     document.getElementById('takeBtn').addEventListener('click', playerTake);
     document.getElementById('againBtn').addEventListener('click', startGame);
@@ -1278,6 +1290,22 @@
       }
     })();
 
+    // ── 인트로 화면 전용 반딧불 파티클 ────────────────────────────────────
+    (function createIntroParticles() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var box = document.getElementById('introParticles');
+      if (!box) return;
+      for (var i = 0; i < 18; i++) {
+        var p = document.createElement('span');
+        p.className = 'intro-particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.top = (Math.random() * 100) + '%';
+        p.style.animationDuration = (5 + Math.random() * 6) + 's';
+        p.style.animationDelay = (Math.random() * 6) + 's';
+        box.appendChild(p);
+      }
+    })();
+
     // ── 시작 ───────────────────────────────────────────────────────────────
     initSdk();
     show('title');
@@ -1286,9 +1314,7 @@
     (function () { var g = emptyGrid(); drawSticks(g, 10); drawCanvas(document.getElementById('pins'), g); lastHex = gridToHex(g); })();
     watchResize();
     postReady();
-    setTimeout(function () {
-      speak('닷 스틱 게임. 깊은 숲 속, 빛나는 닷 스틱 10개가 놓여 있어요. 당신과 탐험가 닷이 번갈아, 한 번에 1개 또는 2개를 가져가요. 마지막 스틱을 가져가는 사람이 이겨요. 화살표로 난이도를 고르고 엔터로 시작하세요.');
-    }, 400);
+    setTimeout(speakIntro, 400);
 
   })();
   </script>
