@@ -1085,6 +1085,12 @@
     @media (max-height: 740px) {
       html.embed-mode .intro-controls__hints { display: none; }
     }
+    /* 매우 낮은 화면(예: 200% 확대)에서는 보조 힌트 줄을 숨겨 난이도 옵션과 겹치지 않게 한다.
+       같은 조작 안내는 '게임 방법' 모달과 플레이 화면 안내에도 그대로 제공된다. */
+    @media (max-height: 620px) {
+      .intro-controls__hints { display: none; }
+      .intro-controls { padding-bottom: var(--space-2); }
+    }
     @media (prefers-reduced-motion: reduce) {
       .fly, .intro-particle { animation: none !important; display: none; }
       /* 모션 감소: 지속 애니메이션(타이틀 글로우·버튼 샤인·스캔·파티클·배경 카메라 등)을
