@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>닷 스틱 — 마지막 빛을 가져라</title>
+
+  <!-- 닷게임즈 공용 음성 표준(TW_TTS). speechSynthesis 직접 호출은 임베드에서 불안정하므로
+       TW_TTS 우선, 로드 실패 시에만 브라우저 음성으로 폴백한다. -->
+  <script src="https://dot-games-host.vercel.app/tts.js"></script>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── 닷 스틱 — 밤 숲의 빛나는 막대 ───────────────────────────────────────
+       화면은 시각장애 사용자가 주 사용자이며, 교사·검수자를 위한 보조 뷰이기도 하다.
+       핵심 시그니처: 손으로 하나씩 세는 '빛나는 스틱' 줄 — 화면 핀 미리보기가
+       닷패드 촉각 출력과 픽셀 단위로 동일하다(보이는 것 = 만지는 것).
+       선택 상태는 색 + 형태(굵은 밑줄 + 채움)로 이중 표시해 색맹에도 안전하게. */
+    :root {
+      --bg:        #0b120c;   /* 밤 숲 바닥 */
+      --panel:     #14201a;   /* 이끼 낀 패널 */
+      --line:      #2c4433;   /* 경계선 */
+      --ink:       #eaf3e8;   /* 본문 (대비 13:1) */
+      --ink-dim:   #9db29a;   /* 보조 텍스트 (대비 6.4:1) */
+      --glow:      #7ee38a;   /* 빛나는 스틱 */
+      --glow-soft: #bff5c8;
+      --amber:     #ffcf5c;   /* 선택/마지막 스틱 — 특별한 빛 */
+      --amber-hot: #ffe6a3;
+      --lose:      #ef9b82;   /* 패배 */
+      --pin-off:   #223528;   /* 내려간 핀 */
+      --font-display: 'Jua', 'Pretendard Variable', sans-serif;
+      --font-body: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body, #app { height: 100%; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 78% 8%,  rgba(126,227,138,0.10), transparent 34%),
+        radial-gradient(circle at 14% 96%, rgba(255,207,92,0.08), transparent 30%),
+        radial-gradient(circle at 50% 50%, #101c14 0%, #0a110b 70%, #070d08 100%);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 반딧불 — 배경 장식(장식 전용, 조작·음성과 무관) */
+    .fireflies { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .fly {
+      position: absolute; width: 4px; height: 4px; border-radius: 50%;
+      background: var(--glow); box-shadow: 0 0 8px 2px rgba(126,227,138,0.7);
+      opacity: 0; animation: drift linear infinite;
+    }
+    @keyframes drift {
+      0%   { transform: translateY(20px) translateX(0);   opacity: 0; }
+      15%  { opacity: .8; }
+      85%  { opacity: .6; }
+      100% { transform: translateY(-40px) translateX(24px); opacity: 0; }
+    }
+
+    #app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .wrap {
+      width: 100%; max-width: 760px; margin: 0 auto; padding: 22px 20px 28px;
+      flex: 1; display: flex; flex-direction: column;
+    }
+
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+      padding: 5px 12px 5px 8px; font-size: 13px; color: var(--ink-dim); letter-spacing: .02em;
+    }
+    .badge .dots { display: grid; grid-template-columns: repeat(2, 5px); gap: 2px; }
+    .badge .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--glow); display: block; }
+    .badge .dots i.off { background: var(--line); }
+    header .spacer { flex: 1; }
+
+    .btn {
+      font-family: var(--font-body); font-size: 15px; font-weight: 600;
+      color: var(--ink); background: var(--panel);
+      border: 1px solid var(--line); border-radius: 12px; padding: 10px 15px;
+      cursor: pointer; min-height: 44px; transition: border-color .15s, background .15s, transform .05s;
+    }
+    .btn:hover { border-color: var(--glow); }
+    .btn:active { transform: translateY(1px); }
+    .btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+    .btn.small { font-size: 13px; padding: 8px 12px; min-height: 38px; }
+    .btn[aria-pressed="true"] { border-color: var(--glow); background: #1b2c22; color: var(--glow-soft); }
+
+    h1.title {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(34px, 8vw, 58px); line-height: 1.02; margin: 10px 0 6px;
+      color: var(--amber-hot); text-shadow: 0 0 22px rgba(255,207,92,0.28);
+      letter-spacing: .01em;
+    }
+    .lede { color: var(--ink-dim); font-size: 16px; max-width: 52ch; margin: 0 0 16px; }
+    .story { color: var(--ink); font-size: 16px; max-width: 54ch; margin: 0 0 20px; line-height: 1.7; }
+    .story b { color: var(--glow-soft); font-weight: 700; }
+
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+      padding: 18px; margin-bottom: 16px;
+    }
+    .card h2 { font-family: var(--font-display); font-weight: 400; font-size: 20px; margin: 0 0 10px; color: var(--ink); }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .field-label { font-size: 13px; color: var(--ink-dim); width: 100%; margin-bottom: 2px; }
+
+    /* ── 핀 미리보기 (닷패드 60×40 == 화면) ─────────────────────────────── */
+    .stage { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .preview-wrap {
+      width: 100%; background: #0a130d; border: 1px solid var(--line);
+      border-radius: 16px; padding: 14px; position: relative;
+    }
+    .preview-cap {
+      position: absolute; top: 10px; left: 14px; font-size: 11px; letter-spacing: .12em;
+      color: var(--ink-dim); text-transform: uppercase;
+    }
+    canvas#pins { width: 100%; height: auto; display: block; border-radius: 8px; margin-top: 12px; image-rendering: auto; }
+
+    .count-big { font-family: var(--font-display); font-size: clamp(40px, 12vw, 82px); line-height: 1; color: var(--glow-soft); text-shadow: 0 0 24px rgba(126,227,138,0.3); }
+    .count-cap { font-size: 14px; color: var(--ink-dim); margin-top: 2px; }
+    .turn-tag {
+      display: inline-block; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 15px;
+      border: 1px solid var(--line);
+    }
+    .turn-tag.you { color: var(--amber-hot); border-color: var(--amber); background: rgba(255,207,92,0.08); }
+    .turn-tag.dot { color: var(--glow-soft); border-color: var(--glow); background: rgba(126,227,138,0.08); }
+
+    /* 가져갈 개수 선택 */
+    .choices { display: flex; gap: 12px; width: 100%; max-width: 420px; }
+    .choice {
+      flex: 1; font-family: var(--font-display); font-size: 26px; color: var(--ink);
+      background: #10190f; border: 2px solid var(--line); border-radius: 16px;
+      padding: 18px 8px 14px; cursor: pointer; min-height: 88px; text-align: center;
+      transition: border-color .12s, background .12s, transform .05s;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .choice .n { font-size: 34px; line-height: 1; }
+    .choice .sub { font-family: var(--font-body); font-size: 12px; color: var(--ink-dim); font-weight: 600; }
+    .choice[aria-pressed="true"] {
+      border-color: var(--amber); background: rgba(255,207,92,0.10); color: var(--amber-hot);
+      box-shadow: 0 0 0 3px rgba(255,207,92,0.18);
+    }
+    .choice[aria-pressed="true"] .sub { color: var(--amber); }
+    .choice:disabled { opacity: .35; cursor: not-allowed; }
+    .choice:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+
+    .confirm-btn {
+      font-family: var(--font-display); font-size: 22px; width: 100%; max-width: 420px;
+      background: var(--glow); color: #06210f; border: none; border-radius: 14px;
+      padding: 15px; min-height: 58px; cursor: pointer; font-weight: 400;
+      transition: filter .12s, transform .05s;
+    }
+    .confirm-btn:hover { filter: brightness(1.08); }
+    .confirm-btn:active { transform: translateY(1px); }
+    .confirm-btn:disabled { background: var(--line); color: var(--ink-dim); cursor: not-allowed; }
+    .confirm-btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+    .result-head { font-family: var(--font-display); font-size: clamp(30px, 7vw, 46px); margin: 6px 0; }
+    .result-head.win  { color: var(--amber-hot); text-shadow: 0 0 22px rgba(255,207,92,0.35); }
+    .result-head.lose { color: var(--lose); }
+
+    .keyhint { color: var(--ink-dim); font-size: 13px; line-height: 1.7; margin-top: 6px; }
+    .keyhint b { color: var(--ink); }
+    .keyhint code {
+      background: #10190f; border: 1px solid var(--line); border-radius: 6px;
+      padding: 1px 6px; font-size: 12px; color: var(--glow-soft);
+    }
+    .status-line { min-height: 24px; color: var(--amber-hot); font-weight: 600; margin-top: 4px; }
+    footer { color: var(--ink-dim); font-size: 12px; text-align: center; padding: 10px 0 4px; }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+    .hidden { display: none !important; }
+    .dp-status { font-size: 13px; color: var(--ink-dim); }
+    .dp-status.on { color: var(--glow); }
+
+    @media (max-width: 480px) {
+      .wrap { padding: 16px 14px 22px; }
+      .choice { min-height: 76px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fly { animation: none; display: none; }
+      * { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="fireflies" aria-hidden="true" id="fireflies"></div>
+
+  <div id="app">
+    <div class="wrap">
+      <header>
+        <span class="badge">
+          <span class="dots" aria-hidden="true"><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i></span>
+          DOT INC. · 닷게임즈
+        </span>
+        <span class="spacer"></span>
+        <span class="dp-status" id="dpStatus">닷패드 미연결</span>
+        <button class="btn small" id="connectBtn" type="button">닷패드 연결</button>
+      </header>
+
+      <!-- ── 시작 화면 ─────────────────────────────────────────────── -->
+      <section id="screenTitle" aria-labelledby="titleH1">
+        <h1 class="title" id="titleH1">닷 스틱</h1>
+        <p class="lede">마지막 빛을 가져오는 사람이 이깁니다.</p>
+        <p class="story">
+          깊은 숲속에 빛나는 <b>닷 스틱 10개</b>가 놓여 있어요.
+          당신과 탐험가 닷이 <b>번갈아</b> 스틱을 가져가요.
+          한 번에 <b>1개 또는 2개</b>를 가져갈 수 있어요.
+          <b>마지막 스틱</b>에는 특별한 빛의 힘이 담겨 있어요 — 그것을 손에 넣는 사람이 승리합니다.
+        </p>
+
+        <div class="card">
+          <div class="row">
+            <span class="field-label">난이도 — 화살표로 바꾸고 엔터로 시작</span>
+            <button class="btn diff" data-diff="easy"   type="button" aria-pressed="false">연습 (닷이 마음대로)</button>
+            <button class="btn diff" data-diff="normal" type="button" aria-pressed="true">대결 (닷이 똑똑하게)</button>
+            <button class="btn diff" data-diff="hard"   type="button" aria-pressed="false">고수 (닷이 최선을)</button>
+          </div>
+        </div>
+
+        <button class="confirm-btn" id="startBtn" type="button">게임 시작</button>
+
+        <p class="keyhint">
+          <b>키보드</b> — <code>← →</code> 난이도 선택 · <code>Enter</code> 시작 · <code>F3</code> 도움말<br>
+          <b>닷패드</b> — 패닝키 좌·우로 선택, 기능키 3으로 시작
+        </p>
+      </section>
+
+      <!-- ── 플레이 화면 ───────────────────────────────────────────── -->
+      <section id="screenPlay" class="hidden" aria-labelledby="playH">
+        <h2 id="playH" class="sr-only">닷 스틱 놀이 진행</h2>
+        <div class="stage">
+          <div style="text-align:center">
+            <span class="turn-tag" id="turnTag">당신 차례</span>
+          </div>
+
+          <div class="preview-wrap">
+            <span class="preview-cap">닷패드 미리보기 · 60 × 40</span>
+            <canvas id="pins" width="420" height="280" role="img"
+              aria-label="빛나는 스틱 미리보기"></canvas>
+          </div>
+
+          <div style="text-align:center">
+            <div class="count-big" id="countBig">10</div>
+            <div class="count-cap">개의 스틱이 남았어요</div>
+          </div>
+
+          <div class="choices" role="group" aria-label="가져갈 스틱 개수 선택">
+            <button class="choice" id="choice1" type="button" aria-pressed="true">
+              <span class="n">1</span><span class="sub">개 가져가기</span>
+            </button>
+            <button class="choice" id="choice2" type="button" aria-pressed="false">
+              <span class="n">2</span><span class="sub">개 가져가기</span>
+            </button>
+          </div>
+
+          <button class="confirm-btn" id="takeBtn" type="button">가져가기 (Enter)</button>
+
+          <p class="status-line" id="statusLine" role="status"></p>
+
+          <p class="keyhint" style="text-align:center">
+            <code>← →</code> 개수 · <code>Enter</code> 가져가기 · <code>F1</code> 다시 듣기 · <code>F2</code> 촉각 다시 · <code>F3</code> 도움말 · <code>F4</code> 새 게임
+          </p>
+        </div>
+      </section>
+
+      <!-- ── 결과 화면 ─────────────────────────────────────────────── -->
+      <section id="screenResult" class="hidden" aria-labelledby="resultH">
+        <div class="stage">
+          <h2 id="resultH" class="result-head win">승리!</h2>
+          <div class="preview-wrap">
+            <span class="preview-cap">닷패드 미리보기 · 60 × 40</span>
+            <canvas id="pinsR" width="420" height="280" role="img" aria-label="결과 촉각 그림"></canvas>
+          </div>
+          <p class="story" id="resultText" style="text-align:center"></p>
+          <button class="confirm-btn" id="againBtn" type="button">다시 하기 (Enter)</button>
+          <p class="keyhint" style="text-align:center"><code>Enter</code> 다시 하기 · <code>F1</code> 다시 듣기</p>
+        </div>
+      </section>
+
+      <footer>닷 스틱 · 마지막 빛을 가져라 — 시각장애인을 위한 촉각 놀이</footer>
+    </div>
+  </div>
+
+  <!-- 스크린리더 실시간 안내 (TW_TTS와 병행) -->
+  <div class="sr-only" id="live" role="status" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- ══ 닷패드 SDK 3.0.0 (Web Bluetooth) — 인라인 ══════════════════════════ -->
+  <script>const Command={requestDisplayLine:"0200",responseDisplayLine:"0201",notificateDisplayComplete:"0202",requestDisplayPartial:"0220",responseDisplayPartial:"0221",notificateDisplayPartial:"0222"},DataCodes=Object.freeze({Connected:"Connected",ConnectedFail:"ConnectedFail",Disconnected:"Disconnected",BoardInfo:"BoardInfo",BleMacAddress:"BleMacAddress",DeviceName:"DeviceName",DeviceFWVersion:"DeviceFWVersion",DeviceHWVersion:"DeviceHWVersion",ResponseDisplayLineAck:"ResponseDisplayLineAck",ResponseDisplayLineNonAck:"ResponseDisplayLineNonAck",ResponseDisplayLineComplete:"ResponseDisplayLineComplete",CommandError:"CommandError",CommandNone:"CommandNone"}),KeyCodes=Object.freeze({KeyFunction1:"KeyFunction1",KeyFunction2:"KeyFunction2",KeyFunction3:"KeyFunction3",KeyFunction4:"KeyFunction4",KeyFunction12:"KeyFunction12",KeyFunction13:"KeyFunction13",KeyFunction14:"KeyFunction14",KeyFunction23:"KeyFunction23",KeyFunction24:"KeyFunction24",KeyFunction34:"KeyFunction34",KeyElse:"KeyElse",PanningAll:"PanningAll",PanningLeft:"PanningLeft",PanningRight:"PanningRight",LPF1:"LPF1",RPF4:"RPF4"}),DeviceInfo=Object.freeze({DeviceName:"DeviceName",FirmwareVersion:"FirmwareVersion",HardwareVersion:"HardwareVersion"}),DisplayMode={GraphicMode:"GraphicMode",TextMode:"TextMode"},DeviceCellType=Object.freeze({D2:{name:"D2",models:["KM2-300A","KM2-20","DotPad320A","DPK12A","DotPad832A","DMI32A"]},D3:{name:"D3",models:["KM3-12A","KM3-08A","KM3-20A","KM3-40A","DPK12B","DotPad320C","DotPad320X","DotPad768A","DotPad300A"]},NONE:{name:"NONE",models:[]},fromDeviceName(e){return e=e??"",this.D2.models.some((t=>e.toLowerCase().includes(t.toLowerCase())))?this.D2:this.D3.models.some((t=>e.toLowerCase().includes(t.toLowerCase())))?this.D3:this.NONE}});class DotReceiver{#e=null;#t="";#s=null;#i=null;#n=null;#a=null;#r=null;#o=0;#h=!0;#c=0;#l=!0;#d=200;#u=null;#f=!1;#D=!0;constructor(e,t){this.#s=e,this.#i=t,this.#n={PERKINS_KEY:/aa55000900031200.*/,FUNCTION_KEY:/aa55000900033200.*/},this.#a={RSP_BOARD_INFO:/aa55001100011100.*/,RSP_FW_VER:/aa55000d00000100.*/,RSP_HW_VERSION:/aa55000600001100.*/,RSP_DEV_NAME:/aa55(....)00010100.*/},this.#r={ACK:{[Command.responseDisplayLine]:e=>this.#s(DataCodes.ResponseDisplayLineAck,e),[Command.responseDisplayPartial]:e=>this.#s(DataCodes.ResponseDisplayLineAck,e)},NOTI:{[Command.notificateDisplayComplete]:()=>this.#s(DataCodes.ResponseDisplayLineComplete,""),[Command.notificateDisplayPartial]:()=>this.#s(DataCodes.ResponseDisplayLineComplete,"")}}}async startUsbReadLoop(e){this.#e=e.readable.getReader();try{for(;;){const{value:e,done:t}=await this.#e.read();if(t)break;this.receiveHexPacket=Array.from(new Uint8Array(e.buffer)).map((e=>e.toString(16).padStart(2,"0"))).join(""),this.#m(this.receiveHexPacket)}}catch(e){console.error("read loop error",e)}finally{this.#e.releaseLock(),this.#e=null}}async stopReadLoop(){if(this.#e)try{await this.#e.cancel(),this.#e=null}catch(e){}}startBleNotification(e){this.receiveHexPacket=Array.from(new Uint8Array(e.target.value.buffer)).map((e=>e.toString(16).padStart(2,"0"))).join(""),this.#m(this.receiveHexPacket)}#m(e){this.#t.length>4&&!this.#t.startsWith("aa55")&&(this.#t=""),this.#t.length+e.length<18?(this.#t=`${this.#t}${e}`,e=""):(e=`${this.#t}${e}`,this.#t="");const t=this.#C(e);for(let e of t){this.#L(this.#n,e)?this.#p(this.#n,e):this.#L(this.#a,e)&&this.#y(this.#a,e);for(const[t,s]of Object.entries(this.#r.ACK)){const i=new RegExp(`aa550006(..)${t}(..)00.*`),n=e.match(i);if(n)return void s.call(this,n)}for(const[t,s]of Object.entries(this.#r.NOTI)){const i=new RegExp(`aa550006(..)${t}(..)00.*`);if(e.match(i))return void s.call(this)}}}#L(e,t){return Object.values(e).some((e=>t.match(e)))}#C(e){let t=[],s=0;for(;s<e.length;){if(e.length-s<18){this.#t=e.substring(s);break}const i=s+4,n=i+4,a=e.substring(i,n),r=parseInt(a,16);if(isNaN(r)){this.#t=e.substring(s);break}const o=s+8+2*r,h=e.substring(s,o);if(h.length!==2*r+8){this.#t=e.substring(s);break}t.push(h),s=o}return t}#y(e,t){const s=Object.keys(e).find((s=>t.match(e[s])));if(s){const e=16,i=t.substring(e,t.length-2),n=this.#I(i);switch(s){case"RSP_BOARD_INFO":this.#s(DataCodes.BoardInfo,i);break;case"RSP_FW_VER":this.#s(DataCodes.DeviceFWVersion,n);break;case"RSP_HW_VERSION":this.#s(DataCodes.DeviceHWVersion,i);break;case"RSP_DEV_NAME":this.#s(DataCodes.DeviceName,n)}}}#p(e,t){const s=Object.keys(e).find((s=>t.match(e[s])));if(s){if("PERKINS_KEY"===s){const e=parseInt(t.substr(19,1),16);this.#h=0===e,this.#o<e&&(this.#o=e)}else if("FUNCTION_KEY"===s){const e=parseInt(t.substr(16,1),16);this.#l=0===e,this.#c<e&&(this.#c=e)}this.#l&&this.#h&&(this.#D=!0),this.#D&&(this.#h&&this.#l?(null!==this.#u&&(clearTimeout(this.#u),this.#u=null),this.#f||this.#g(),this.#o=0,this.#c=0,this.#f=!1,this.#D=!0):null===this.#u&&(this.#f=!1,this.#u=setTimeout((()=>{this.#f||(this.#g(),this.#f=!0,this.#D=!1),this.#u=null}),this.#d)))}}#g(){let e=KeyCodes.KeyElse,t="";if(6===this.#o)0===this.#c&&(e=KeyCodes.PanningAll),t="AP + "+this.#c;else if(4===this.#o)8===this.#c?e=KeyCodes.LPF1:0===this.#c&&(e=KeyCodes.PanningLeft),t="LP + "+this.#c;else if(2===this.#o)1===this.#c?e=KeyCodes.RPF4:0===this.#c&&(e=KeyCodes.PanningRight),t="RP + "+this.#c;else if(0===this.#o){switch(this.#c){case 12:e=KeyCodes.KeyFunction12;break;case 10:e=KeyCodes.KeyFunction13;break;case 9:e=KeyCodes.KeyFunction14;break;case 8:e=KeyCodes.KeyFunction1;break;case 6:e=KeyCodes.KeyFunction23;break;case 5:e=KeyCodes.KeyFunction24;break;case 4:e=KeyCodes.KeyFunction2;break;case 3:e=KeyCodes.KeyFunction34;break;case 2:e=KeyCodes.KeyFunction3;break;case 1:e=KeyCodes.KeyFunction4}t=""+this.#c}this.#i(e,t)}#I(e){let t="";for(let s=0;s<e.length;s+=2){const i=e.substr(s,2),n=parseInt(i,16);t+=String.fromCharCode(n)}return t}}const SendMode={BASIC:"BASIC",REFRESH:"REFRESH"};class DotPadLine{#P=SendMode.BASIC;get sendMode(){return this.#P}constructor(e,t,s){this.lineId=e,this.startCellIndex=0,this.sendData="",this.seqNum="00",this.lineData="00".repeat(s),this.requestReady=!1,this.requestTime=t,this.receiveAck=!0,this.numberCellColumns=s,this.refreshLiveData="",this.refreshLiveStartCellIndex=0}getSendData(){return this.sendData}getLineId(){return this.lineId}getRequestReady(){return this.requestReady}getReceiveAck(){return this.receiveAck}setReceiveAck(e){this.receiveAck=e}setRequestReady(e){this.requestReady=e}getRequestTime(){return this.requestTime}getStartCellIndex(){return this.startCellIndex}getSeqNum(){return this.seqNum}refresh(e="ALL_DISPLAY"){this.requestReady||(this.requestReady=!0,this.receiveAck=!0,this.#P=SendMode.REFRESH,"LIVE_DISPLAY"==e?(this.sendData=this.refreshLiveData,this.startCellIndex=this.refreshLiveStartCellIndex):(this.sendData=this.lineData,this.startCellIndex=0))}initRefreshLiveData(e,t){this.refreshLiveData=t,this.refreshLiveStartCellIndex=e}setRefreshLiveData(e,t){const s=this.getMergeCellData(this.refreshLiveData,this.refreshLiveStartCellIndex,t,e);this.refreshLiveData=s.sendData,this.refreshLiveStartCellIndex=s.startCellIndex}setSendStatus(){this.requestReady=!1,this.receiveAck=!1}setCommand(e,t,s){if(this.#P=SendMode.BASIC,this.seqNum=e,!this.requestReady&&this.receiveAck)this.startCellIndex=t,this.sendData=s;else{const e=this.getMergeCellData(this.sendData,this.startCellIndex,s,t);this.sendData=e.sendData,this.startCellIndex=e.startCellIndex}this.requestReady=!0,this.receiveAck=!0,this.setLineData()}getMergeCellData(e,t,s,i){var n="",a=0;if(""==e)return{sendData:s,startCellIndex:i};if(t>=i){const r=t-i;if(2*r<s.length){const t="00".repeat(r)+e;n=s.length>=t.length?s:s+t.substring(s.length)}else{n=s+this.lineData.substring(2*i+s.length,2*t)+e}a=i}else{a=t;const r=i-t;if(2*r<e.length){const t=e.substring(0,2*r)+s;n=t.length>=e.length?t:t+e.substring(t.length)}else{n=this.lineData.substring(2*t,2*i)+s}}return{sendData:n,startCellIndex:a}}setLineData(){let e=this.lineData.substring(0,2*this.startCellIndex)+this.sendData;this.lineData=e+this.lineData.substring(e.length);const t=2*this.numberCellColumns-this.lineData.length;t>0&&(this.lineData+="00".repeat(t))}getLineData(){return this.lineData}clearLineData(){this.lineData="00".repeat(this.numberCellColumns),this.sendData=this.lineData,this.requestReady=!0,this.receiveAck=!0,this.startCellIndex=0}}const BufferMode=Object.freeze({ALL_LINE:"ALL_LINE",SINGLE_LINE:"SINGLE_LINE",ALL_PARTIAL:"ALL_PARTIAL",SINGLE_PARTIAL:"SINGLE_PARTIAL",models:["DotPad320C","DotPad320X","DotPad300A"],fromDeviceName(e){const t=e.toLowerCase();return this.models.some((e=>t.includes(e.toLowerCase())))?this.ALL_PARTIAL:this.SINGLE_LINE}}),DotPadSendMakeModel={getSendData(e,t,s){var i="";switch(e){case BufferMode.ALL_LINE:i=this.makeTotalLineData(t);break;case BufferMode.SINGLE_LINE:i=this.makeSingleLineData(s);break;case BufferMode.ALL_PARTIAL:i=this.makeTotalPartialData(t);break;case BufferMode.SINGLE_PARTIAL:i=this.makeSinglePartialData(s)}return i},makeSingleLineData(e){let t=e.getSendData(),s=this.decimalToHex(e.getStartCellIndex())+t;return this.makePacket(s,e.getLineId(),e.getSeqNum(),Command.requestDisplayLine)},makeTotalLineData(e){var t="";for(let s=1;s<e.length;s++)t+=e[s].getLineData();let s=this.decimalToHex(0)+t;return this.makePacket(s,1,e[1].getSeqNum(),Command.requestDisplayLine)},makeSinglePartialData(e){let t=e.getSendData(),s=e.getStartCellIndex(),i=s+t.length/2,n=this.decimalToHex(s)+this.decimalToHex(i);return"80"==e.getSeqNum()?n+=this.brailleToGraphic(t):n+=t,this.makePacket(n,e.getLineId(),"00",Command.requestDisplayPartial)},makeTotalPartialData(e){let t=-1,s=-1,i=999,n=-1;for(let a=1;a<e.length;a++){const r=e[a];if(r.getRequestReady()){const e=r.getStartCellIndex(),o=e+r.getSendData().length/2;t<0&&(t=a),i>e&&(i=e),n<o&&(n=o),s=a}}let a="";if(t>-1){for(let r=t;r<=s;r++){a+=e[r].getLineData().slice(2*i,2*n)}let r=this.decimalToHex(i)+this.decimalToHex(n);return"80"==e[t].getSeqNum()?r+=this.brailleToGraphic(a):r+=a,this.makePacket(r,t,"00",Command.requestDisplayPartial)}return null},makePacket(e,t,s,i){const n=e.length/2;let a="AA55"+this.decimalToHex(5+n,4)+this.decimalToHex(t,2)+i+s+e;return a+=this.checksum(this.hexToBytes(a.substring(8))),this.hexStringToArrayBuffer(a)},hexStringToArrayBuffer(e){(e=e.replace(/^0x/,"")).length%2!=0&&console.warn("WARNING: expecting an even number of characters in the hexString");let t=e.match(/[G-Z\s]/i);t&&console.warn("WARNING: found non-hex characters",t);let s=e.match(/[\dA-F]{2}/gi);if(null!=s){let e=s.map((function(e){return parseInt(e,16)}));return new Uint8Array(e).buffer}return null},checksum(e){let t=165;for(let s=0;s<e.length;s++)t^=e[s];return("0"+(255&t).toString(16)).slice(-2)},decimalToHex:(e,t=2)=>Number(e).toString(16).padStart(t,"0"),hexToBytes(e){const t=[];for(let s=0;s<e.length;s+=2)t.push(parseInt(e.substr(s,2),16));return t},brailleToGraphic(e){const t=this.hexToBinary(e),s=[];for(let e=0;e<t.length;e+=8)s.push(t.substring(e,e+8));const i=s.map((e=>{const t=e.padEnd(8,"0"),s=t.substring(0,1),i=t.substring(1,2);return s+t.substring(2,5)+i+t.substring(5)}));return this.binaryToHex(i.join(""))},hexToBinary(e){let t="";for(let s=0;s<e.length;s++){t+=parseInt(e[s],16).toString(2).padStart(4,"0")}return t},binaryToHex(e){let t="";for(let s=0;s<e.length;s+=4){const i=e.substring(s,s+4);t+=parseInt(i,2).toString(16).toUpperCase()}return t}},RefreshType={TYPE_A:"TYPE_A",TYPE_B:"TYPE_B",TYPE_C:"TYPE_C"},RefreshMode={NONE:"NONE",ALL_DISPLAY:"ALL_DISPLAY",GRAPHIC_DISPLAY:"GRAPHIC_DISPLAY",TEXT_DISPLAY:"TEXT_DISPLAY",LIVE_DISPLAY:"LIVE_DISPLAY"};class DotPadSendModule{constructor(e){this.dotPadLineList=[],this.dotCommandSendReady=!0,this.sendTime=new Date,this.sendCnt=0,this.dotPadLine=null,this.restart=!1,this.currentIndex=0,this.isFunctionRunning=!1,this.dotPad=e,this.baseDisplayComplete=!0,this.refreshType=RefreshType.TYPE_C,this.refreshCount=0,this.refreshItem=null,this.refreshLine=[],this.refreshMode=RefreshMode.NONE,this.bufferMode=BufferMode.SINGLE_LINE,this.isAutoRefresh=!1}clearDotPadLine(){this.dotPadLineList=[]}resetAllLineData(){for(const e of this.dotPadLineList)e.clearLineData()}addDotPadLine(e,t){const s=new DotPadLine(this.dotPadLineList.length,e,t);this.dotPad.cellType==DeviceCellType.D3&&s.setCommand("00",0,"00".repeat(t)),this.dotPadLineList.push(s)}#R(e,t,s,i,n=!0){n?(this.refreshCount=0,this.currentIndex=0):this.currentIndex=0,this.refreshMode!==RefreshMode.LIVE_DISPLAY||this.refreshLine.includes(e)?this.dotPadLineList[e].setRefreshLiveData(s,i):(this.refreshLine.push(e),this.dotPadLineList[e].initRefreshLiveData(s,i)),this.dotPadLineList[e].setCommand(t,s,i)}setDotPadLineCommand(e,t,s,i,n=!0){const a=this.dotPadLineList[e].getLineData(),r=a.substring(0,2*s)+i,o=this.compareString(r,a);if(null!==o){const[s,i]=o,a=r.slice(s,i+1);return this.#R(e,t,parseInt(s/2),a,n),!0}return!1}setDotCommandSendReady(e){this.dotCommandSendReady=e}async refresh(){for(let e=0;e<this.dotPadLineList.length;e++)this.dotPadLineList[e].refresh();await this.sendCommand()}checkBaseDisplay(){return this.isFunctionRunning&&this.currentIndex>=this.dotPadLineList.length-1||this.refreshCount>0||!this.isFunctionRunning}getIsFunctionRunning(){return this.isFunctionRunning}setDisplayComplete(){this.checkBaseDisplay()&&(this.baseDisplayComplete=!0)}getDisplayComplete(){return this.setDisplayComplete(),this.baseDisplayComplete}setBufferMode(e){this.bufferMode=e}getBufferMode(){return this.bufferMode}async sendCommand(e=!1){if(this.isFunctionRunning)this.restart=!0;else{this.isFunctionRunning=!0,this.currentIndex=0,e||(this.refreshCount=0);const t=this.dotPad.cellType,s=async()=>{if(this.currentIndex<this.dotPadLineList.length){if(this.restart){null!=this.refreshItem&&(clearTimeout(this.refreshItem),this.refreshItem=null);for(const e of this.dotPadLineList)e.sendMode==SendMode.REFRESH&&(e.setRequestReady(!1),e.setReceiveAck(!0));this.currentIndex=0,this.restart=!1,this.dotCommandSendReady=!0,this.refreshCount=0}else{if(this.currentIndex>0&&(this.bufferMode===BufferMode.ALL_LINE||this.bufferMode===BufferMode.ALL_PARTIAL)){let e=this.dotPadLineList.filter((e=>e.getRequestReady()));this.currentIndex=e.length>0?e[0].getLineId():this.currentIndex}if(this.dotPadLine=this.dotPadLineList[this.currentIndex],this.dotPadLine.getRequestReady()&&this.dotCommandSendReady){if(0===this.currentIndex||this.bufferMode===BufferMode.SINGLE_LINE||this.bufferMode===BufferMode.SINGLE_PARTIAL?this.dotPadLine.setSendStatus():this.dotPadLine.setReceiveAck(!1),this.currentIndex>=1&&0===this.refreshCount){let e=DotPadSendMakeModel.getSendData(this.bufferMode,this.dotPadLineList,this.dotPadLine);if(this.bufferMode===BufferMode.ALL_LINE||this.bufferMode===BufferMode.ALL_PARTIAL)for(let e=this.currentIndex;e<this.dotPadLineList.length;e++)this.dotPadLineList[e].setRequestReady(!1);await this.dotPad.sendCommand(e)}else{let e=DotPadSendMakeModel.makeSingleLineData(this.dotPadLine);await this.dotPad.sendCommand(e)}this.dotCommandSendReady=!1,0===this.refreshCount&&(this.baseDisplayComplete=!1),this.sendTime=new Date,this.sendCnt=0}else if(this.dotPadLine.getReceiveAck())this.dotCommandSendReady?this.currentIndex>=1&&0===this.refreshCount&&(this.bufferMode===BufferMode.ALL_LINE||this.bufferMode===BufferMode.ALL_PARTIAL)?(this.currentIndex=this.dotPadLineList.length,this.dotPadLine=null):this.currentIndex+=1:this.dotCommandSendReady=!0;else{if(new Date-this.sendTime>(()=>{const e=this.dotPadLine?.getRequestTime?.()??500;return this.currentIndex>=1&&0===this.refreshCount&&(this.bufferMode===BufferMode.ALL_LINE||this.bufferMode===BufferMode.ALL_PARTIAL)?"D3"===t?e*this.dotPadLineList.length:600:e})())if(this.sendCnt<3){if(this.currentIndex>=1&&0===this.refreshCount){if(this.bufferMode===BufferMode.ALL_LINE||this.bufferMode===BufferMode.ALL_PARTIAL)for(let e=this.currentIndex;e<this.dotPadLineList.length;e++)this.dotPadLineList[e].setRequestReady(!0);let e=DotPadSendMakeModel.getSendData(this.bufferMode,this.dotPadLineList,this.dotPadLine);if(await this.dotPad.sendCommand(e),this.bufferMode===BufferMode.ALL_LINE||this.bufferMode===BufferMode.ALL_PARTIAL)for(let e=this.currentIndex;e<this.dotPadLineList.length;e++)this.dotPadLineList[e].setRequestReady(!1)}else{let e=DotPadSendMakeModel.makeSingleLineData(this.dotPadLine);await this.dotPad.sendCommand(e)}this.sendTime=new Date,this.sendCnt+=1}else this.dotPadLine.setReceiveAck(!0),this.dotCommandSendReady=!0,this.baseDisplayComplete=!0}}"D2"===t&&this.refreshCommand(),setTimeout(s,1)}else this.isFunctionRunning=!1,this.baseDisplayComplete=!0};try{await s()}catch(e){console.log("sendCommand Error: ",e)}}}setDotPadLineReceiveAck(e,t){if(e>0&&(this.bufferMode===BufferMode.ALL_LINE||this.bufferMode===BufferMode.ALL_PARTIAL))for(let e=1;e<this.dotPadLineList.length;e++)this.dotPadLineList[e].setReceiveAck(t);else{const s=this.dotPadLineList[e];s&&s.setReceiveAck(t)}}setRefreshType(e){this.refreshType=e}refreshCommand(){if(this.dotPadLineList.length===this.currentIndex)switch(this.refreshType){case RefreshType.TYPE_A:this.refreshCommandFuncA();break;case RefreshType.TYPE_B:this.refreshCommandFuncB();break;case RefreshType.TYPE_C:this.refreshCommandFuncC()}}refreshCommandFuncA(){if(this.refreshCount<3){this.currentIndex=0;for(const e of this.dotPadLineList)e.refresh();this.refreshCount+=1}}refreshCommandFuncB(){if(this.refreshCount<3){this.currentIndex=0;for(let e=0;e<=3;e++)this.dotPadLineList[e].refresh()}else if(this.refreshCount<6){this.currentIndex=1;for(let e=4;e<=10;e++)this.dotPadLineList[e].refresh()}else this.refreshMode=RefreshMode.NONE;this.refreshCount+=1}refreshCommandFuncC(){if(null==this.refreshItem)switch(this.refreshMode){case RefreshMode.ALL_DISPLAY:this.refreshCommandFuncB();break;case RefreshMode.GRAPHIC_DISPLAY:this.graphicRefresh();break;case RefreshMode.TEXT_DISPLAY:this.textRefresh();break;case RefreshMode.LIVE_DISPLAY:this.liveRefresh()}}graphicRefresh(){this.refreshItem=()=>{if(this.refreshCount<3){this.currentIndex=1;for(let e=1;e<=3;e++)this.dotPadLineList[e].refresh()}else if(this.refreshCount<6){this.currentIndex=4;for(let e=4;e<this.dotPadLineList.length;e++)this.dotPadLineList[e].refresh()}else this.refreshMode=RefreshMode.NONE;this.refreshItem=null,this.refreshCount+=1,this.sendCommand(!0)},setTimeout(this.refreshItem,500)}textRefresh(){this.refreshCount<3?(this.refreshItem=()=>{this.currentIndex=0,this.dotPadLineList[0].refresh(),this.refreshItem=null,this.refreshCount+=1,this.sendCommand(!0)},setTimeout(this.refreshItem,1500)):this.refreshMode=RefreshMode.NONE}liveRefresh(){this.refreshCount<3?(this.refreshItem=()=>{this.currentIndex=0;for(const e of this.refreshLine)this.dotPadLineList[e].refresh(RefreshMode.LIVE_DISPLAY);this.refreshItem=null,this.refreshCount+=1,this.sendCommand(!0)},setTimeout(this.refreshItem,1500)):(this.refreshLine=[],this.refreshMode=RefreshMode.NONE)}setRefreshMode(e){clearTimeout(this.refreshItem),this.refreshItem=null,this.refreshMode!==RefreshMode.LIVE_DISPLAY&&e===RefreshMode.LIVE_DISPLAY&&(this.refreshLine=[]),this.refreshMode===RefreshMode.NONE?(this.refreshMode=e,this.refreshLine=[]):this.refreshMode!==RefreshMode.ALL_DISPLAY&&this.refreshMode!==e&&(this.refreshMode===RefreshMode.GRAPHIC_DISPLAY?e===RefreshMode.TEXT_DISPLAY&&(this.refreshMode=RefreshMode.ALL_DISPLAY):this.refreshMode===RefreshMode.TEXT_DISPLAY?e!==RefreshMode.TEXT_DISPLAY&&(this.refreshMode=RefreshMode.ALL_DISPLAY):this.refreshMode===RefreshMode.LIVE_DISPLAY&&(e===RefreshMode.TEXT_DISPLAY?this.refreshMode=RefreshMode.ALL_DISPLAY:e===RefreshMode.GRAPHIC_DISPLAY&&(this.refreshMode=RefreshMode.GRAPHIC_DISPLAY)))}compareString(e,t){let s=-1,i=-1,n=e.length;e.length>t.length&&(n=t.length);for(let a=0;a<n-1;a+=2){e.substring(a,a+2)!==t.substring(a,a+2)&&(-1===s&&(s=a),i=a+1)}return-1!==s?[s,i]:null}}const ConnectType={NONE:"",BLE:"BLE",USB:"USB"};class DotDevice{#s=null;#i=null;#M=null;#k=null;#v=ConnectType.NONE;#b=null;get connectDevice(){return this.#b}#S=null;#A=!1;get isConnect(){return this.#A}#T=20;#B="";#E="";get cellType(){return this.#E}#w=!1;#x=!1;#N=10;get numberCellRows(){return this.#N}#K=30;get numberCellColumns(){return this.#K}#_=1;#F=20;get numberBrailleCellColumns(){return this.#F}#H=600;#Y=600;#q=!1;#O=10;#G=3e3;constructor(e,t){this.#s=e,this.#i=t,this.DOTPAD_SERVICE="49535343-fe7d-4ae5-8fa9-9fafd205e455",this.DOTPAD_NOTIFY_CHARACTERISTIC="49535343-1e4d-4bd9-ba61-23c647249616",this.DOTPAD_WRITE_CHARACTERISTIC="49535343-8841-43f4-a8d4-ecbe34729bb3",this.#M=new DotReceiver(this.#V.bind(this),this.#U.bind(this)),this.#k=new DotPadSendModule(this)}async connectBleDevice(e){try{await e.gatt.connect();return this.#b=e,await this.#W(),this.#v=ConnectType.BLE,await this.#j(),await this.requestDeviceInfo(DeviceInfo.DeviceName),!0}catch(e){console.error(`BLE Device Connect failed: ${e.message}`)}return!1}async#W(){const e=await this.#b.gatt.getPrimaryService(this.DOTPAD_SERVICE),t=await this.#$(e,this.DOTPAD_NOTIFY_CHARACTERISTIC,"notify");t.startNotifications().then((()=>t.addEventListener("characteristicvaluechanged",(async e=>{this.#M.startBleNotification(e)})))),this.#b.addEventListener("gattserverdisconnected",(e=>{this.#V(DataCodes.Disconnected,"")}),{once:!0}),this.#S=await this.#$(e,this.DOTPAD_WRITE_CHARACTERISTIC,"write")}async#$(e,t,s){const i=e=>"write"===s?e.properties.write||e.properties.writeWithoutResponse:e.properties[s];try{const n=await e.getCharacteristic(t);if(i(n))return n;console.warn(`Characteristic ${t} does not have '${s}' property. Searching from list.`)}catch{console.warn(`Characteristic ${t} not found. Searching from list.`)}const n=(await e.getCharacteristics()).find(i);if(!n)throw new Error(`No characteristic with '${s}' property found in service.`);return n}async connectUsbDevice(e){try{return await e.open({baudRate:115200,dataBits:8}),this.#M.startUsbReadLoop(e),this.#b=e,this.#S=e.writable.getWriter(),this.#v=ConnectType.USB,await this.requestDeviceInfo(DeviceInfo.DeviceName),!0}catch(e){console.error(`USB Device Connect failed: ${e.message}`)}return!1}async disconnect(){if(!this.#A)return Promise.reject("Device is not connected.");this.#A=!1,this.#v===ConnectType.BLE?this.#b.gatt.disconnect():this.#v===ConnectType.USB&&(await this.#M.stopReadLoop(),await this.#S.close(),this.#b.close()),this.#b=null,this.#S=null,this.#s(this,DataCodes.Disconnected,"")}async sendCommand(e){if(this.#A)try{if(this.#v===ConnectType.BLE){let t=0;for(;t<e.byteLength;){let s=Math.min(this.#T,e.byteLength-t),i=e.slice(t,t+s);try{await this.#S.writeValue(i)}catch(e){return}t+=s}return!0}if(this.#v===ConnectType.USB)return await this.#S.write(e),!0}catch(e){"NetworkError"===e.name&&19===e.code&&this.connected?(this.#A=!1,await this.disconnect()):this.#b?this.#v==ConnectType.BLE?await this.connectBleDevice(this.#b):this.#v==ConnectType.USB&&await this.connectUsbDevice(this.#b):(console.log(e.code,e.name,e.message),console.error(e))}}displayGraphicData(e,t=1,s=0,i=DisplayMode.GraphicMode){if(!this.#w)return;const n=i===DisplayMode.GraphicMode?"00":"80",a=this.#K,r=s,o=s+e.length/2;for(let i=t;i<=this.#N;i++){const h=i-1;if(h<0)continue;const c=h*a,l=c+a,d=Math.max(c,r),u=Math.min(l,o);if(d>=u||l<r)continue;const f=2*(d-r),D=2*(u-d),m=e.substring(f,f+D),C=t===i?s:0;this.#k.setDotPadLineCommand(i,n,C,m)}this.#k.setRefreshMode(RefreshMode.GRAPHIC_DISPLAY),this.#k.sendCommand(!0)}displayTextData(e,t=0,s=DisplayMode.TextMode){if(!this.#x)return;const i=s===DisplayMode.GraphicMode?"00":"80";this.#k.setDotPadLineCommand(0,i,t,e),this.#k.setRefreshMode(RefreshMode.TEXT_DISPLAY),this.#k.sendCommand(!0)}displayLineData(e,t=0,s,i){if(!this.#x&&0==e)return;if(!this.#w&&e>0)return;const n=i===DisplayMode.GraphicMode?"00":"80";this.#k.setDotPadLineCommand(e,n,t,s),this.#k.setRefreshMode(RefreshMode.LIVE_DISPLAY),this.#k.sendCommand(!0)}async#j(){let e=20,t=!0,s=10;for(;t;){let i=new Uint8Array(e).fill(171);try{if(await this.#S.writeValue(i),e+=s,e>150)break}catch(i){10==s?(e-=9,s=1):t=!1}}this.#T=e-1>=148?148:e-1}async requestDeviceInfo(e){let t;switch(e){case DeviceInfo.DeviceName:t=DotPadSendMakeModel.makePacket("","00","00","0100");break;case DeviceInfo.FirmwareVersion:t=DotPadSendMakeModel.makePacket("","00","00","0000");break;case DeviceInfo.HardwareVersion:t=DotPadSendMakeModel.makePacket("","00","00","0010");break;default:return void console.warn("Unknown deviceInfo:",e)}this.#v===ConnectType.BLE?await this.#S.writeValue(t):this.#v===ConnectType.USB&&await this.#S.write(t)}async#X(){const e=DotPadSendMakeModel.makePacket("","00","00","0110");this.#v===ConnectType.BLE?await this.#S.writeValue(e):this.#v===ConnectType.USB&&await this.#S.write(e)}async#z(e){if(this.#B=e,this.#s(this,DataCodes.DeviceName,e),this.#B.includes("KM2-300A"))this.#Z(0,0,20,15);else if(this.#B.includes("KM2-20"))this.#Z(1,20,0,0);else{if(!this.#B.includes("KM3-20A"))return void await this.#X();this.#Z(1,20,0,0)}this.#J(),this.#Z(),this.#V(DataCodes.Connected,"")}#Q(e){const t=e.substring(0,2);let s=parseInt(t.substring(0,1),16);s>=8?(s-=8,this.#w=!0):this.#w=!1,s>=4?(s-=4,this.#x=!0):this.#x=!1,parseInt(e.substring(2,4),16),parseInt(e.substring(4,6),16),parseInt(e.substring(6,8),16);const i=parseInt(e.substring(8,10),16);this.#_=i;const n=parseInt(e.substring(10,12),16);this.#F=n,parseInt(e.substring(12,14),16);const a=parseInt(e.substring(14,16),16),r=parseInt(e.substring(16,18),16);this.#N=r;const o=parseInt(e.substring(18,20),16);this.#K=o,parseInt(e.substring(20,22),16);const h=parseInt(e.substring(22,24),16);if(0!==h&&0!==r){let e=3*Math.floor(100*h/r);e<300&&(e=300),this.#H=e}if(0!==a&&0!==i){let e=3*Math.floor(100*a/i);e<300&&(e=300),this.#Y=e}this.#J(),this.#Z(),this.#V(DataCodes.Connected,"")}#J(){this.#E=DeviceCellType.fromDeviceName(this.#B).name,this.#k.setBufferMode(BufferMode.fromDeviceName(this.#B))}#Z(e=this.#_,t=this.#F,s=this.#N,i=this.#K){if(this.#k.clearDotPadLine(),this.#x=e>0,this.#w=s>0,this.#x)for(let s=0;s<e;s++)this.#k.addDotPadLine(this.#Y,t);else this.#k.addDotPadLine(0,0);if(this.#w)for(let e=0;e<s;e++)this.#k.addDotPadLine(this.#H,i);"D3"===this.#E&&this.#k.resetAllLineData()}#V(e,t){switch(e){case DataCodes.Connected:this.#A=!0,this.#s(this,DataCodes.Connected,"");break;case DataCodes.Disconnected:this.#ee();break;case DataCodes.DeviceName:this.#z(t);break;case DataCodes.BoardInfo:this.#Q(t);break;case DataCodes.ResponseDisplayLineAck:this.#k.setDotPadLineReceiveAck(parseInt(t[1],16),!0);break;case DataCodes.ResponseDisplayLineComplete:this.#k.setDotCommandSendReady(!0);break;default:this.#s(this,e,t)}}#U(e,t){this.#i(this,e,t)}async#ee(){if(this.#A&&this.#v===ConnectType.BLE)if(this.#b){if(!this.#q){this.#q=!0;try{for(let e=1;e<=this.#O;e++){console.log(`Reconnect try #${e}`);try{return await this.#te(this.#G),await this.#W(),void console.log("Reconnect success")}catch(t){if(console.error("Reconnect failed:",t),e===this.#O)return console.log("Reconnect attempts exceeded. Force disconnect."),void this.disconnect()}}}finally{this.#q=!1}}}else this.disconnect()}async#te(e){if(!this.#b)throw new Error("Device is null");const t=this.#b.gatt.connect();let s=null;try{const i=new Promise(((t,i)=>{s=setTimeout((()=>{i(new Error("BLE connect timeout"))}),e)}));return await Promise.race([t,i])}finally{null!==s&&clearTimeout(s)}}}class DotPadScanner{constructor(){this.DOTPAD_PREFIX="DotPad",this.DOTPAD_SERVICE="49535343-fe7d-4ae5-8fa9-9fafd205e455"}async startBleScan(){const e={filters:[{namePrefix:this.DOTPAD_PREFIX}],optionalServices:[this.DOTPAD_SERVICE]};try{return await navigator.bluetooth.requestDevice(e)}catch(e){if("NotFoundError"===e.name)return;console.error(e)}}async startUsbScan(){const e=[{usbVendorId:1027,usbProductId:24592},{usbVendorId:1027,usbProductId:24597}];try{return await navigator.serial.requestPort({filters:e})}catch(e){if("NotFoundError"===e.name)return;console.error(e)}}}class DotPadSDK{#se=[];messageCallBack=null;keyCallBack=null;getConnectedDevices(){return[...this.#se]}async connectBleDevice(e){for(const t of this.#se)if(t.connectDevice==e)return null;const t=new DotDevice(this.#ie.bind(this),this.#U.bind(this));return await t.connectBleDevice(e)?(this.#se.push(t),t):null}async connectUsbDevice(e){for(const t of this.#se)if(t.connectDevice==e)return null;const t=new DotDevice(this.#ie.bind(this),this.#U.bind(this));return await t.connectUsbDevice(e)?(this.#se.push(t),t):null}disconnect(e=null){if(null==e){for(const e of this.#se)e.disconnect();this.#se=[]}else e.disconnect(),this.#se=this.#se.filter((t=>t!==e))}requestDeviceInfo(e,t){e.requestDeviceInfo(t)}displayGraphicData(e,t=null,s=DisplayMode.GraphicMode){if(null==t)for(const t of this.#se)t.displayGraphicData(e,1,0,s);else t.displayGraphicData(e,1,0,s)}displayTextData(e,t=null,s=DisplayMode.TextMode){if(null==t)for(const t of this.#se)t.displayTextData(e,0,s);else t.displayTextData(e,0,s)}displayLineData(e,t,s,i,n=null){if(null==n)for(const n of this.#se)n.displayLineData(e,t,s,i);else n.displayLineData(e,t,s,i)}displayAllUp(e=null){if(null==e)for(const e of this.#se)e.displayTextData("FF".repeat(e.numberBrailleCellColumns)),e.displayGraphicData("FF".repeat(e.numberCellColumns*e.numberCellRows));else e.displayTextData("FF".repeat(e.numberBrailleCellColumns)),e.displayGraphicData("FF".repeat(e.numberCellColumns*e.numberCellRows))}displayAllDown(e=null){if(null==e)for(const e of this.#se)e.displayTextData("00".repeat(e.numberBrailleCellColumns)),e.displayGraphicData("00".repeat(e.numberCellColumns*e.numberCellRows));else e.displayTextData("00".repeat(e.numberBrailleCellColumns)),e.displayGraphicData("00".repeat(e.numberCellColumns*e.numberCellRows))}setCallBack(e,t){this.messageCallBack=e,this.keyCallBack=t}#ie(e,t,s){t==DataCodes.Disconnected&&(this.#se=this.#se.filter((t=>t!==e))),this.messageCallBack&&this.messageCallBack(e,t,s)}#U(e,t,s){this.keyCallBack&&this.keyCallBack(e,t,s)}}window.DataCodes=DataCodes;window.DeviceInfo=DeviceInfo;window.DisplayMode=DisplayMode;window.DotDevice=DotDevice;window.DotPadSDK=DotPadSDK;window.DotPadScanner=DotPadScanner;window.KeyCodes=KeyCodes;</script>
+
+  <!-- ══ 게임 로직 ═══════════════════════════════════════════════════════════ -->
+  <script>
+  (function () {
+    'use strict';
+
+    // ── URL 파라미터 / 임베드 규격 ─────────────────────────────────────────
+    var params = new URLSearchParams(location.search);
+    var IS_EMBED = params.get('embed') === '1';
+    var LANG = params.get('lang') === 'en' ? 'en' : 'ko';
+
+    function post(msg) {
+      try { window.parent.postMessage(Object.assign({ source: 'dotarcade' }, msg), '*'); } catch (e) {}
+    }
+    var readySent = false;
+    function postReady() { if (!readySent) { readySent = true; post({ type: 'ready' }); } }
+    function postExit() { post({ type: 'exit' }); }
+    function watchResize() {
+      if (window.self === window.top) return;
+      var last = 0;
+      var report = function () {
+        var h = Math.ceil(document.documentElement.scrollHeight);
+        if (h !== last) { last = h; post({ type: 'resize', height: h }); }
+      };
+      if (window.ResizeObserver) { new ResizeObserver(report).observe(document.body); }
+      report();
+    }
+
+    // ── 음성 (TW_TTS 우선, 폴백은 개발 환경 전용) ─────────────────────────
+    var lastSpoken = '';
+    function speak(text) {
+      if (!text) return;
+      lastSpoken = text;
+      var live = document.getElementById('live');
+      if (live) { live.textContent = ''; setTimeout(function () { live.textContent = text; }, 30); }
+      var tts = window.TW_TTS;
+      if (tts && typeof tts.speak === 'function') {
+        try { if (tts.stop) tts.stop(); if (tts.cancel) tts.cancel(); } catch (e) {}
+        tts.speak(text); return;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = LANG === 'en' ? 'en-US' : 'ko-KR'; u.rate = 1.05;
+        window.speechSynthesis.speak(u);
+      }
+    }
+    function replay() { if (lastSpoken) speak(lastSpoken); }
+
+    // ── 60×40 그리드 → 300바이트 → 600 HEX (닷패드 GRAPHIC, 2×4 셀 컬럼우선) ─
+    var BIT_ORDER = [
+      { x: 0, y: 0, b: 0 }, { x: 0, y: 1, b: 1 }, { x: 0, y: 2, b: 2 }, { x: 0, y: 3, b: 3 },
+      { x: 1, y: 0, b: 4 }, { x: 1, y: 1, b: 5 }, { x: 1, y: 2, b: 6 }, { x: 1, y: 3, b: 7 }
+    ];
+    function emptyGrid() {
+      var g = new Array(40);
+      for (var y = 0; y < 40; y++) { g[y] = new Array(60).fill(false); }
+      return g;
+    }
+    function gridToHex(g) {
+      var bytes = [];
+      for (var cy = 0; cy < 10; cy++) {
+        for (var cx = 0; cx < 30; cx++) {
+          var bx = cx * 2, by = cy * 4, byte = 0;
+          for (var i = 0; i < 8; i++) {
+            var o = BIT_ORDER[i];
+            if (g[by + o.y] && g[by + o.y][bx + o.x]) byte |= (1 << o.b);
+          }
+          bytes.push(byte);
+        }
+      }
+      return bytes.map(function (b) { return ('0' + b.toString(16)).slice(-2).toUpperCase(); }).join('');
+    }
+
+    // ── 스틱 그리기 (5개씩 묶어 세기 쉽게, 남은 만큼 왼쪽부터 채움) ─────────
+    function stickPositions(count) {
+      var pos = [], STICK_W = 2, GAP = 2, GROUP_GAP = 6, START = 8, x = START;
+      for (var i = 0; i < count; i++) {
+        if (i > 0) { x += (i % 5 === 0) ? (STICK_W + GROUP_GAP) : (STICK_W + GAP); }
+        pos.push(x);
+      }
+      return pos;
+    }
+    function drawSticks(g, count) {
+      if (count <= 0) return;
+      if (count === 1) {
+        // 마지막 한 개 — 특별한 빛: 더 굵고 더 길게
+        var cx = 29;
+        for (var yy = 3; yy <= 36; yy++)
+          for (var xx = cx; xx < cx + 3; xx++) g[yy][xx] = true;
+        return;
+      }
+      var pos = stickPositions(count);
+      for (var k = 0; k < pos.length; k++) {
+        var px = pos[k];
+        for (var y = 6; y <= 33; y++)
+          for (var x2 = px; x2 < px + 2; x2++) if (x2 < 60) g[y][x2] = true;
+      }
+    }
+    function drawWin(g) {
+      // 빛이 활짝 퍼진 별빛 — 채워진 마름모 + 사방 광선
+      var cx = 30, cy = 20;
+      for (var y = 0; y < 40; y++) {
+        for (var x = 0; x < 60; x++) {
+          var d = Math.abs(x - cx) + Math.abs(y - cy) * 1.4;
+          if (d <= 15 && (x + y) % 2 === 0) g[y][x] = true;       // 채움(질감)
+          if (Math.abs(d - 15) < 1.1) g[y][x] = true;             // 테두리
+        }
+      }
+      for (var i = -2; i <= 2; i++) {                             // 광선
+        for (var r = 16; r < 27; r++) {
+          if (cx + r < 60) g[cy + i][cx + r] = true;
+          if (cx - r >= 0) g[cy + i][cx - r] = true;
+        }
+      }
+    }
+    function drawLose(g) {
+      // 사라진 빛 — 작은 빈 사각형
+      var x0 = 24, x1 = 36, y0 = 13, y1 = 27;
+      for (var x = x0; x <= x1; x++) { g[y0][x] = true; g[y1][x] = true; }
+      for (var y = y0; y <= y1; y++) { g[y][x0] = true; g[y][x1] = true; }
+    }
+
+    // ── 캔버스에 핀 미리보기 (화면 = 닷패드) ───────────────────────────────
+    function drawCanvas(canvas, g) {
+      var ctx = canvas.getContext('2d');
+      var W = canvas.width, H = canvas.height;
+      var cw = W / 60, ch = H / 40, r = Math.min(cw, ch) * 0.36;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#0a130d';
+      ctx.fillRect(0, 0, W, H);
+      for (var y = 0; y < 40; y++) {
+        for (var x = 0; x < 60; x++) {
+          var on = g[y][x];
+          ctx.beginPath();
+          ctx.arc(x * cw + cw / 2, y * ch + ch / 2, r, 0, Math.PI * 2);
+          if (on) {
+            ctx.fillStyle = '#7ee38a';
+            ctx.shadowColor = 'rgba(126,227,138,0.9)'; ctx.shadowBlur = 6;
+          } else {
+            ctx.fillStyle = '#223528'; ctx.shadowBlur = 0;
+          }
+          ctx.fill();
+        }
+      }
+      ctx.shadowBlur = 0;
+    }
+
+    // ── 닷패드 연결 (인라인 SDK 사용, 하드웨어 없어도 게임은 완전 동작) ─────
+    var sdk = null, device = null, connected = false, lastHex = '';
+    var HW_MAP = {};
+    function initSdk() {
+      if (typeof window.DotPadSDK === 'undefined') return;
+      HW_MAP[KeyCodes.PanningLeft]  = 'ArrowLeft';
+      HW_MAP[KeyCodes.PanningRight] = 'ArrowRight';
+      HW_MAP[KeyCodes.KeyFunction1] = 'ArrowLeft';   // 2키 기기: F1/F2로 선택
+      HW_MAP[KeyCodes.KeyFunction2] = 'ArrowRight';
+      HW_MAP[KeyCodes.KeyFunction3] = 'Enter';        // 확정
+      HW_MAP[KeyCodes.KeyFunction4] = 'F1';           // 상태 다시 듣기
+      HW_MAP[KeyCodes.PanningAll]   = 'F1';
+      sdk = new DotPadSDK();
+      sdk.setCallBack(
+        function (dev, code) {
+          if (code === DataCodes.Connected) { device = dev; connected = true; setDpStatus(true); speak('닷패드가 연결되었어요.'); if (lastHex) pushHex(lastHex); }
+          else if (code === DataCodes.Disconnected) { device = null; connected = false; setDpStatus(false); }
+        },
+        function (dev, key) {
+          var dom = HW_MAP[key];
+          if (dom) window.dispatchEvent(new KeyboardEvent('keydown', { key: dom, bubbles: true, cancelable: true }));
+        }
+      );
+    }
+    function setDpStatus(on) {
+      var el = document.getElementById('dpStatus');
+      el.textContent = on ? '닷패드 연결됨' : '닷패드 미연결';
+      el.className = 'dp-status' + (on ? ' on' : '');
+    }
+    async function connectDot() {
+      if (!('bluetooth' in navigator) || !window.isSecureContext) {
+        speak('이 환경에서는 닷패드 블루투스 연결을 쓸 수 없어요. 크롬 브라우저와 https 주소가 필요해요. 그래도 키보드와 음성으로 게임을 즐길 수 있어요.');
+        return;
+      }
+      if (connected) { speak('이미 연결되어 있어요.'); return; }
+      try {
+        var scanner = new DotPadScanner();
+        var ble = await scanner.startBleScan();
+        if (!ble) return;
+        var dev = await sdk.connectBleDevice(ble);
+        if (dev) { device = dev; connected = true; setDpStatus(true); if (lastHex) pushHex(lastHex); }
+      } catch (e) { /* 사용자가 취소 */ }
+    }
+    function pushHex(hex) {
+      lastHex = hex;
+      if (connected && device && sdk) { try { sdk.displayGraphicData(hex); } catch (e) {} }
+    }
+
+    // ── 게임 상태 ──────────────────────────────────────────────────────────
+    var S = { screen: 'title', sticks: 10, turn: 'you', choice: 1, diff: 'normal', winner: null, busy: false };
+    var START_COUNT = 10;
+
+    var elTitle = document.getElementById('screenTitle');
+    var elPlay = document.getElementById('screenPlay');
+    var elResult = document.getElementById('screenResult');
+
+    function show(screen) {
+      S.screen = screen;
+      elTitle.classList.toggle('hidden', screen !== 'title');
+      elPlay.classList.toggle('hidden', screen !== 'play');
+      elResult.classList.toggle('hidden', screen !== 'result');
+    }
+
+    // 최선의 수: 상대에게 3의 배수를 남긴다 (마지막 가져가면 승리)
+    function optimalTake(n) {
+      var r = n % 3, t = (r === 0) ? 1 : r;
+      return Math.max(1, Math.min(t, 2, n));
+    }
+    function aiChoose(n) {
+      var maxT = Math.min(2, n);
+      var rand = 1 + Math.floor(Math.random() * maxT);
+      if (S.diff === 'easy') return rand;
+      if (S.diff === 'normal') return Math.random() < 0.6 ? optimalTake(n) : rand;
+      return optimalTake(n);
+    }
+
+    // ── 렌더 ───────────────────────────────────────────────────────────────
+    function renderTactile() {
+      var g = emptyGrid();
+      if (S.screen === 'result') {
+        (S.winner === 'you' ? drawWin : drawLose)(g);
+        drawCanvas(document.getElementById('pinsR'), g);
+      } else {
+        drawSticks(g, S.sticks);
+        drawCanvas(document.getElementById('pins'), g);
+      }
+      pushHex(gridToHex(g));
+    }
+
+    function renderPlay() {
+      document.getElementById('countBig').textContent = S.sticks;
+      var tag = document.getElementById('turnTag');
+      if (S.turn === 'you') { tag.textContent = '당신 차례'; tag.className = 'turn-tag you'; }
+      else { tag.textContent = '탐험가 닷 차례'; tag.className = 'turn-tag dot'; }
+
+      var maxT = Math.min(2, S.sticks);
+      if (S.choice > maxT) S.choice = maxT;
+      var c1 = document.getElementById('choice1'), c2 = document.getElementById('choice2');
+      c2.disabled = maxT < 2;
+      c1.setAttribute('aria-pressed', String(S.choice === 1));
+      c2.setAttribute('aria-pressed', String(S.choice === 2));
+
+      var canAct = S.turn === 'you' && !S.busy && S.sticks > 0;
+      document.getElementById('takeBtn').disabled = !canAct;
+      c1.disabled = !canAct;
+      c2.disabled = !canAct || maxT < 2;
+      renderTactile();
+    }
+
+    // ── 흐름 ───────────────────────────────────────────────────────────────
+    function startGame() {
+      S.sticks = START_COUNT; S.turn = 'you'; S.choice = 1; S.winner = null; S.busy = false;
+      show('play'); renderPlay();
+      setTimeout(function () {
+        speak('게임을 시작해요. 빛나는 닷 스틱이 ' + START_COUNT + '개 있어요. 당신이 먼저예요. 화살표로 1개 또는 2개를 고르고, 엔터를 눌러 가져가세요.');
+      }, 60);
+    }
+
+    function setChoice(n) {
+      if (S.turn !== 'you' || S.busy) return;
+      var maxT = Math.min(2, S.sticks);
+      if (n > maxT) n = maxT;
+      if (n < 1) n = 1;
+      S.choice = n;
+      renderPlay();
+      var remain = S.sticks - n;
+      speak(n + '개 선택. 가져가면 ' + remain + '개가 남아요.');
+    }
+
+    function playerTake() {
+      if (S.turn !== 'you' || S.busy || S.sticks <= 0) return;
+      var take = Math.min(S.choice, S.sticks);
+      S.sticks -= take;
+      if (S.sticks <= 0) { endGame('you'); return; }
+      S.busy = true; renderPlay();
+      setStatus('당신이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요.');
+      speak('당신이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요.');
+      setTimeout(aiTurn, 1600);
+    }
+
+    function aiTurn() {
+      S.turn = 'dot'; renderPlay();
+      var take = Math.min(aiChoose(S.sticks), S.sticks);
+      S.sticks -= take;
+      if (S.sticks <= 0) {
+        setStatus('탐험가 닷이 ' + take + '개를 가져갔어요.');
+        speak('탐험가 닷이 마지막 ' + take + '개를 가져갔어요.');
+        setTimeout(function () { endGame('dot'); }, 900);
+        return;
+      }
+      S.turn = 'you'; S.busy = false; S.choice = Math.min(1, S.sticks); if (S.choice < 1) S.choice = 1;
+      S.choice = 1; renderPlay();
+      setStatus('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 당신 차례예요.');
+      speak('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 이제 당신 차례예요. 1개 또는 2개를 고르세요.');
+    }
+
+    function endGame(winner) {
+      S.winner = winner; S.busy = false; show('result');
+      var head = document.getElementById('resultH');
+      var text = document.getElementById('resultText');
+      if (winner === 'you') {
+        head.textContent = '승리!'; head.className = 'result-head win';
+        text.textContent = '마지막 닷 스틱을 당신이 가져갔어요. 특별한 빛이 숲에 활짝 퍼졌어요!';
+        renderTactile();
+        setTimeout(function () { speak('마지막 닷 스틱을 당신이 가져갔어요! 빛이 활짝 퍼졌어요. 당신의 승리예요. 다시 하려면 엔터를 누르세요.'); }, 60);
+      } else {
+        head.textContent = '아쉬워요'; head.className = 'result-head lose';
+        text.textContent = '마지막 닷 스틱을 탐험가 닷이 가져갔어요. 다음엔 3의 배수를 남겨 보세요.';
+        renderTactile();
+        setTimeout(function () { speak('마지막 닷 스틱을 탐험가 닷이 가져갔어요. 이번엔 닷이 이겼어요. 다시 하려면 엔터를 누르세요.'); }, 60);
+      }
+    }
+
+    function setStatus(t) { document.getElementById('statusLine').textContent = t; }
+
+    // ── 난이도 선택 (시작 화면) ───────────────────────────────────────────
+    var DIFFS = ['easy', 'normal', 'hard'];
+    var DIFF_NAME = { easy: '연습', normal: '대결', hard: '고수' };
+    function setDiff(d) {
+      S.diff = d;
+      var btns = document.querySelectorAll('.diff');
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.diff === d)); });
+      speak('난이도 ' + DIFF_NAME[d] + '.');
+    }
+    function cycleDiff(dir) {
+      var i = DIFFS.indexOf(S.diff);
+      i = (i + dir + DIFFS.length) % DIFFS.length;
+      setDiff(DIFFS[i]);
+    }
+
+    // ── 도움말 ─────────────────────────────────────────────────────────────
+    function helpText() {
+      return '닷 스틱 놀이. 빛나는 스틱 ' + START_COUNT + '개에서 시작해요. 당신과 탐험가 닷이 번갈아, 한 번에 1개 또는 2개를 가져가요. 마지막 스틱을 가져가는 사람이 이겨요. '
+        + '조작 방법. 왼쪽 오른쪽 화살표로 가져갈 개수를 정하고, 엔터로 가져가요. 에프원은 지금 상태 다시 듣기, 에프투는 닷패드에 촉각을 다시 보내기, 에프쓰리는 도움말, 에프포는 새 게임이에요. '
+        + '닷패드에서는 패닝키 좌우로 개수를 정하고 기능키 3으로 가져가요.';
+    }
+
+    // ── 키 입력 ────────────────────────────────────────────────────────────
+    var GAME_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', ' ', 'F1', 'F2', 'F3', 'F4', 'Escape'];
+    window.addEventListener('keydown', function (e) {
+      var tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (GAME_KEYS.indexOf(e.key) === -1) return;
+      e.preventDefault();
+      var k = e.key;
+
+      if (k === 'F3') { speak(helpText()); return; }
+      if (k === 'Escape') { if (IS_EMBED) postExit(); return; }
+
+      if (S.screen === 'title') {
+        if (k === 'ArrowLeft' || k === 'ArrowUp') cycleDiff(-1);
+        else if (k === 'ArrowRight' || k === 'ArrowDown') cycleDiff(1);
+        else if (k === 'Enter' || k === ' ') startGame();
+        return;
+      }
+      if (S.screen === 'play') {
+        if (k === 'F1') { replay(); return; }
+        if (k === 'F2') { if (lastHex) pushHex(lastHex); speak(connected ? '닷패드에 촉각을 다시 보냈어요.' : '지금 남은 스틱은 ' + S.sticks + '개예요.'); return; }
+        if (k === 'F4') { startGame(); return; }
+        if (k === 'ArrowLeft' || k === 'ArrowUp') setChoice(1);
+        else if (k === 'ArrowRight' || k === 'ArrowDown') setChoice(2);
+        else if (k === 'Enter' || k === ' ') playerTake();
+        return;
+      }
+      if (S.screen === 'result') {
+        if (k === 'F1') { replay(); return; }
+        if (k === 'Enter' || k === ' ') startGame();
+      }
+    });
+
+    // ── 버튼(마우스/터치) ─────────────────────────────────────────────────
+    document.getElementById('connectBtn').addEventListener('click', connectDot);
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('takeBtn').addEventListener('click', playerTake);
+    document.getElementById('againBtn').addEventListener('click', startGame);
+    document.getElementById('choice1').addEventListener('click', function () { setChoice(1); });
+    document.getElementById('choice2').addEventListener('click', function () { setChoice(2); });
+    document.querySelectorAll('.diff').forEach(function (b) {
+      b.addEventListener('click', function () { setDiff(b.dataset.diff); });
+    });
+
+    // ── 반딧불 장식 ────────────────────────────────────────────────────────
+    (function fireflies() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var box = document.getElementById('fireflies');
+      for (var i = 0; i < 14; i++) {
+        var f = document.createElement('span');
+        f.className = 'fly';
+        f.style.left = Math.random() * 100 + '%';
+        f.style.top = (60 + Math.random() * 40) + '%';
+        f.style.animationDuration = (5 + Math.random() * 6) + 's';
+        f.style.animationDelay = (Math.random() * 6) + 's';
+        box.appendChild(f);
+      }
+    })();
+
+    // ── 시작 ───────────────────────────────────────────────────────────────
+    initSdk();
+    show('title');
+    setDiff('normal');
+    // 시작 화면 촉각: 스틱 10개 미리 보여주기
+    (function () { var g = emptyGrid(); drawSticks(g, 10); drawCanvas(document.getElementById('pins'), g); lastHex = gridToHex(g); })();
+    watchResize();
+    postReady();
+    setTimeout(function () {
+      speak('닷 스틱 게임. 깊은 숲 속, 빛나는 닷 스틱 10개가 놓여 있어요. 당신과 탐험가 닷이 번갈아, 한 번에 1개 또는 2개를 가져가요. 마지막 스틱을 가져가는 사람이 이겨요. 화살표로 난이도를 고르고 엔터로 시작하세요.');
+    }, 400);
+
+  })();
+  </script>
+</body>
+</html>
