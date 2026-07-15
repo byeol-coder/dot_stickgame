@@ -181,8 +181,10 @@ html.embed-mode .play-screen .stage {
 html.embed-mode #screenPlay .preview-wrap,
 html.embed-mode .play-screen .preview-wrap {
   width: 100%;
+  max-width: 520px;
   height: 100%;
   min-height: 0;
+  max-height: min(25vh, 190px);
   padding: clamp(8px, 1.4vh, 12px);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
