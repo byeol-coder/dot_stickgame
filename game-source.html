@@ -9,12 +9,9 @@
        TW_TTS 우선, 로드 실패 시에만 브라우저 음성으로 폴백한다. -->
   <script src="https://dot-games-host.vercel.app/tts.js"></script>
 
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
   <style>
     /* ── 닷 스틱 — 밤 숲의 빛나는 막대 ───────────────────────────────────────
@@ -34,8 +31,8 @@
       --amber-hot: #ffe6a3;
       --lose:      #ef9b82;   /* 패배 */
       --pin-off:   #223528;   /* 내려간 핀 */
-      --font-display: 'Jua', 'Pretendard Variable', sans-serif;
-      --font-body: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            --font-body: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -121,7 +118,7 @@
     }
     .intro-topbar {
       position: relative; z-index: 2; display: flex; align-items: center; gap: 10px;
-      padding: 14px clamp(16px, 4vw, 32px); color: var(--ink-dim); font-size: 13px;
+              padding: 16px clamp(20px, 5vw, 48px); color: var(--ink-dim); font-size: 13px;
     }
     .intro-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
     .intro-device { margin-left: auto; display: flex; align-items: center; gap: 10px; }
@@ -137,7 +134,7 @@
     }
     .intro-title { margin: 0 0 6px; line-height: 1; }
     .intro-title__ko {
-      display: block; font-family: var(--font-display); font-weight: 400;
+      display: block; font-family: var(--font-display); font-weight: 800;
       font-size: clamp(40px, 9vw, 64px); color: var(--amber-hot);
       text-shadow: 0 0 26px rgba(255,207,92,0.35); letter-spacing: .01em;
       animation: title-glow 3.6s ease-in-out infinite;
@@ -155,7 +152,7 @@
 
     .intro-start {
       position: relative; overflow: hidden; width: 100%; max-width: 420px;
-      font-family: var(--font-display); font-size: clamp(22px, 3vw, 26px); font-weight: 400;
+      font-family: var(--font-display); font-size: clamp(22px, 3vw, 26px); font-weight: 700;
       color: #06210f; background: linear-gradient(180deg, #bff5c8 0%, var(--glow) 60%, #57c96a 100%);
       border: none; border-radius: 16px; padding: 16px; min-height: 60px; cursor: pointer;
       box-shadow: 0 0 0 5px rgba(126,227,138,0.10), 0 10px 26px rgba(0,0,0,0.3);
@@ -179,10 +176,9 @@
 
     .intro-difficulty { margin-top: 18px; }
     .intro-difficulty__legend {
-      display: flex; align-items: center; gap: 10px; margin: 0 0 10px;
+              margin: 0 0 10px;
       color: var(--ink-dim); font-size: 13px; font-weight: 700; letter-spacing: .02em;
     }
-    .intro-difficulty__legend::before, .intro-difficulty__legend::after { content: ''; height: 1px; flex: 1; background: var(--line); }
     .intro-difficulty__options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 420px; }
     .intro-difficulty__button {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -201,8 +197,10 @@
 
     .intro-controls {
       position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center;
-      gap: 8px 14px; padding: 14px clamp(20px, 5vw, 48px) 18px; color: var(--ink-dim); font-size: 12px;
+              gap: 10px 14px; padding: 16px clamp(20px, 5vw, 48px) 22px; color: var(--ink-dim); font-size: 12px;
     }
+          .intro-controls__hints { margin: 0 0 0 auto; }
+                @media (max-width: 900px) { .intro-controls__hints { margin-left: 0; } }
     .intro-utility {
       background: rgba(10,19,13,0.6); border: 1px solid var(--line); border-radius: 999px;
       color: var(--ink-dim); font-size: 12px; font-weight: 700; padding: 6px 14px; cursor: pointer;
@@ -223,12 +221,11 @@
     }
     .control-guide b { color: var(--ink); margin-right: 2px; }
     .control-guide code {
-      background: #10190f; border: 1px solid var(--line); border-radius: 6px;
+      background: #10190f; border: 1px solid var(--line); border-radius: 6px;      
       padding: 1px 6px; font-size: 12px; color: var(--glow-soft);
     }
-
     h1.title {
-      font-family: var(--font-display); font-weight: 400;
+            font-family: var(--font-display); font-weight: 800;
       font-size: clamp(34px, 8vw, 58px); line-height: 1.02; margin: 10px 0 6px;
       color: var(--amber-hot); text-shadow: 0 0 22px rgba(255,207,92,0.28);
       letter-spacing: .01em;
@@ -241,7 +238,7 @@
       background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
       padding: 18px; margin-bottom: 16px;
     }
-    .card h2 { font-family: var(--font-display); font-weight: 400; font-size: 20px; margin: 0 0 10px; color: var(--ink); }
+    .card h2 { font-family: var(--font-display); font-weight: 700; font-size: 20px; margin: 0 0 10px; color: var(--ink); }
     .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
     .field-label { font-size: 13px; color: var(--ink-dim); width: 100%; margin-bottom: 2px; }
 
@@ -258,7 +255,7 @@
     canvas#pins { width: 100%; height: auto; display: block; border-radius: 8px; margin-top: 12px; image-rendering: auto; }
     canvas#pinsR { width: 100%; height: auto; display: block; image-rendering: auto; }
 
-    .count-big { font-family: var(--font-display); font-size: clamp(40px, 12vw, 82px); line-height: 1; color: var(--glow-soft); text-shadow: 0 0 24px rgba(126,227,138,0.3); }
+        .count-big { font-family: var(--font-display); font-weight: 800; font-size: clamp(40px, 12vw, 82px); line-height: 1; color: var(--glow-soft); text-shadow: 0 0 24px rgba(126,227,138,0.3); }
     .count-cap { font-size: 14px; color: var(--ink-dim); margin-top: 2px; }
     .turn-tag {
       display: inline-block; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 15px;
@@ -270,7 +267,7 @@
     /* 가져갈 개수 선택 */
     .choices { display: flex; gap: 12px; width: 100%; max-width: 420px; }
     .choice {
-      flex: 1; font-family: var(--font-display); font-size: 26px; color: var(--ink);
+            flex: 1; font-family: var(--font-display); font-weight: 700; font-size: 26px; color: var(--ink);
       background: #10190f; border: 2px solid var(--line); border-radius: 16px;
       padding: 18px 8px 14px; cursor: pointer; min-height: 88px; text-align: center;
       transition: border-color .12s, background .12s, transform .05s;
@@ -289,7 +286,7 @@
     .confirm-btn {
       font-family: var(--font-display); font-size: 22px; width: 100%; max-width: 420px;
       background: var(--glow); color: #06210f; border: none; border-radius: 14px;
-      padding: 15px; min-height: 58px; cursor: pointer; font-weight: 400;
+            padding: 15px; min-height: 58px; cursor: pointer; font-weight: 700;
       transition: filter .12s, transform .05s;
     }
     .confirm-btn:hover { filter: brightness(1.08); }
@@ -297,7 +294,7 @@
     .confirm-btn:disabled { background: var(--line); color: var(--ink-dim); cursor: not-allowed; }
     .confirm-btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 
-    .result-head { font-family: var(--font-display); font-size: clamp(30px, 7vw, 46px); margin: 6px 0; }
+        .result-head { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 7vw, 46px); margin: 6px 0; }
     .result-head.win  { color: var(--amber-hot); text-shadow: 0 0 22px rgba(255,207,92,0.35); }
     .result-head.lose { color: var(--lose); }
 
@@ -365,7 +362,7 @@
     .result-button:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
     .result-button--primary {
       grid-column: 1 / -1; min-height: 62px; color: #092313; background: linear-gradient(180deg, #a5f4a9, #6edc7b);
-      border-color: #c9ffce; font-family: var(--font-display); font-size: 20px; font-weight: 400;
+            border-color: #c9ffce; font-family: var(--font-display); font-size: 20px; font-weight: 700;
       box-shadow: 0 0 0 5px rgba(126,227,138,0.09), 0 0 28px rgba(126,227,138,0.23);
     }
     .result-button--primary:hover { border-color: #fff; box-shadow: 0 0 0 6px rgba(126,227,138,0.11), 0 0 36px rgba(126,227,138,0.32); }
@@ -757,7 +754,7 @@
         <div class="intro-controls">
           <button class="intro-utility" id="introHelpBtn" type="button">게임 방법</button>
           <button class="intro-utility" id="introReplayBtn" type="button">안내 다시 듣기</button>
-          <span class="control-guide" style="margin:0;">
+          <span class="control-guide intro-controls__hints">
             <span><b>키보드</b> <code>← →</code> 난이도 · <code>Enter</code> 시작 · <code>F3</code> 도움말</span>
             <span><b>닷패드</b> 패닝키 좌·우로 선택 · 기능키 3으로 시작</span>
           </span>
