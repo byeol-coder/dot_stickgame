@@ -101,7 +101,8 @@
       position: fixed; inset: 0; z-index: 10;
       display: flex; flex-direction: column;
       background: #050b07;
-      overflow: hidden; isolation: isolate;
+      overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable;
+      isolation: isolate;
     }
     .intro-screen.hidden { display: none !important; }
     .intro-hero { position: absolute; inset: 0; z-index: 0; }
@@ -123,7 +124,7 @@
     .intro-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
     .intro-device { margin-left: auto; display: flex; align-items: center; gap: 10px; }
     .intro-content {
-      position: relative; z-index: 2; flex: 1;
+      position: relative; z-index: 2; flex: 1 0 auto;
       display: flex; flex-direction: column; justify-content: flex-end;
       padding: 0 clamp(20px, 5vw, 48px) clamp(20px, 4vw, 32px);
       max-width: 640px; width: 100%;
@@ -174,12 +175,12 @@
     .intro-start:active { transform: translateY(1px); }
     .intro-start:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 
-    .intro-difficulty { margin-top: 18px; }
+    .intro-difficulty { width: 100%; max-width: 420px; margin-top: 18px; }
     .intro-difficulty__legend {
               margin: 0 0 10px;
       color: var(--ink-dim); font-size: 13px; font-weight: 700; letter-spacing: .02em;
     }
-    .intro-difficulty__options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 420px; }
+    .intro-difficulty__options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; }
     .intro-difficulty__button {
       display: flex; flex-direction: column; align-items: center; gap: 4px;
       min-height: 64px; padding: 10px 6px; color: var(--ink-dim);
@@ -196,12 +197,13 @@
     .intro-difficulty__button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 
     .intro-controls {
-      position: relative; z-index: 2; display: flex; flex-wrap: wrap; align-items: center;
-              gap: 10px 14px; padding: 16px clamp(20px, 5vw, 48px) 22px; color: var(--ink-dim); font-size: 12px;
+      position: relative; z-index: 2; display: grid; grid-template-columns: repeat(2, max-content) minmax(0, 1fr); align-items: center;
+              gap: 12px 14px; padding: 16px clamp(20px, 5vw, 48px) max(22px, env(safe-area-inset-bottom)); color: var(--ink-dim); font-size: 12px;
     }
-          .intro-controls__hints { margin: 0 0 0 auto; }
+          .intro-controls__hints { order: 3; grid-column: 1 / -1; max-width: 600px; margin: 0; }
                 @media (max-width: 900px) { .intro-controls__hints { margin-left: 0; } }
     .intro-utility {
+      order: 1;
       background: rgba(10,19,13,0.6); border: 1px solid var(--line); border-radius: 999px;
       color: var(--ink-dim); font-size: 12px; font-weight: 700; padding: 6px 14px; cursor: pointer;
     }
@@ -631,16 +633,20 @@
     .voice-control {
       min-height: 42px; padding: 8px 12px; color: var(--ink); background: #14201a;
       border: 1px solid var(--line); border-radius: 10px; font: 700 13px/1.2 var(--font-body); cursor: pointer;
+      white-space: nowrap;
     }
     .voice-control:hover { border-color: var(--glow); }
     .voice-control:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
     .voice-control[aria-pressed="true"] { color: var(--amber-hot); border-color: var(--amber); }
 
+    .intro-controls .voice-controls {
+      order: 2; grid-column: 1 / -1; position: static; z-index: auto; width: min(100%, 560px); max-width: min(100%, 560px);
+      justify-content: center; margin: 0; box-shadow: none; backdrop-filter: none;
+    }
+    .intro-controls .voice-control { flex: 0 1 auto; }
+
     /* 임베드에서는 떠 있는 패널을 없애고 현재 화면의 문서 흐름 안에 배치한다. */
     html.embed-mode, html.embed-mode body { min-height: 100%; height: auto; }
-    html.embed-mode .intro-screen {
-      overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable;
-    }
     html.embed-mode .intro-content { flex: 0 0 auto; margin-top: auto; }
     html.embed-mode .intro-controls { flex: 0 0 auto; align-items: stretch; }
     html.embed-mode .intro-controls .intro-utility { order: 1; align-self: center; }
@@ -658,27 +664,33 @@
       transform: none; border-radius: 18px;
     }
 
-    @media (max-height: 520px) {
-      html.embed-mode .intro-screen { display: block; }
-      html.embed-mode .intro-topbar { padding-block: 8px; }
-      html.embed-mode .intro-content { margin: 0; padding-top: 6px; padding-bottom: 10px; }
-      html.embed-mode .intro-eyebrow, html.embed-mode .intro-summary { display: none; }
-      html.embed-mode .intro-title__ko { font-size: clamp(34px, 7vw, 48px); }
-      html.embed-mode .intro-title__en { font-size: 12px; }
-      html.embed-mode .intro-tagline { margin-top: 6px; }
-      html.embed-mode .intro-start { min-height: 50px; padding: 11px 14px; }
-      html.embed-mode .intro-difficulty { margin-top: 10px; }
-      html.embed-mode .intro-difficulty__legend { margin-bottom: 7px; }
-      html.embed-mode .intro-difficulty__button { min-height: 54px; padding-block: 7px; }
-      html.embed-mode .intro-controls { padding-block: 8px 12px; }
-      html.embed-mode .voice-control { min-height: 40px; padding-block: 7px; }
+    @media (max-height: 560px) {
+      .intro-screen { display: block; }
+      .intro-topbar { padding-block: 8px; }
+      .intro-content { margin: 0; padding-top: 6px; padding-bottom: 10px; }
+      .intro-eyebrow, .intro-summary { display: none; }
+      .intro-title__ko { font-size: clamp(34px, 7vw, 48px); }
+      .intro-title__en { font-size: 12px; }
+      .intro-tagline { margin-top: 6px; }
+      .intro-start { min-height: 50px; padding: 11px 14px; }
+      .intro-difficulty { margin-top: 10px; }
+      .intro-difficulty__legend { margin-bottom: 7px; }
+      .intro-difficulty__button { min-height: 54px; padding-block: 7px; }
+      .intro-controls { padding-block: 8px 12px; }
+      .voice-control { min-height: 40px; padding-block: 7px; }
       html.embed-mode .result-layout { min-height: 0; align-content: start; padding-top: 22px; }
     }
 
     @media (max-height: 360px) {
-      html.embed-mode .intro-controls .control-guide { display: none; }
-      html.embed-mode .intro-device .dp-status { display: none; }
+      .intro-controls .control-guide { display: none; }
+      .intro-device .dp-status { display: none; }
       html.embed-mode .result-controls { display: none; }
+    }
+
+    @media (max-width: 560px) {
+      .intro-controls { align-items: stretch; }
+      .intro-controls .voice-controls { max-width: 100%; }
+      .intro-controls .voice-control { flex: 1 1 0; min-width: 0; }
     }
 
     @media (max-width: 480px) {
@@ -808,7 +820,7 @@
 
       <!-- ── 결과 화면 ─────────────────────────────────────────────── -->
       <section id="screenResult" class="result-screen hidden" aria-labelledby="resultH" data-result="lose">
-        <img class="result-screen__background" src="assets/dot-stick-result-bg.jpg" alt="" aria-hidden="true" />
+        <img class="result-screen__background" src="assets/dot-stick-result-bg.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" />
         <div class="result-screen__overlay" aria-hidden="true"></div>
         <div class="result-screen__vignette" aria-hidden="true"></div>
         <div class="result-fireflies" aria-hidden="true">
@@ -1254,13 +1266,16 @@
     // ── 게임 상태 ──────────────────────────────────────────────────────────
     var S = { screen: 'title', sticks: 10, turn: 'you', choice: 1, diff: 'normal', winner: null, busy: false, tactileMode: '' };
     var START_COUNT = 10;
+    // 한 판을 식별하는 세대 토큰. 새 게임을 시작하면 증가하며,
+    // 이전 판에서 예약된 await 이후 콜백(AI 턴/결과 확정)이 새 판을 덮어쓰지 못하게 막는다.
+    var gameGen = 0;
 
     var elTitle = document.getElementById('screenTitle');
     var elPlay = document.getElementById('screenPlay');
     var elResult = document.getElementById('screenResult');
+    var voiceControlsHome = document.body;
 
     function placeVoiceControls(screen) {
-      if (!IS_EMBED) return;
       var controls = document.querySelector('.voice-controls');
       if (!controls) return;
       if (screen === 'title') {
@@ -1268,10 +1283,18 @@
         var guide = introControls && introControls.querySelector('.control-guide');
         if (introControls) introControls.insertBefore(controls, guide || null);
       } else if (screen === 'play') {
+        if (!IS_EMBED) {
+          voiceControlsHome.appendChild(controls);
+          return;
+        }
         var stage = document.querySelector('#screenPlay .stage');
         var playGuide = stage && stage.querySelector('.control-guide');
         if (stage) stage.insertBefore(controls, playGuide || null);
       } else if (screen === 'result') {
+        if (!IS_EMBED) {
+          voiceControlsHome.appendChild(controls);
+          return;
+        }
         var actions = document.querySelector('#screenResult .result-actions');
         if (actions) actions.appendChild(controls);
       }
@@ -1341,11 +1364,14 @@
       document.getElementById('takeBtn').disabled = !canAct;
       c1.disabled = !canAct;
       c2.disabled = !canAct || maxT < 2;
+      document.getElementById('pins').setAttribute('aria-label',
+        '남은 스틱 ' + S.sticks + '개, ' + (S.turn === 'you' ? '당신' : '탐험가 닷') + ' 차례, 현재 선택 ' + S.choice + '개');
       renderTactile();
     }
 
     // ── 흐름 ───────────────────────────────────────────────────────────────
     function startGame() {
+      gameGen++;
       S.sticks = START_COUNT; S.turn = 'you'; S.choice = 1; S.winner = null; S.busy = false; S.tactileMode = '';
       show('play'); renderPlay();
       requestAnimationFrame(function () { document.getElementById('playH').focus(); });
@@ -1365,27 +1391,29 @@
 
     async function playerTake() {
       if (S.turn !== 'you' || S.busy || S.sticks <= 0) return;
+      var myGen = gameGen;
       var take = Math.min(S.choice, S.sticks);
       S.sticks -= take;
       if (S.sticks <= 0) { endGame('you'); return; }
       S.busy = true; renderPlay();
       setStatus('당신이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요.');
       await speak('당신이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요.', { liveText: '당신이 ' + take + '개 가져감. ' + S.sticks + '개 남음.' });
-      if (S.screen === 'play' && S.busy) aiTurn();
+      if (gameGen === myGen && S.screen === 'play' && S.busy) aiTurn(myGen);
     }
 
-    async function aiTurn() {
+    async function aiTurn(myGen) {
+      if (myGen == null) myGen = gameGen;
+      if (gameGen !== myGen) return;
       S.turn = 'dot'; renderPlay();
       var take = Math.min(aiChoose(S.sticks), S.sticks);
       S.sticks -= take;
       if (S.sticks <= 0) {
         setStatus('탐험가 닷이 ' + take + '개를 가져갔어요.');
         await speak('탐험가 닷이 마지막 ' + take + '개를 가져갔어요.', { liveText: '탐험가 닷이 마지막 스틱을 가져감.' });
-        if (S.screen === 'play') endGame('dot');
+        if (gameGen === myGen && S.screen === 'play') endGame('dot');
         return;
       }
-      S.turn = 'you'; S.busy = false; S.choice = Math.min(1, S.sticks); if (S.choice < 1) S.choice = 1;
-      S.choice = 1; renderPlay();
+      S.turn = 'you'; S.busy = false; S.choice = 1; renderPlay();
       setStatus('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 당신 차례예요.');
       speak('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 이제 당신 차례예요. 1개 또는 2개를 고르세요.', { liveText: '닷이 ' + take + '개 가져감. ' + S.sticks + '개 남음. 당신 차례.' });
     }
@@ -1404,6 +1432,7 @@
     }
 
     async function showWinResult() {
+      var myGen = gameGen;
       var resultScreen = document.getElementById('screenResult');
       resultScreen.dataset.result = 'win';
       document.getElementById('resultBadge').textContent = '마지막 빛 획득';
@@ -1421,10 +1450,11 @@
         speak('마지막 빛을 찾았어요! 당신이 마지막 닷 스틱을 가져왔습니다. 닷패드에 트로피가 표시됩니다. 숲에 특별한 빛이 퍼졌어요. 다시 도전하려면 엔터 또는 닷패드 기능키 3을 누르세요.', { interrupt: true, liveText: '승리. 닷패드에 트로피 촉각 그래픽이 표시됩니다.' }),
         waitForTactileReading()
       ]);
-      if (S.screen === 'result' && S.winner === 'you') showRetryTactile();
+      if (gameGen === myGen && S.screen === 'result' && S.winner === 'you') showRetryTactile();
     }
 
     async function showLoseResult() {
+      var myGen = gameGen;
       var resultScreen = document.getElementById('screenResult');
       resultScreen.dataset.result = 'lose';
       document.getElementById('resultBadge').textContent = '탐험가 닷의 발견';
@@ -1442,7 +1472,7 @@
         speak('탐험가 닷이 마지막 빛을 먼저 찾았어요. 닷패드에 금이 간 방패가 표시됩니다. 하지만 빛의 규칙을 발견했습니다. 상대에게 3, 6, 9개의 스틱을 남겨 보세요. 다시 도전하려면 엔터 또는 닷패드 기능키 3을 누르세요.', { interrupt: true, liveText: '패배. 닷패드에 금이 간 방패 촉각 그래픽이 표시됩니다.' }),
         waitForTactileReading()
       ]);
-      if (S.screen === 'result' && S.winner === 'dot') showRetryTactile();
+      if (gameGen === myGen && S.screen === 'result' && S.winner === 'dot') showRetryTactile();
     }
 
     function endGame(winner) {
