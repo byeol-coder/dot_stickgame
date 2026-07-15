@@ -676,10 +676,23 @@
     }
     html.embed-mode #screenPlay .voice-controls { margin-top: 4px; }
     html.embed-mode .result-actions > .voice-controls { grid-column: 1 / -1; }
-    /* 결과 화면(비임베드)에서는 떠 있는 음성 패널을 오른쪽 아래로 옮겨, 왼쪽 아래의
-       '난이도 바꾸기'·'결과 다시 듣기' 버튼과 겹치지 않게 한다(레이아웃 높이 영향 없음). */
-    body.is-result .voice-controls {
-      left: auto; right: max(14px, env(safe-area-inset-right));
+    /* 결과 화면 음성 패널: 기본은 결과 버튼 목록 안(흐름)에 한 줄로 배치(임베드·좁은 화면)
+       → 버튼과 겹치지 않는다. 넓은 비임베드 화면에서는 오른쪽 아래에 떠 있게 되돌려
+       액션 열 높이에 영향을 주지 않는다. 화면 크기 변화는 CSS가 자동 처리한다. */
+    .result-actions > .voice-controls {
+      position: static; z-index: auto; left: auto; right: auto; bottom: auto;
+      grid-column: 1 / -1; width: 100%; max-width: none; margin: 0;
+      justify-content: center; box-shadow: none; backdrop-filter: none;
+    }
+    @media (min-width: 781px) {
+      html:not(.embed-mode) .result-actions > .voice-controls {
+        position: fixed; z-index: 30; grid-column: auto;
+        left: auto; right: max(14px, env(safe-area-inset-right));
+        bottom: max(76px, calc(env(safe-area-inset-bottom) + 14px));
+        width: auto; max-width: calc(100vw - 28px); justify-content: flex-start;
+        background: rgba(3,12,7,.88); border: 1px solid rgba(126,227,138,.28);
+        border-radius: 16px; backdrop-filter: blur(14px); box-shadow: 0 8px 30px rgba(0,0,0,.35);
+      }
     }
     html.embed-mode .result-layout { padding-bottom: 28px; }
     html.embed-mode .result-controls {
@@ -1852,13 +1865,10 @@
         var playGuide = stage && stage.querySelector('.control-guide');
         if (stage) stage.insertBefore(controls, playGuide || null);
       } else if (screen === 'result') {
-        if (!IS_EMBED) {
-          // 비임베드: 떠 있는 패널 유지하되 body.is-result로 오른쪽 아래에 도킹(겹침 방지).
-          voiceControlsHome.appendChild(controls);
-          return;
-        }
+        // 항상 결과 버튼 목록 안에 배치한다. 떠 있기/흐름 배치는 CSS가 화면폭으로 결정.
         var actions = document.querySelector('#screenResult .result-actions');
         if (actions) actions.appendChild(controls);
+        else voiceControlsHome.appendChild(controls);
       }
     }
 
