@@ -436,6 +436,197 @@
       .result-icon, .result-preview__glow { animation: none; }
     }
 
+    /* ── 전체 배경형 결과 화면 ─────────────────────────────────────────── */
+    .result-screen {
+      position: fixed; inset: 0; z-index: 20; min-height: 100dvh; overflow: auto;
+      isolation: isolate; color: #f3f5ef; background: #020906;
+    }
+    .result-screen.hidden { display: none; }
+    .result-screen__background {
+      position: fixed; inset: 0; z-index: -5; display: block; width: 100%; height: 100%;
+      object-fit: cover; object-position: center; pointer-events: none; user-select: none;
+      transform: scale(1.02); animation: result-background-camera 18s ease-in-out infinite alternate;
+    }
+    .result-screen__overlay, .result-screen__vignette { position: fixed; inset: 0; pointer-events: none; }
+    .result-screen__overlay {
+      z-index: -4;
+      background:
+        linear-gradient(90deg, rgba(1,7,4,.98) 0%, rgba(2,9,6,.93) 27%, rgba(2,9,6,.69) 49%, rgba(2,9,6,.28) 72%, rgba(2,9,6,.14) 100%),
+        linear-gradient(180deg, rgba(1,6,4,.3) 0%, transparent 30%, rgba(1,7,4,.71) 100%);
+    }
+    .result-screen[data-result="lose"] .result-screen__overlay {
+      background:
+        radial-gradient(circle at 73% 28%, rgba(82,137,192,.12), transparent 37%),
+        linear-gradient(90deg, rgba(1,7,5,.98) 0%, rgba(2,10,8,.94) 29%, rgba(3,13,12,.72) 52%, rgba(3,14,14,.31) 75%, rgba(2,8,7,.2) 100%),
+        linear-gradient(180deg, rgba(1,5,5,.25), rgba(1,7,5,.75));
+    }
+    .result-screen__vignette {
+      z-index: -3; box-shadow: inset 0 0 170px rgba(0,0,0,.72), inset 0 -140px 150px rgba(0,0,0,.55);
+    }
+    .result-layout {
+      width: min(calc(100% - 48px), 1180px); min-height: calc(100dvh - 130px); margin: 0 auto;
+      display: grid; grid-template-columns: minmax(320px,.88fr) minmax(440px,1.12fr);
+      grid-template-areas: "story tactile" "actions tactile"; align-content: center; align-items: center;
+      column-gap: clamp(32px,5vw,78px); row-gap: 28px;
+      padding: max(90px, env(safe-area-inset-top)) 0 115px;
+    }
+    .result-story { grid-area: story; max-width: 470px; }
+    .result-story__badge {
+      width: fit-content; min-height: 34px; display: inline-flex; align-items: center; gap: 9px;
+      padding: 6px 13px; color: #c8dfcc; background: rgba(8,31,20,.64);
+      border: 1px solid rgba(126,227,138,.25); border-radius: 999px;
+      font-size: 12px; font-weight: 800; letter-spacing: .03em; backdrop-filter: blur(13px);
+    }
+    .result-story__badge-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: #7ee38a;
+      box-shadow: 0 0 8px rgba(126,227,138,.8), 0 0 15px rgba(126,227,138,.35);
+    }
+    .result-screen[data-result="lose"] .result-story__badge-dot { background: #84c5ff; box-shadow: 0 0 9px rgba(132,197,255,.8); }
+    .result-moon {
+      position: relative; width: 58px; height: 58px; margin: 27px 0 18px; border-radius: 50%;
+      background: #ffdc63; box-shadow: 0 0 13px rgba(255,220,99,.58), 0 0 32px rgba(255,206,74,.28);
+      transform: rotate(-16deg);
+    }
+    .result-moon::after {
+      content: ''; position: absolute; top: -7px; left: 17px; width: 57px; height: 57px;
+      border-radius: 50%; background: #05110d;
+    }
+    .result-screen[data-result="win"] .result-moon::after { display: none; }
+    .result-story__eyebrow { margin: 0 0 10px; color: rgba(174,199,180,.66); font-size: 10px; font-weight: 900; letter-spacing: .18em; }
+    .result-title {
+      margin: 0; color: var(--amber-hot); font-family: var(--font-display); font-size: clamp(55px,6vw,86px);
+      font-weight: 400; line-height: 1.05; letter-spacing: -.045em;
+      text-shadow: 0 0 22px rgba(255,208,110,.18), 0 10px 32px rgba(0,0,0,.52);
+      animation: result-title-arrive 720ms cubic-bezier(.19,1,.22,1) both;
+    }
+    .result-screen[data-result="lose"] .result-title { color: #ff9f8c; text-shadow: 0 0 22px rgba(255,136,114,.15), 0 10px 32px rgba(0,0,0,.52); }
+    .result-description { max-width: 42ch; margin: 24px 0 0; color: #d7dfd6; font-size: clamp(15px,1.3vw,18px); line-height: 1.75; }
+    .result-secret {
+      width: 100%; max-width: 440px; margin-top: 27px; display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px; color: #fff0c3; background: linear-gradient(135deg, rgba(88,60,15,.83), rgba(44,30,10,.89));
+      border: 1px solid rgba(255,204,82,.48); border-radius: 18px;
+      box-shadow: inset 0 1px rgba(255,255,255,.08), 0 18px 40px rgba(0,0,0,.3), 0 0 35px rgba(255,187,66,.05);
+      backdrop-filter: blur(14px);
+    }
+    .result-secret__symbol {
+      width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center;
+      color: #493207; background: linear-gradient(180deg,#ffdd67,#ffbe39); border-radius: 50%; font-size: 24px;
+      box-shadow: 0 0 18px rgba(255,204,82,.3), inset 0 1px rgba(255,255,255,.5);
+    }
+    .result-secret strong { display: block; margin-bottom: 5px; color: #ffe69d; font-size: 16px; }
+    .result-secret p { margin: 0; color: #dfcfaa; font-size: 14px; line-height: 1.6; }
+    .result-tactile {
+      grid-area: tactile; position: relative; z-index: 2; width: 100%; max-width: 560px; justify-self: end;
+      align-self: center; margin: 0; padding: 21px;
+      background: linear-gradient(145deg, rgba(2,12,8,.88), rgba(3,17,11,.76));
+      border: 1px solid rgba(126,227,138,.3); border-radius: 25px;
+      box-shadow: 0 28px 75px rgba(0,0,0,.5), inset 0 1px rgba(255,255,255,.03); backdrop-filter: blur(18px);
+    }
+    .result-tactile__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 15px; padding: 0; }
+    .result-tactile__header strong, .result-tactile__header span { display: block; }
+    .result-tactile__header strong { color: #f1f5ef; font-size: 16px; }
+    .result-tactile__header div > span { margin-top: 2px; color: #819486; font-size: 12px; }
+    .result-tactile__resolution {
+      padding: 6px 10px; color: #c8ffd1 !important; background: rgba(126,227,138,.1);
+      border: 1px solid rgba(126,227,138,.24); border-radius: 999px; font-size: 12px; font-weight: 850;
+    }
+    .result-tactile__display {
+      position: relative; overflow: hidden; width: 100%; aspect-ratio: 3/2;
+      background: radial-gradient(circle at center, rgba(107,255,128,.07), transparent 48%), #061009;
+      border: 1px solid #28422f; border-radius: 16px;
+      box-shadow: inset 0 0 45px rgba(0,0,0,.48), 0 18px 35px rgba(0,0,0,.24);
+    }
+    .result-tactile__display #pinsR { position: relative; z-index: 2; display: block; width: 100%; height: 100%; object-fit: contain; }
+    .result-tactile__scan {
+      position: absolute; top: -20%; left: 0; right: 0; z-index: 4; height: 32%; pointer-events: none;
+      background: linear-gradient(180deg, transparent, rgba(126,227,138,.07), rgba(126,227,138,.18), transparent);
+      animation: result-tactile-scan 4.5s linear infinite;
+    }
+    .result-tactile__glow {
+      position: absolute; inset: 22%; z-index: 1; pointer-events: none; border-radius: 50%;
+      background: rgba(126,227,138,.11); filter: blur(32px); animation: result-tactile-pulse 2.6s ease-in-out infinite;
+    }
+    .result-tactile > p { margin: 14px 4px 0; color: #8fa294; font-size: 13px; line-height: 1.55; text-align: center; }
+    .result-actions {
+      grid-area: actions; width: 100%; max-width: 470px; margin: 0;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 11px;
+    }
+    .result-action {
+      min-height: 60px; display: flex; align-items: center; justify-content: center; gap: 11px; padding: 12px 16px;
+      color: #edf4ec; background: rgba(7,25,15,.79); border: 1px solid rgba(126,227,138,.2); border-radius: 15px;
+      font: inherit; text-align: left; cursor: pointer; backdrop-filter: blur(13px);
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+    .result-action:hover { transform: translateY(-3px); border-color: rgba(126,227,138,.67); background: rgba(12,38,22,.9); }
+    .result-action:active { transform: translateY(1px); }
+    .result-action:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
+    .result-action > span:not(.result-action__icon) { display: flex; flex-direction: column; }
+    .result-action strong { color: inherit; font-size: 15px; }
+    .result-action small { margin-top: 2px; color: inherit; opacity: .65; font-size: 9px; }
+    .result-action__icon { font-size: 23px; }
+    .result-action--primary {
+      grid-column: 1/-1; min-height: 78px; color: #092914;
+      background: linear-gradient(180deg,#a8f4ac,#6edd7a); border-color: #caffce;
+      box-shadow: 0 0 0 6px rgba(126,227,138,.07), 0 0 35px rgba(126,227,138,.22), inset 0 1px rgba(255,255,255,.48);
+    }
+    .result-screen[data-result="lose"] .result-action--primary {
+      color: #34150f; background: linear-gradient(180deg,#ffd2c3,#ff9f8c); border-color: #ffe7df;
+      box-shadow: 0 0 0 6px rgba(255,159,140,.08), 0 0 35px rgba(255,159,140,.22), inset 0 1px rgba(255,255,255,.52);
+    }
+    .result-action--primary strong { font-family: var(--font-display); font-size: 24px; font-weight: 400; }
+    .result-action--quiet { grid-column: 1/-1; min-height: 43px; color: #a1b3a4; background: transparent; border-color: transparent; font-size: 13px; }
+    .result-controls {
+      position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 8;
+      width: min(calc(100% - 40px),880px); min-height: 47px; display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 8px 17px; padding: 9px 17px; color: #819386; background: rgba(2,11,7,.78);
+      border: 1px solid rgba(126,227,138,.2); border-radius: 999px; font-size: 11px;
+      transform: translateX(-50%); backdrop-filter: blur(15px);
+    }
+    .result-controls strong { color: #e4ebe3; }
+    .result-controls kbd {
+      min-width: 27px; min-height: 25px; display: inline-grid; place-items: center; margin: 0 2px; padding: 2px 6px;
+      color: #bdf6c5; background: #101a12; border: 1px solid #36513c; border-bottom-width: 2px; border-radius: 6px;
+      font: 800 10px/1 inherit;
+    }
+    .result-controls__divider { width: 1px; height: 18px; background: rgba(255,255,255,.1); }
+    .result-fireflies { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .result-fireflies i {
+      position: absolute; left: var(--x); top: var(--y); width: 5px; height: 5px; border-radius: 50%;
+      background: #8cff9b; box-shadow: 0 0 8px rgba(126,227,138,.9), 0 0 20px rgba(126,227,138,.55);
+      opacity: 0; animation: result-firefly 5.5s ease-in-out var(--delay) infinite;
+    }
+    @keyframes result-background-camera { from { transform: scale(1.02) translate3d(0,0,0); } to { transform: scale(1.075) translate3d(-.7%,-.4%,0); } }
+    @keyframes result-title-arrive { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes result-tactile-scan { from { transform: translateY(-120%); } to { transform: translateY(450%); } }
+    @keyframes result-tactile-pulse { 0%,100% { opacity: .38; transform: scale(.92); } 50% { opacity: .8; transform: scale(1.1); } }
+    @keyframes result-firefly {
+      0%,100% { opacity: 0; transform: translateY(14px) scale(.7); } 25% { opacity: .85; }
+      70% { opacity: .45; } 90% { opacity: 0; transform: translate(20px,-36px) scale(1.1); }
+    }
+    @media (max-width: 780px) {
+      .result-screen__background { object-position: 65% top; animation: none; }
+      .result-screen__overlay, .result-screen[data-result="lose"] .result-screen__overlay {
+        background: linear-gradient(180deg, rgba(1,7,5,.07) 0%, rgba(2,10,7,.25) 25%, rgba(2,10,7,.87) 47%, rgba(2,10,7,.98) 65%, #020906 100%);
+      }
+      .result-layout {
+        width: 100%; min-height: auto; grid-template-columns: 1fr;
+        grid-template-areas: "story" "tactile" "actions"; gap: 22px; padding: 42vh 18px 105px;
+      }
+      .result-story, .result-actions, .result-tactile { width: 100%; max-width: none; }
+      .result-moon { width: 46px; height: 46px; margin-top: 19px; }
+      .result-moon::after { width: 46px; height: 46px; left: 14px; }
+      .result-title { font-size: clamp(48px,15vw,68px); }
+      .result-description br { display: none; }
+      .result-tactile { padding: 15px; border-radius: 20px; }
+      .result-actions { grid-template-columns: 1fr; }
+      .result-action, .result-action--primary, .result-action--quiet { grid-column: auto; }
+      .result-controls { bottom: 12px; width: calc(100% - 24px); gap: 5px 11px; border-radius: 18px; }
+      .result-controls__divider, .result-controls span:last-child { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .result-screen__background, .result-title, .result-tactile__scan, .result-tactile__glow, .result-fireflies i { animation: none; }
+    }
+
     .keyhint { color: var(--ink-dim); font-size: 13px; line-height: 1.7; margin-top: 6px; }
     .keyhint b { color: var(--ink); }
     .keyhint code {
@@ -566,55 +757,53 @@
       </section>
 
       <!-- ── 결과 화면 ─────────────────────────────────────────────── -->
-      <section id="screenResult" class="hidden" aria-labelledby="resultH">
-        <div class="result-card" id="resultCard" data-result="win">
-          <div class="result-copy">
-            <span class="result-badge" id="resultBadge">빛의 대결 종료</span>
-            <div class="result-icon" id="resultIcon" aria-hidden="true">✨</div>
-            <h2 id="resultH" class="result-head win">마지막 빛을 찾았어요!</h2>
-            <p class="result-message" id="resultText">특별한 빛이 숲 전체에 퍼지기 시작했어요.</p>
-
-            <aside class="strategy-reward" id="strategyReward" aria-labelledby="strategyTitle">
-              <span class="strategy-reward__icon" aria-hidden="true">✦</span>
-              <div>
-                <strong id="strategyTitle">빛의 비밀</strong>
-                <p id="resultHint">상대에게 3·6·9개의 스틱을 남겨 보세요.</p>
-              </div>
+      <section id="screenResult" class="result-screen hidden" aria-labelledby="resultH" data-result="lose">
+        <img class="result-screen__background" src="assets/dot-stick-result-bg.jpg" alt="" aria-hidden="true" />
+        <div class="result-screen__overlay" aria-hidden="true"></div>
+        <div class="result-screen__vignette" aria-hidden="true"></div>
+        <div class="result-fireflies" aria-hidden="true">
+          <i style="--x:8%; --y:68%; --delay:0s;"></i><i style="--x:15%; --y:82%; --delay:1.7s;"></i>
+          <i style="--x:31%; --y:61%; --delay:3s;"></i><i style="--x:57%; --y:79%; --delay:.8s;"></i>
+          <i style="--x:72%; --y:68%; --delay:2.4s;"></i><i style="--x:88%; --y:74%; --delay:1.2s;"></i>
+        </div>
+        <div class="result-layout">
+          <article class="result-story">
+            <div class="result-story__badge"><span class="result-story__badge-dot" aria-hidden="true"></span><span id="resultBadge">탐험가 닷의 발견</span></div>
+            <div class="result-moon" aria-hidden="true"></div>
+            <p class="result-story__eyebrow" id="resultEyebrow">THE LAST LIGHT WAS FOUND</p>
+            <h2 id="resultH" class="result-title">닷이 먼저<br />찾았어요!</h2>
+            <p id="resultText" class="result-description">탐험가 닷이 마지막 빛을 먼저 발견했어요.<br />하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.</p>
+            <aside class="result-secret" aria-labelledby="resultSecretTitle">
+              <span class="result-secret__symbol" aria-hidden="true">✦</span>
+              <div><strong id="resultSecretTitle">빛의 비밀</strong><p id="resultHint">3의 배수가 열쇠예요.<br />상대에게 3·6·9개의 스틱을 남겨 보세요.</p></div>
             </aside>
-
-            <div class="result-actions">
-              <button class="result-button result-button--primary" id="againBtn" type="button">
-                <span aria-hidden="true">↻</span> 다시 도전
-              </button>
-              <button class="result-button result-button--secondary" id="changeDiffBtn" type="button">
-                <span aria-hidden="true">◆</span> 난이도 바꾸기
-              </button>
-              <button class="result-button result-button--quiet" id="replayResultBtn" type="button">
-                <span aria-hidden="true">◖))</span> 결과 다시 듣기
-              </button>
+          </article>
+          <aside class="result-tactile" aria-labelledby="tactileResultTitle">
+            <header class="result-tactile__header">
+              <div><strong id="tactileResultTitle">손끝으로 확인하기</strong><span>닷패드 촉각 결과</span></div>
+              <span class="result-tactile__resolution">60 × 40</span>
+            </header>
+            <div class="result-tactile__display">
+              <span class="result-tactile__scan" aria-hidden="true"></span>
+              <canvas id="pinsR" width="420" height="280" role="img" aria-label="게임 결과를 나타내는 촉각 문양"></canvas>
+              <span class="result-tactile__glow" aria-hidden="true"></span>
             </div>
-          </div>
-
-          <div class="result-tactile">
-            <div class="result-tactile__header">
-              <div>
-                <strong>손끝으로 확인하기</strong>
-                <span>닷패드 촉각 결과</span>
-              </div>
-              <span class="result-resolution">60 × 40</span>
-            </div>
-            <div class="result-preview">
-              <canvas id="pinsR" width="420" height="280" role="img" aria-label="게임 결과 촉각 그림"></canvas>
-              <div class="result-preview__glow" aria-hidden="true"></div>
-            </div>
-            <p class="result-tactile__description" id="tactileDescription">빛이 퍼지는 별 모양을 손끝으로 확인해 보세요.</p>
+            <p id="tactileDescription">다음 도전을 알려 주는 촉각 문양을 손끝으로 확인해 보세요.</p>
+          </aside>
+          <div class="result-actions">
+            <button type="button" class="result-action result-action--primary" id="againBtn">
+              <span class="result-action__icon" aria-hidden="true">↻</span><span><strong id="againLabel">다시 도전하기</strong><small>Enter · 닷패드 기능키 3</small></span>
+            </button>
+            <button type="button" class="result-action result-action--secondary" id="changeDiffBtn">
+              <span class="result-action__icon" aria-hidden="true">◆</span><span><strong>난이도 바꾸기</strong><small>새로운 탐험 준비</small></span>
+            </button>
+            <button type="button" class="result-action result-action--quiet" id="replayResultBtn"><span aria-hidden="true">◖))</span> 결과 다시 듣기</button>
           </div>
         </div>
-
-        <div class="control-guide" style="justify-content:center">
-          <span><b>키보드</b> <code>← →</code> 메뉴 이동 · <code>Enter</code> 선택 · <code>F1</code> 다시 듣기</span>
-          <span><b>닷패드</b> 패닝키 좌·우로 이동 · 기능키 3으로 선택</span>
-        </div>
+        <footer class="result-controls" aria-label="결과 화면 조작 안내">
+          <span><strong>키보드</strong> <kbd>←</kbd><kbd>→</kbd> 메뉴 이동</span><span><kbd>Enter</kbd> 선택</span><span><kbd>F1</kbd> 다시 듣기</span>
+          <span class="result-controls__divider" aria-hidden="true"></span><span><strong>닷패드</strong> 패닝키 좌·우 이동 · 기능키 3 선택</span>
+        </footer>
       </section>
 
       <footer>닷 스틱 · 마지막 빛을 가져라 — 시각장애인을 위한 촉각 놀이</footer>
@@ -930,39 +1119,48 @@
       speak('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 이제 당신 차례예요. 1개 또는 2개를 고르세요.');
     }
 
+    function showWinResult() {
+      var resultScreen = document.getElementById('screenResult');
+      resultScreen.dataset.result = 'win';
+      document.getElementById('resultBadge').textContent = '마지막 빛 획득';
+      document.getElementById('resultEyebrow').textContent = 'THE LAST LIGHT IS YOURS';
+      document.getElementById('resultH').innerHTML = '마지막 빛을<br>찾았어요!';
+      document.getElementById('resultText').innerHTML = '당신이 마지막 닷 스틱을 가져왔어요.<br>특별한 빛이 숲 전체에 퍼지기 시작했어요.';
+      document.getElementById('resultHint').innerHTML = '이번에 사용한 전략을 기억해 보세요.<br>상대에게 3·6·9개의 스틱을 남기면 유리해요.';
+      document.getElementById('tactileDescription').textContent = '빛이 활짝 퍼지는 별 모양을 손끝으로 확인해 보세요.';
+      document.getElementById('pinsR').setAttribute('aria-label', '승리를 나타내는 별빛 촉각 문양');
+      document.getElementById('againLabel').textContent = '한 번 더 빛 찾기';
+      renderTactile();
+      resetResultMenu();
+      setTimeout(function () {
+        speak('마지막 빛을 찾았어요! 당신이 마지막 닷 스틱을 가져왔습니다. 숲에 특별한 빛이 퍼졌어요. 다시 도전하려면 엔터 또는 닷패드 기능키 3을 누르세요.');
+      }, 120);
+    }
+
+    function showLoseResult() {
+      var resultScreen = document.getElementById('screenResult');
+      resultScreen.dataset.result = 'lose';
+      document.getElementById('resultBadge').textContent = '탐험가 닷의 발견';
+      document.getElementById('resultEyebrow').textContent = 'THE LAST LIGHT WAS FOUND';
+      document.getElementById('resultH').innerHTML = '닷이 먼저<br>찾았어요!';
+      document.getElementById('resultText').innerHTML = '탐험가 닷이 마지막 빛을 먼저 발견했어요.<br>하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.';
+      document.getElementById('resultHint').innerHTML = '3의 배수가 열쇠예요.<br>상대에게 3·6·9개의 스틱을 남겨 보세요.';
+      document.getElementById('tactileDescription').textContent = '다음 도전을 알려 주는 촉각 문양을 손끝으로 확인해 보세요.';
+      document.getElementById('pinsR').setAttribute('aria-label', '다음 도전을 나타내는 촉각 문양');
+      document.getElementById('againLabel').textContent = '다시 도전하기';
+      renderTactile();
+      resetResultMenu();
+      setTimeout(function () {
+        speak('탐험가 닷이 마지막 빛을 먼저 찾았어요. 하지만 빛의 규칙을 발견했습니다. 상대에게 3, 6, 9개의 스틱을 남겨 보세요. 다시 도전하려면 엔터 또는 닷패드 기능키 3을 누르세요.');
+      }, 120);
+    }
+
     function endGame(winner) {
-      S.winner = winner; S.busy = false; show('result');
-      var card = document.getElementById('resultCard');
-      var head = document.getElementById('resultH');
-      var icon = document.getElementById('resultIcon');
-      var badge = document.getElementById('resultBadge');
-      var text = document.getElementById('resultText');
-      var hint = document.getElementById('resultHint');
-      var tactileDesc = document.getElementById('tactileDescription');
-      var againButton = document.getElementById('againBtn');
-      card.dataset.result = winner === 'you' ? 'win' : 'lose';
-      if (winner === 'you') {
-        badge.textContent = '마지막 빛 획득';
-        icon.textContent = '✨';
-        head.textContent = '마지막 빛을 찾았어요!'; head.className = 'result-head win';
-        text.textContent = '당신이 마지막 닷 스틱을 가져왔어요. 특별한 빛이 숲 전체에 퍼지기 시작했어요.';
-        hint.textContent = '이번에 사용한 전략을 기억해 보세요. 상대에게 3·6·9개의 스틱을 남기면 유리해요.';
-        tactileDesc.textContent = '빛이 활짝 퍼지는 별 모양을 손끝으로 확인해 보세요.';
-        againButton.innerHTML = '<span aria-hidden="true">↻</span> 한 번 더 빛 찾기';
-        renderTactile();
-        setTimeout(function () { speak('마지막 빛을 찾았어요! 당신이 마지막 닷 스틱을 가져왔습니다. 숲에 특별한 빛이 퍼졌어요. 다시 도전하려면 엔터를 누르세요.'); }, 60);
-      } else {
-        badge.textContent = '탐험가 닷의 발견';
-        icon.textContent = '🌙';
-        head.textContent = '닷이 먼저 찾았어요!'; head.className = 'result-head lose';
-        text.textContent = '탐험가 닷이 마지막 빛을 먼저 발견했어요. 하지만 빛의 규칙을 하나 알아냈습니다.';
-        hint.textContent = '3의 배수가 열쇠예요. 상대에게 3·6·9개의 스틱을 남겨 보세요.';
-        tactileDesc.textContent = '다음 도전을 알려 주는 촉각 문양을 손끝으로 확인해 보세요.';
-        againButton.innerHTML = '<span aria-hidden="true">↻</span> 다시 도전하기';
-        renderTactile();
-        setTimeout(function () { speak('탐험가 닷이 마지막 빛을 먼저 찾았어요. 빛의 비밀을 발견했습니다. 상대에게 3, 6, 9개의 스틱을 남겨 보세요. 다시 도전하려면 엔터를 누르세요.'); }, 60);
-      }
-      resultButtonIndex = 0;
+      S.winner = winner;
+      S.busy = false;
+      show('result');
+      if (winner === 'you') showWinResult();
+      else showLoseResult();
     }
 
     function setStatus(t) { document.getElementById('statusLine').textContent = t; }
@@ -983,6 +1181,12 @@
     function activateResultMenu() {
       if (!resultButtons.length) return;
       resultButtons[resultButtonIndex].click();
+    }
+    function resetResultMenu() {
+      resultButtonIndex = 0;
+      requestAnimationFrame(function () {
+        if (resultButtons.length) resultButtons[0].focus();
+      });
     }
 
     // ── 난이도 선택 (시작 화면) ───────────────────────────────────────────
