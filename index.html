@@ -848,7 +848,7 @@
           </div>
         </div>
         <footer class="result-controls" aria-label="결과 화면 조작 안내">
-          <span><strong>키보드</strong> <kbd>←</kbd><kbd>→</kbd> 메뉴 이동</span><span><kbd>Enter</kbd> 선택</span><span><kbd>F1</kbd> 다시 듣기</span>
+          <span><strong>키보드</strong> <kbd>←</kbd><kbd>→</kbd> 메뉴 이동</span><span><kbd>Enter</kbd> 선택</span><span><kbd>F1</kbd> 다시 듣기</span><span><kbd>F2</kbd> 촉각 다시</span>
           <span class="result-controls__divider" aria-hidden="true"></span><span><strong>닷패드</strong> 패닝키 좌·우 이동 · 기능키 3 선택</span>
         </footer>
       </section>
@@ -1030,6 +1030,48 @@
       return bytes.map(function (b) { return ('0' + b.toString(16)).slice(-2).toUpperCase(); }).join('');
     }
 
+    function hexToGrid(hex) {
+      var g = emptyGrid();
+      if (typeof hex !== 'string' || hex.length !== 600 || !/^[0-9a-f]+$/i.test(hex)) return g;
+      var byteIndex = 0;
+      for (var cy = 0; cy < 10; cy++) {
+        for (var cx = 0; cx < 30; cx++) {
+          var byte = parseInt(hex.slice(byteIndex * 2, byteIndex * 2 + 2), 16);
+          byteIndex += 1;
+          for (var i = 0; i < BIT_ORDER.length; i++) {
+            var o = BIT_ORDER[i];
+            if (byte & (1 << o.b)) g[cy * 4 + o.y][cx * 2 + o.x] = true;
+          }
+        }
+      }
+      return g;
+    }
+
+    var tactileAssets = { trophy: '', shield: '', retry: '' };
+    function loadDtmsGraphic(key, path) {
+      return fetch(path).then(function (response) {
+        if (!response.ok) throw new Error('DTMS ' + response.status);
+        return response.json();
+      }).then(function (dtms) {
+        var item = dtms && dtms.items && dtms.items[0];
+        var hex = item && item.graphic && item.graphic.data;
+        if (dtms.device !== 'dotpad320' || typeof hex !== 'string' || hex.length !== 600 || !/^[0-9a-f]+$/i.test(hex)) {
+          throw new Error('지원하지 않는 DTMS 형식');
+        }
+        tactileAssets[key] = hex.toUpperCase();
+        if (S && S.screen === 'result' && S.tactileMode === key) renderTactile();
+      }).catch(function (error) {
+        console.warn('촉각 그래픽을 불러오지 못했습니다:', path, error);
+      });
+    }
+    function loadTactileAssets() {
+      return Promise.all([
+        loadDtmsGraphic('trophy', 'assets/tactile/trophy.dtms'),
+        loadDtmsGraphic('shield', 'assets/tactile/cracked-shield.dtms'),
+        loadDtmsGraphic('retry', 'assets/tactile/retry.dtms')
+      ]);
+    }
+
     // ── 스틱 그리기 (5개씩 묶어 세기 쉽게, 남은 만큼 왼쪽부터 채움) ─────────
     function stickPositions(count) {
       var pos = [], STICK_W = 2, GAP = 2, GROUP_GAP = 6, START = 8, x = START;
@@ -1077,6 +1119,23 @@
       var x0 = 24, x1 = 36, y0 = 13, y1 = 27;
       for (var x = x0; x <= x1; x++) { g[y0][x] = true; g[y1][x] = true; }
       for (var y = y0; y <= y1; y++) { g[y][x0] = true; g[y][x1] = true; }
+    }
+    function drawRetry(g) {
+      // DTMS를 불러오지 못한 경우를 위한 재도전 순환 화살표 폴백.
+      var cx = 30, cy = 20;
+      for (var a = 0.35; a < Math.PI * 1.82; a += 0.045) {
+        var px = Math.round(cx + Math.cos(a) * 16);
+        var py = Math.round(cy + Math.sin(a) * 11);
+        for (var oy = -1; oy <= 1; oy++) for (var ox = -1; ox <= 1; ox++) {
+          if (py + oy >= 0 && py + oy < 40 && px + ox >= 0 && px + ox < 60) g[py + oy][px + ox] = true;
+        }
+      }
+      for (var d = 0; d < 8; d++) {
+        for (var w = -1; w <= 1; w++) {
+          g[9 + d][43 - d + w] = true;
+          g[9 + d][43 + w] = true;
+        }
+      }
     }
 
     // ── 캔버스에 핀 미리보기 (화면 = 닷패드) ───────────────────────────────
@@ -1190,7 +1249,7 @@
     }
 
     // ── 게임 상태 ──────────────────────────────────────────────────────────
-    var S = { screen: 'title', sticks: 10, turn: 'you', choice: 1, diff: 'normal', winner: null, busy: false };
+    var S = { screen: 'title', sticks: 10, turn: 'you', choice: 1, diff: 'normal', winner: null, busy: false, tactileMode: '' };
     var START_COUNT = 10;
 
     var elTitle = document.getElementById('screenTitle');
@@ -1243,8 +1302,12 @@
     // ── 렌더 ───────────────────────────────────────────────────────────────
     function renderTactile() {
       var g = emptyGrid();
+      var hex = '';
       if (S.screen === 'result') {
-        (S.winner === 'you' ? drawWin : drawLose)(g);
+        hex = tactileAssets[S.tactileMode] || '';
+        if (hex) g = hexToGrid(hex);
+        else if (S.tactileMode === 'retry') drawRetry(g);
+        else (S.winner === 'you' ? drawWin : drawLose)(g);
         drawCanvas(document.getElementById('pinsR'), g);
       } else {
         drawSticks(g, S.sticks);
@@ -1255,7 +1318,7 @@
         else g[1][58] = true;
         drawCanvas(document.getElementById('pins'), g);
       }
-      pushHex(gridToHex(g));
+      pushHex(hex || gridToHex(g));
     }
 
     function renderPlay() {
@@ -1280,7 +1343,7 @@
 
     // ── 흐름 ───────────────────────────────────────────────────────────────
     function startGame() {
-      S.sticks = START_COUNT; S.turn = 'you'; S.choice = 1; S.winner = null; S.busy = false;
+      S.sticks = START_COUNT; S.turn = 'you'; S.choice = 1; S.winner = null; S.busy = false; S.tactileMode = '';
       show('play'); renderPlay();
       requestAnimationFrame(function () { document.getElementById('playH').focus(); });
       speak('게임을 시작해요. 빛나는 닷 스틱이 ' + START_COUNT + '개 있어요. 당신이 먼저예요. 화살표로 1개 또는 2개를 고르고, 엔터를 눌러 가져가세요.', { interrupt: true, liveText: '게임 시작. 스틱 ' + START_COUNT + '개, 당신 차례.' });
@@ -1324,7 +1387,20 @@
       speak('탐험가 닷이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요. 이제 당신 차례예요. 1개 또는 2개를 고르세요.', { liveText: '닷이 ' + take + '개 가져감. ' + S.sticks + '개 남음. 당신 차례.' });
     }
 
-    function showWinResult() {
+    function waitForTactileReading() {
+      return new Promise(function (resolve) { setTimeout(resolve, 4000); });
+    }
+
+    function showRetryTactile() {
+      if (S.screen !== 'result') return;
+      S.tactileMode = 'retry';
+      document.getElementById('tactileDescription').textContent = '재도전을 안내하는 촉각 그래픽을 손끝으로 확인해 보세요.';
+      document.getElementById('pinsR').setAttribute('aria-label', '재도전을 안내하는 촉각 그래픽');
+      renderTactile();
+      announceLive('닷패드에 재도전 촉각 안내가 표시되었습니다.');
+    }
+
+    async function showWinResult() {
       var resultScreen = document.getElementById('screenResult');
       resultScreen.dataset.result = 'win';
       document.getElementById('resultBadge').textContent = '마지막 빛 획득';
@@ -1332,15 +1408,20 @@
       document.getElementById('resultH').innerHTML = '마지막 빛을<br>찾았어요!';
       document.getElementById('resultText').innerHTML = '당신이 마지막 닷 스틱을 가져왔어요.<br>특별한 빛이 숲 전체에 퍼지기 시작했어요.';
       document.getElementById('resultHint').innerHTML = '이번에 사용한 전략을 기억해 보세요.<br>상대에게 3·6·9개의 스틱을 남기면 유리해요.';
-      document.getElementById('tactileDescription').textContent = '빛이 활짝 퍼지는 별 모양을 손끝으로 확인해 보세요.';
-      document.getElementById('pinsR').setAttribute('aria-label', '승리를 나타내는 별빛 촉각 문양');
+      document.getElementById('tactileDescription').textContent = '승리를 나타내는 트로피 촉각 그래픽을 손끝으로 확인해 보세요.';
+      document.getElementById('pinsR').setAttribute('aria-label', '승리를 나타내는 트로피 촉각 그래픽');
       document.getElementById('againLabel').textContent = '한 번 더 빛 찾기';
+      S.tactileMode = 'trophy';
       renderTactile();
       resetResultMenu();
-      speak('마지막 빛을 찾았어요! 당신이 마지막 닷 스틱을 가져왔습니다. 숲에 특별한 빛이 퍼졌어요. 다시 도전하려면 엔터 또는 닷패드 기능키 3을 누르세요.', { interrupt: true, liveText: '승리. 당신이 마지막 스틱을 가져갔습니다.' });
+      await Promise.all([
+        speak('마지막 빛을 찾았어요! 당신이 마지막 닷 스틱을 가져왔습니다. 닷패드에 트로피가 표시됩니다. 숲에 특별한 빛이 퍼졌어요. 다시 도전하려면 엔터 또는 닷패드 기능키 3을 누르세요.', { interrupt: true, liveText: '승리. 닷패드에 트로피 촉각 그래픽이 표시됩니다.' }),
+        waitForTactileReading()
+      ]);
+      if (S.screen === 'result' && S.winner === 'you') showRetryTactile();
     }
 
-    function showLoseResult() {
+    async function showLoseResult() {
       var resultScreen = document.getElementById('screenResult');
       resultScreen.dataset.result = 'lose';
       document.getElementById('resultBadge').textContent = '탐험가 닷의 발견';
@@ -1348,12 +1429,17 @@
       document.getElementById('resultH').innerHTML = '닷이 먼저<br>찾았어요!';
       document.getElementById('resultText').innerHTML = '탐험가 닷이 마지막 빛을 먼저 발견했어요.<br>하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.';
       document.getElementById('resultHint').innerHTML = '3의 배수가 열쇠예요.<br>상대에게 3·6·9개의 스틱을 남겨 보세요.';
-      document.getElementById('tactileDescription').textContent = '다음 도전을 알려 주는 촉각 문양을 손끝으로 확인해 보세요.';
-      document.getElementById('pinsR').setAttribute('aria-label', '다음 도전을 나타내는 촉각 문양');
+      document.getElementById('tactileDescription').textContent = '실패를 나타내는 금이 간 방패 촉각 그래픽을 손끝으로 확인해 보세요.';
+      document.getElementById('pinsR').setAttribute('aria-label', '실패를 나타내는 금이 간 방패 촉각 그래픽');
       document.getElementById('againLabel').textContent = '다시 도전하기';
+      S.tactileMode = 'shield';
       renderTactile();
       resetResultMenu();
-      speak('탐험가 닷이 마지막 빛을 먼저 찾았어요. 하지만 빛의 규칙을 발견했습니다. 상대에게 3, 6, 9개의 스틱을 남겨 보세요. 다시 도전하려면 엔터 또는 닷패드 기능키 3을 누르세요.', { interrupt: true, liveText: '패배. 탐험가 닷이 마지막 스틱을 가져갔습니다.' });
+      await Promise.all([
+        speak('탐험가 닷이 마지막 빛을 먼저 찾았어요. 닷패드에 금이 간 방패가 표시됩니다. 하지만 빛의 규칙을 발견했습니다. 상대에게 3, 6, 9개의 스틱을 남겨 보세요. 다시 도전하려면 엔터 또는 닷패드 기능키 3을 누르세요.', { interrupt: true, liveText: '패배. 닷패드에 금이 간 방패 촉각 그래픽이 표시됩니다.' }),
+        waitForTactileReading()
+      ]);
+      if (S.screen === 'result' && S.winner === 'dot') showRetryTactile();
     }
 
     function endGame(winner) {
@@ -1460,6 +1546,7 @@
       }
       if (S.screen === 'result') {
         if (k === 'F1') { replay(); return; }
+        if (k === 'F2') { if (lastHex) pushHex(lastHex, true); speak(S.tactileMode === 'retry' ? '재도전 촉각 안내를 다시 보냈어요.' : '결과 촉각 그래픽을 다시 보냈어요.', { interrupt: true }); return; }
         if (k === 'ArrowLeft' || k === 'ArrowUp') { moveResultMenu(-1); return; }
         if (k === 'ArrowRight' || k === 'ArrowDown') { moveResultMenu(1); return; }
         if (k === 'Enter' || k === ' ') { activateResultMenu(); return; }
@@ -1532,6 +1619,7 @@
 
     // ── 시작 ───────────────────────────────────────────────────────────────
     initSdk();
+    loadTactileAssets();
     show('title');
     setDiff('normal', true);
     // 시작 화면 촉각: 스틱 10개 미리 보여주기

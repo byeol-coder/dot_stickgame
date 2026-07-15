@@ -1,0 +1,25 @@
+{
+  "title": "트로피 아이콘",
+  "lang": "korean",
+  "lang_option": "1",
+  "device": "dotpad320",
+  "audioPath": "",
+  "items": [
+    {
+      "page": 1,
+      "title": "1쪽",
+      "graphic": {
+        "name": "1.dtm",
+        "data": "000000000000000000808888888888888888888808000000000000000000000000000000ccccccffffffffffffffffffffffffcccccc000000000000000000000000ff0100f1ffffffffffffffffffff1f0000ff00000000000000000000000071cf0030ffffffffffffffffffff0700fc17000000000000000000000000003177cefdffffffffffffffffdfec77130000000000000000000000000000000000113177ffffffff771311000000000000000000000000000000000000000000000010ffff01000000000000000000000000000000000000000000000000c0ccfcffffcfcc0c000000000000000000000000000000000000000000c0feffffffffffffef8c00000000000000000000000000000000000000001011111111111111110100000000000000000000"
+      },
+      "text": {
+        "name": "1.txt",
+        "data": "",
+        "plain": "1쪽"
+      },
+      "audio": {
+        "fileName": ""
+      }
+    }
+  ]
+}
