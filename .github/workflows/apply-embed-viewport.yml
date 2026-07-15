@@ -1,0 +1,104 @@
+name: Apply embedded viewport layout
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/apply-embed-viewport.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Patch index.html
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          title = '  <title>닷 스틱 — 마지막 빛을 가져라</title>'
+          head = '''  <title>닷 스틱 — 마지막 빛을 가져라</title>
+  <script>
+    // Apply the Tactile Worlds fixed viewport layout before first paint.
+    if (new URLSearchParams(location.search).get('embed') === '1') {
+      document.documentElement.classList.add('embed-mode');
+    }
+  </script>
+  <link rel="stylesheet" href="embed-overrides.css" />'''
+          if 'href="embed-overrides.css"' not in text:
+              if title not in text:
+                  raise SystemExit('title marker not found')
+              text = text.replace(title, head, 1)
+
+          anchor = "    var IS_EMBED = params.get('embed') === '1';"
+          addition = anchor + "\n    if (IS_EMBED) document.documentElement.classList.add('embed-mode');"
+          if "if (IS_EMBED) document.documentElement.classList.add('embed-mode');" not in text:
+              if anchor not in text:
+                  raise SystemExit('IS_EMBED marker not found')
+              text = text.replace(anchor, addition, 1)
+
+          old = '''    function watchResize() {
+      if (window.self === window.top) return;
+      var last = 0;
+      var report = function () {
+        var h = Math.ceil(document.documentElement.scrollHeight);
+        if (h !== last) { last = h; post({ type: 'resize', height: h }); }
+      };
+      if (window.ResizeObserver) { new ResizeObserver(report).observe(document.body); }
+      report();
+    }'''
+          new = '''    function watchResize() {
+      if (window.self === window.top) return;
+      var last = 0;
+      var report = function () {
+        // Embed mode follows the iframe viewport instead of expanding to scrollHeight.
+        var h = IS_EMBED
+          ? Math.max(1, Math.round(window.innerHeight))
+          : Math.ceil(document.documentElement.scrollHeight);
+        if (h !== last) { last = h; post({ type: 'resize', height: h, fixed: IS_EMBED }); }
+      };
+      if (window.ResizeObserver) { new ResizeObserver(report).observe(document.body); }
+      window.addEventListener('resize', report, { passive: true });
+      report();
+    }'''
+          if 'Embed mode follows the iframe viewport' not in text:
+              if old in text:
+                  text = text.replace(old, new, 1)
+              else:
+                  pattern = re.compile(r"    function watchResize\(\) \{.*?\n    \}", re.S)
+                  match = pattern.search(text)
+                  if not match:
+                      raise SystemExit('watchResize function not found')
+                  text = text[:match.start()] + new + text[match.end():]
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Verify patch
+        run: |
+          grep -q 'href="embed-overrides.css"' index.html
+          grep -q "classList.add('embed-mode')" index.html
+          grep -q 'height: h, fixed: IS_EMBED' index.html
+
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "fix(embed): fit game inside host viewport"
+          git push origin main
