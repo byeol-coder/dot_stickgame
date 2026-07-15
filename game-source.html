@@ -2147,7 +2147,16 @@
       m.hidden = true;
       document.documentElement.classList.remove('modal-open');
       stopSpeech(false);
-      var back = (helpReturnFocus && document.contains(helpReturnFocus)) ? helpReturnFocus : document.getElementById('introHelpBtn');
+      // 원래 버튼으로 포커스 복귀. 트리거가 사라졌거나 포커스 불가(예: body)라면
+      // 현재 화면에 맞는 안전한 컨트롤로 되돌린다.
+      var back = helpReturnFocus;
+      var usable = back && document.contains(back) && back.focus &&
+        back !== document.body && !back.disabled && back.offsetParent !== null;
+      if (!usable) {
+        if (S.screen === 'play') back = document.getElementById('takeBtn');
+        else if (S.screen === 'result') back = (resultButtons[0] || document.getElementById('againBtn'));
+        else back = document.getElementById('introHelpBtn');
+      }
       if (back && back.focus) back.focus();
       helpReturnFocus = null;
       announceLive('게임 방법 안내를 닫았습니다.');
@@ -2161,6 +2170,24 @@
         if (panel) panel.focus();
       }
     });
+    // Tab/Shift+Tab을 모달 안에서 순환시키는 결정적 트랩(포커스인 백업과 병행).
+    (function () {
+      var m = document.getElementById('helpModal');
+      if (!m) return;
+      m.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab') return;
+        var items = modalButtons();
+        if (!items.length) return;
+        var first = items[0], last = items[items.length - 1];
+        var panel = m.querySelector('.modal__panel');
+        var a = document.activeElement;
+        if (e.shiftKey) {
+          if (a === first || a === panel) { e.preventDefault(); last.focus(); }
+        } else {
+          if (a === last || a === panel) { e.preventDefault(); first.focus(); }
+        }
+      });
+    })();
 
     // ── 키 입력 ────────────────────────────────────────────────────────────
     var GAME_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', ' ', 'F1', 'F2', 'F3', 'F4', 'Escape'];
