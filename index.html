@@ -5,14 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>닷 스틱 — 마지막 빛을 가져라</title>
   <style>
-    html, body, iframe { width: 100%; height: 100%; margin: 0; border: 0; }
-    body { background: #050b07; overflow: hidden; }
-    iframe { display: block; }
+    html, body, iframe {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      border: 0;
+    }
+    body {
+      background: #050b07;
+      overflow: hidden;
+    }
+    iframe {
+      display: block;
+    }
   </style>
 </head>
 <body>
-  <!-- 게임 본문을 브라우저가 직접 문서로 로드한다. 동적 document.write 로더의
-       실패가 첫 화면 전체를 비우는 문제를 피한다. -->
-  <iframe src="game-source.html" title="닷 스틱 게임" allow="autoplay"></iframe>
+  <iframe
+    id="gameFrame"
+    title="닷 스틱 게임"
+    allow="bluetooth; microphone; autoplay; clipboard-write"
+  ></iframe>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var gameFrame = document.getElementById('gameFrame');
+
+      // TW가 index.html에 전달한 embed/preview/lang 등의 값을 실제 게임 문서에도 전달한다.
+      gameFrame.src = 'game-source.html' + window.location.search + window.location.hash;
+
+      // game-source.html → wrapper → Tactile Worlds
+      // 중첩 iframe 구조에서는 자식의 postMessage가 자동으로 최상위 부모까지 전달되지 않는다.
+      window.addEventListener('message', function (event) {
+        if (event.source !== gameFrame.contentWindow) return;
+
+        var data = event.data;
+        if (!data || data.source !== 'dotarcade') return;
+
+        if (window.parent !== window) {
+          window.parent.postMessage(data, '*');
+        }
+      });
+
+      // 필요할 경우 TW → wrapper 메시지도 실제 게임 문서로 전달한다.
+      window.addEventListener('message', function (event) {
+        if (event.source === gameFrame.contentWindow) return;
+        if (!gameFrame.contentWindow) return;
+
+        var data = event.data;
+        if (!data || typeof data !== 'object') return;
+
+        gameFrame.contentWindow.postMessage(data, '*');
+      });
+    })();
+  </script>
 </body>
 </html>

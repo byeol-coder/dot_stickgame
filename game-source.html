@@ -691,6 +691,12 @@
       * { scroll-behavior: auto; }
     }
   </style>
+<script>
+  if (new URLSearchParams(location.search).get('embed') === '1') {
+        document.documentElement.classList.add('embed-mode');
+  }
+    </script>
+<link rel="stylesheet" href="embed-overrides.css" />
 </head>
 <body>
   <div class="fireflies" aria-hidden="true" id="fireflies"></div>
