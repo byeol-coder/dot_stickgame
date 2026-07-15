@@ -900,7 +900,7 @@
       position: static; justify-self: start; align-self: start; line-height: 1;
     }
     canvas#pins {
-      width: auto; height: 100%; max-width: 100%; max-height: 100%; margin-top: 0;
+      width: auto; height: calc(100% - var(--space-3)); max-width: 100%; max-height: calc(100% - var(--space-3)); margin-top: 0;
       aspect-ratio: 3 / 2; object-fit: contain;
     }
     .count-big { font-size: clamp(36px, 8vh, 66px); }
@@ -1673,7 +1673,11 @@
     function drawCanvas(canvas, g) {
       var ctx = canvas.getContext('2d');
       var W = canvas.width, H = canvas.height;
-      var cw = W / 60, ch = H / 40, r = Math.min(cw, ch) * 0.36;
+      var padX = Math.max(8, W * 0.026);
+      var padY = Math.max(8, H * 0.04);
+      var gridW = W - padX * 2;
+      var gridH = H - padY * 2;
+      var cw = gridW / 60, ch = gridH / 40, r = Math.min(cw, ch) * 0.34;
       ctx.clearRect(0, 0, W, H);
       ctx.fillStyle = '#0a130d';
       ctx.fillRect(0, 0, W, H);
@@ -1681,7 +1685,7 @@
         for (var x = 0; x < 60; x++) {
           var on = g[y][x];
           ctx.beginPath();
-          ctx.arc(x * cw + cw / 2, y * ch + ch / 2, r, 0, Math.PI * 2);
+          ctx.arc(padX + x * cw + cw / 2, padY + y * ch + ch / 2, r, 0, Math.PI * 2);
           if (on) {
             ctx.fillStyle = '#7ee38a';
             ctx.shadowColor = 'rgba(126,227,138,0.9)'; ctx.shadowBlur = 6;

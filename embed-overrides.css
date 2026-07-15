@@ -201,9 +201,9 @@ html.embed-mode .play-screen .preview-cap {
 
 html.embed-mode canvas#pins {
   width: auto;
-  height: 100%;
+  height: calc(100% - 10px);
   max-width: 100%;
-  max-height: 100%;
+  max-height: calc(100% - 10px);
   margin: 0;
   object-fit: contain;
   aspect-ratio: 3 / 2;
