@@ -1,0 +1,43 @@
+name: Deploy Dot Stick to GitHub Pages
+
+# 닷 스틱을 GitHub Pages(https)로 배포한다.
+# 닷패드(Web Bluetooth)는 https 주소에서만 연결되므로, 배포 후 나오는
+# https 실행 주소를 닷게임즈 제출 양식의 "실행 주소"에 넣으면 된다.
+
+on:
+  push:
+    branches: [main]      # main에 푸시될 때마다 자동 배포
+  workflow_dispatch:       # Actions 탭에서 수동 실행도 가능
+
+# Pages 배포에 필요한 권한
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 동시에 하나의 배포만 진행(중간 취소 없이 순차 처리)
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Pages 설정
+        uses: actions/configure-pages@v5
+
+      - name: 사이트 파일 업로드 (저장소 루트 그대로)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: GitHub Pages 배포
+        id: deployment
+        uses: actions/deploy-pages@v4
