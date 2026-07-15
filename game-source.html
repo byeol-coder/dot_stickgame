@@ -892,8 +892,12 @@
     }
     .preview-wrap {
       height: 100%; min-height: 180px; max-height: min(34vh, 280px);
-      display: grid; place-items: center; padding: var(--space-5) var(--space-3) var(--space-2);
+      display: grid; grid-template-rows: auto minmax(0, 1fr); place-items: center;
+      gap: var(--space-2); padding: var(--space-3);
       overflow: hidden;
+    }
+    .preview-cap {
+      position: static; justify-self: start; align-self: start; line-height: 1;
     }
     canvas#pins {
       width: auto; height: 100%; max-width: 100%; max-height: 100%; margin-top: 0;

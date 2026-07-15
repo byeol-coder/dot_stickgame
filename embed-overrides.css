@@ -183,10 +183,20 @@ html.embed-mode .play-screen .preview-wrap {
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: 18px 8px 5px;
+  padding: clamp(8px, 1.4vh, 12px);
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(4px, .7vh, 8px);
   place-items: center;
   overflow: hidden;
+}
+
+html.embed-mode #screenPlay .preview-cap,
+html.embed-mode .play-screen .preview-cap {
+  position: static;
+  justify-self: start;
+  align-self: start;
+  line-height: 1;
 }
 
 html.embed-mode canvas#pins {
@@ -391,7 +401,7 @@ html.embed-mode .result-action small { font-size: 10px; }
   html.embed-mode .intro-tagline { display: none; }
   html.embed-mode .intro-difficulty { margin-top: 5px; }
   html.embed-mode #screenPlay .preview-wrap,
-  html.embed-mode .play-screen .preview-wrap { padding-top: 15px; }
+  html.embed-mode .play-screen .preview-wrap { padding: 7px; }
   html.embed-mode .count-cap,
   html.embed-mode .result-description,
   html.embed-mode .result-secret,
