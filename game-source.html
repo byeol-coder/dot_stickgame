@@ -676,12 +676,10 @@
     }
     html.embed-mode #screenPlay .voice-controls { margin-top: 4px; }
     html.embed-mode .result-actions > .voice-controls { grid-column: 1 / -1; }
-    /* 결과 화면에서는 음성 컨트롤을 결과 버튼 목록 안(문서 흐름)에 배치해, 떠 있는
-       고정 패널이 '난이도 바꾸기'·'결과 다시 듣기' 버튼을 가리는 문제를 없앤다(공통). */
-    .result-actions > .voice-controls {
-      position: static; z-index: auto; left: auto; right: auto; bottom: auto;
-      grid-column: 1 / -1; width: 100%; max-width: none; margin: 0;
-      justify-content: center; box-shadow: none; backdrop-filter: none;
+    /* 결과 화면(비임베드)에서는 떠 있는 음성 패널을 오른쪽 아래로 옮겨, 왼쪽 아래의
+       '난이도 바꾸기'·'결과 다시 듣기' 버튼과 겹치지 않게 한다(레이아웃 높이 영향 없음). */
+    body.is-result .voice-controls {
+      left: auto; right: max(14px, env(safe-area-inset-right));
     }
     html.embed-mode .result-layout { padding-bottom: 28px; }
     html.embed-mode .result-controls {
@@ -1854,16 +1852,20 @@
         var playGuide = stage && stage.querySelector('.control-guide');
         if (stage) stage.insertBefore(controls, playGuide || null);
       } else if (screen === 'result') {
-        // 임베드·비임베드 모두 결과 버튼 목록 안(흐름)에 배치 → 고정 패널 겹침 제거.
+        if (!IS_EMBED) {
+          // 비임베드: 떠 있는 패널 유지하되 body.is-result로 오른쪽 아래에 도킹(겹침 방지).
+          voiceControlsHome.appendChild(controls);
+          return;
+        }
         var actions = document.querySelector('#screenResult .result-actions');
         if (actions) actions.appendChild(controls);
-        else voiceControlsHome.appendChild(controls);
       }
     }
 
     function show(screen) {
       S.screen = screen;
       document.body.classList.toggle('is-title', screen === 'title');
+      document.body.classList.toggle('is-result', screen === 'result');
       elTitle.classList.toggle('hidden', screen !== 'title');
       elPlay.classList.toggle('hidden', screen !== 'play');
       elResult.classList.toggle('hidden', screen !== 'result');
