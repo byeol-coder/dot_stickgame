@@ -709,11 +709,18 @@
     .ui-btn--ghost { background: transparent; color: var(--ink-dim); }
     .ui-btn--utility { min-height: 38px; padding-inline: var(--space-3); border-radius: 999px; font-size: 12px; }
     .keycap {
-      display: inline-flex; align-items: center; justify-content: center; min-height: 28px;
-      padding: 5px 12px; border: 1px solid rgba(5,37,20,.25);
-      border-radius: 10px; background: rgba(3,39,22,.10); color: rgba(4,22,13,.78);
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,.10);
-      font-size: .7em; font-weight: 900; line-height: 1; vertical-align: middle;
+      display: inline-flex; align-items: center; justify-content: center; min-width: 34px; min-height: 28px;
+      padding: 5px 9px; border: 1px solid rgba(151,235,171,.46);
+      border-radius: 9px; background: rgba(126,227,138,.13); color: #e5ffe9;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,.16);
+      font-size: .72em; font-weight: 900; line-height: 1; vertical-align: middle;
+    }
+    .ui-btn:hover .keycap {
+      border-color: rgba(183,255,199,.72); background: rgba(126,227,138,.2); color: #fff;
+    }
+    .ui-btn:focus-visible .keycap {
+      border-color: #fff2a8; background: #fff2a8; color: #102015;
+      box-shadow: none;
     }
 
     .intro-screen {
@@ -1386,9 +1393,13 @@
     html.hc-mode .result-screen__background { opacity: .22; }
     html.hc-mode body.is-play .play-ambient-bg { opacity: .18 !important; }
     html.hc-mode .fireflies, html.hc-mode #introParticles, html.hc-mode .result-fireflies { display: none; }
+    html.hc-mode .keycap {
+      color: #000; background: #fff; border-color: #fff; box-shadow: none;
+    }
     @media (prefers-contrast: more) {
       :root { --line: #8fe6a0; --ink: #ffffff; --ink-dim: #e2f3e0; }
       .ui-btn, .btn, .choice, .result-action, .result-button, .intro-difficulty__button { border-width: 2px; }
+      .keycap { color: #000; background: #fff; border-color: #fff; box-shadow: none; }
       :focus-visible { outline-width: 4px !important; }
     }
     @media (forced-colors: active) {
@@ -1397,6 +1408,10 @@
         box-shadow: none !important; backdrop-filter: none !important;
       }
       .intro-start, .intro-difficulty__button, .ui-btn { forced-color-adjust: none; }
+      .keycap {
+        forced-color-adjust: auto; color: ButtonText; background: ButtonFace;
+        border-color: ButtonText; box-shadow: none;
+      }
       .intro-start:focus-visible, .intro-difficulty__button:focus-visible, .intro-utility:focus-visible {
         outline: 3px solid Highlight !important;
       }
