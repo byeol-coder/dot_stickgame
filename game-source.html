@@ -809,9 +809,9 @@
       font-weight: 800; color: rgba(218,234,222,.60);
     }
     .intro-tagline {
-      margin: 0; max-width: 26ch; color: #d9eadb;
+      width: 100%; min-width: 0; margin: 0; max-width: 30ch; color: #d9eadb;
       font-size: clamp(19px, 1.9vw, 26px); font-weight: 700; line-height: 1.42; letter-spacing: -.025em;
-      word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
+      word-break: normal; overflow-wrap: anywhere; text-wrap: balance;
     }
     .intro-summary {
       margin: 12px 0 0; max-width: 44ch; color: #d0decf;
@@ -1329,7 +1329,7 @@
       .intro-title { margin-bottom: 15px; gap: 6px; }
       .intro-title__ko { font-size: clamp(39px, 10vw, 50px); }
       .intro-title__en { font-size: 9px; letter-spacing: .25em; }
-      .intro-tagline { max-width: 24ch; font-size: clamp(18px, 5.2vw, 23px); }
+      .intro-tagline { max-width: none; font-size: clamp(18px, 5.2vw, 23px); }
       .intro-summary { max-width: 34ch; font-size: 14px; }
       .intro-rule-card { padding: 10px var(--space-3); }
       .intro-start { min-height: 58px; padding-inline: var(--space-3); border-radius: 20px; }
@@ -1347,7 +1347,9 @@
       .intro-actions { grid-template-columns: 1fr; }
       .intro-device .dp-status { display: none; }
     }
-    html.embed-mode .intro-screen { overflow: hidden; }
+    /* 임베드도 태그라인이 여러 줄이 될 수 있으므로 세로 내용은 보존하고,
+       가로 넘침만 막는다. */
+    html.embed-mode .intro-screen { overflow-x: hidden; overflow-y: auto; }
     html.embed-mode .intro-topbar { min-height: 54px; padding-top: var(--space-2); }
     html.embed-mode .intro-shell { padding-top: var(--space-2); padding-bottom: var(--space-3); }
     html.embed-mode .intro-content { padding: var(--space-4); border-radius: 20px; }
