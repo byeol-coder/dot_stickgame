@@ -317,7 +317,7 @@
       column-gap: 6px;
     }
     .count-big { display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: clamp(40px, 12vw, 82px); line-height: 1; color: var(--glow-soft); text-shadow: 0 0 24px rgba(126,227,138,0.3); }
-    .count-cap { display: inline-block; font-size: 14px; color: var(--ink-dim); margin: 0; }
+    .count-cap { display: inline-block; font-size: 15px; font-weight: 600; color: #b9c9b6; margin: 0; }
     .turn-tag {
       display: inline-block; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 15px;
       border: 1px solid var(--line);
@@ -782,25 +782,25 @@
     /* 여기부터 .intro-content-panel 컨텍스트의 재정의 — 실제 화면에 최종 적용되는 값.
        위쪽 기본 .intro-content 블록과 이름이 겹치므로 함께 유지보수할 것. */
     .intro-eyebrow {
-      margin: 0 0 10px; color: #a9d9b4; font-size: clamp(13px, 1vw, 15px);
-      font-weight: 700; line-height: 1.4; letter-spacing: .06em; text-transform: none;
+      margin: 0 0 12px; color: #c8ead0; font-size: clamp(14px, 1vw, 16px);
+      font-weight: 700; line-height: 1.3; letter-spacing: .04em; text-transform: none;
       text-shadow: none;
     }
-    .intro-title { margin: 0; display: grid; gap: 7px; line-height: 1; }
+    .intro-title { margin: 0 0 22px; display: grid; gap: 8px; line-height: 1; }
     .intro-title__ko {
-      font-size: clamp(52px, 5vw, 72px); line-height: .98; letter-spacing: -.045em; font-weight: 900;
+      font-size: clamp(44px, 5vw, 68px); line-height: .98; letter-spacing: -.035em; font-weight: 900;
       white-space: nowrap; word-break: keep-all; text-wrap: balance;
-      color: #fff1bd;
-      text-shadow: 0 8px 30px rgba(0,0,0,.42), 0 0 22px rgba(255,207,92,.12);
+      color: #fff2be;
+      text-shadow: 0 0 26px rgba(255,207,92,.22), 0 8px 32px rgba(0,0,0,.56);
       animation: none;
     }
     .intro-title__en {
-      margin: 0; font-size: clamp(11px, .9vw, 14px); line-height: 1.2; letter-spacing: .24em;
-      font-weight: 700; color: rgba(210,229,214,.62);
+      margin: 0; font-size: clamp(12px, 1vw, 15px); line-height: 1.2; letter-spacing: .20em;
+      font-weight: 700; color: rgba(218,234,222,.78);
     }
     .intro-tagline {
-      margin: 26px 0 0; max-width: 18ch; color: #e1f2e3;
-      font-size: clamp(23px, 2vw, 30px); font-weight: 700; line-height: 1.38; letter-spacing: -.025em;
+      margin: 0; max-width: 25ch; color: #e0f5df;
+      font-size: clamp(22px, 2.2vw, 30px); font-weight: 700; line-height: 1.35; letter-spacing: -.02em;
       word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
     }
     .intro-summary {
@@ -861,7 +861,7 @@
     }
     @media (max-height: 780px) {
       .intro-content { padding-block: var(--space-5); }
-      .intro-tagline { margin-top: 20px; }
+      .intro-title { margin-bottom: var(--space-5); }
       .intro-summary, .intro-rule-card, .intro-start { margin-top: var(--space-4); }
       .intro-rule-card { padding: var(--space-3) var(--space-4); }
       .intro-start { min-height: 70px; }
@@ -870,8 +870,8 @@
     }
     @media (max-height: 700px) {
       .intro-content { padding-block: var(--space-4); }
-      .intro-eyebrow { margin-bottom: var(--space-2); }
-      .intro-tagline { margin-top: var(--space-4); }
+      .intro-eyebrow { margin-bottom: var(--space-3); }
+      .intro-title { margin-bottom: var(--space-4); }
       .intro-summary, .intro-rule-card, .intro-start { margin-top: var(--space-3); }
       .intro-rule-card { grid-template-columns: 26px minmax(0, 1fr); padding: 10px var(--space-3); }
       .intro-rule-card svg { width: 26px; height: 26px; }
@@ -1059,7 +1059,6 @@
       .stage { gap: var(--space-2); }
       .preview-wrap { min-height: 155px; }
       #screenPlay .control-guide { display: none; }
-      .count-cap { display: none; }
       .count-big { font-size: clamp(38px, 7vh, 54px); }
     }
     @media (max-height: 700px) {
@@ -1090,15 +1089,15 @@
         justify-items: stretch; align-content: center; max-height: none;
         gap: 12px 20px;
       }
-      .play-turn { grid-area: turn; }
+      .play-turn { grid-area: turn; min-width: 0; }
       .preview-wrap {
         grid-area: preview; width: 100%; max-width: none; height: 100%;
-        min-height: 260px; max-height: none; align-self: stretch;
+        min-width: 0; min-height: 260px; max-height: none; align-self: stretch;
       }
-      .play-status { grid-area: status; }
-      .play-action-group { grid-area: action; width: 100%; max-width: none; }
-      .status-line { grid-area: line; }
-      #screenPlay .control-guide { grid-area: guide; max-width: none; }
+      .play-status { grid-area: status; min-width: 0; }
+      .play-action-group { grid-area: action; width: 100%; max-width: none; min-width: 0; }
+      .status-line { grid-area: line; min-width: 0; }
+      #screenPlay .control-guide { grid-area: guide; max-width: none; min-width: 0; }
     }
     @media (max-width: 700px) {
       .play-topbar { padding-inline: var(--space-3); align-items: flex-start; }
@@ -1294,10 +1293,8 @@
       .device-status { max-width: 76px; overflow: hidden; text-overflow: ellipsis; }
       .intro-shell { padding-bottom: var(--space-4); }
       .intro-content { padding: var(--space-4); border-radius: 20px; }
-      .intro-title { gap: 5px; }
-      .intro-title__ko { font-size: clamp(42px, 11vw, 54px); }
-      .intro-title__en { font-size: 11px; }
-      .intro-tagline { max-width: 18ch; margin-top: 18px; font-size: clamp(20px, 5.8vw, 25px); }
+      .intro-title__ko { font-size: clamp(40px, 11vw, 52px); }
+      .intro-tagline { max-width: 22ch; font-size: clamp(20px, 6vw, 25px); }
       .intro-summary { max-width: 32ch; font-size: 15px; }
       .intro-rule-card { padding: var(--space-3) var(--space-4); }
       .intro-start { min-height: 64px; padding-inline: var(--space-4); border-radius: var(--intro-radius-button); }
@@ -1473,12 +1470,12 @@
 
         <main class="intro-shell">
           <div class="intro-content intro-content-panel">
-            <p class="intro-eyebrow">촉각 전략 게임 · 10개의 빛</p>
+            <p class="intro-eyebrow">전략 놀이 · 촉각 게임</p>
             <h1 class="intro-title" id="titleH1">
               <span class="intro-title__ko">닷 스틱</span>
               <span class="intro-title__en">DOT STICK</span>
             </h1>
-            <h2 class="intro-tagline">마지막 빛을 차지하세요.</h2>
+            <h2 class="intro-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</h2>
             <p class="intro-summary">탐험가 닷과 번갈아 스틱을 가져가며 마지막 빛을 차지하는 단순한 전략 놀이입니다.</p>
 
             <aside class="intro-rule-card" aria-label="게임 규칙">
@@ -1686,7 +1683,11 @@
       <div class="modal__body">
         <section aria-labelledby="helpGoalTitle">
           <h3 id="helpGoalTitle" class="modal__subtitle">목표</h3>
-          <p>빛나는 닷 스틱 10개에서 당신과 탐험가 닷이 번갈아 1개 또는 2개를 가져갑니다. <b>마지막 스틱을 가져가는 사람이 이깁니다.</b></p>
+          <p>빛나는 닷 스틱 10개에서 당신과 탐험가 닷(컴퓨터)이 번갈아 1개 또는 2개를 가져갑니다. <b>마지막 스틱을 가져가는 사람이 이깁니다.</b></p>
+        </section>
+        <section aria-labelledby="helpDiffTitle">
+          <h3 id="helpDiffTitle" class="modal__subtitle">난이도와 닷패드 연결</h3>
+          <p><b>연습</b>은 탐험가 닷이 무작위로 움직여 규칙 익히기에 좋고, <b>대결</b>은 이길 때도 실수할 때도 있는 균형 잡힌 상대, <b>고수</b>는 항상 필승 수만 두는 최적 플레이어예요.<br />상단의 <b>연결</b> 버튼은 실제 닷패드(점자 디스플레이) 기기와 블루투스로 연결해, 화면의 촉각 그래픽을 손끝으로도 확인할 수 있게 해줘요. 기기가 없어도 화면만으로 게임을 즐길 수 있습니다.</p>
         </section>
         <section aria-labelledby="helpCtrlTitle">
           <h3 id="helpCtrlTitle" class="modal__subtitle">조작 방법</h3>
@@ -1733,18 +1734,33 @@
     function post(msg) {
       try { window.parent.postMessage(Object.assign({ source: 'dotarcade' }, msg), '*'); } catch (e) {}
     }
-    var readySent = false;
-    function postReady() { if (!readySent) { readySent = true; post({ type: 'ready' }); } }
+    // 중첩 iframe(닷게임즈 → index.html 래퍼 → game-source.html) 구조에서는
+    // 호스트 쪽 message 리스너가 우리 스크립트보다 늦게 붙는 경우가 있다.
+    // 그 순간 보낸 최초 ready/resize 메시지를 호스트가 놓치면, 크기를 못 잡아
+    // 게임 화면이 비어 보이거나 클릭이 엉뚱한 곳으로 새는 것처럼 보일 수 있다.
+    // 그래서 초기 구간에는 몇 차례 더 보내 호스트가 늦게 붙어도 반드시 받게 한다.
+    var readyResendCount = 0;
+    function postReady() {
+      post({ type: 'ready' });
+      if (readyResendCount < 4) {
+        readyResendCount += 1;
+        setTimeout(postReady, 300 * readyResendCount);
+      }
+    }
     function postExit() { post({ type: 'exit' }); }
     function watchResize() {
       if (window.self === window.top) return;
       var last = 0;
-      var report = function () {
+      var report = function (force) {
         var h = Math.ceil(document.documentElement.scrollHeight);
-        if (h !== last) { last = h; post({ type: 'resize', height: h }); }
+        if (force || h !== last) { last = h; post({ type: 'resize', height: h }); }
       };
-      if (window.ResizeObserver) { new ResizeObserver(report).observe(document.body); }
-      report();
+      if (window.ResizeObserver) { new ResizeObserver(function () { report(false); }).observe(document.body); }
+      report(true);
+      // 초기 handshake 유실에 대비해 첫 몇 초간 동일 높이라도 강제로 재전송한다.
+      [300, 800, 1500, 3000].forEach(function (delay) {
+        setTimeout(function () { report(true); }, delay);
+      });
     }
 
     // ── 음성: 게임 음성과 스크린리더 안내를 분리하고 순서대로 재생 ───────
