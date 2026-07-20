@@ -36,13 +36,41 @@
       // TW가 index.html에 전달한 embed/preview/lang 등의 값을 실제 게임 문서에도 전달한다.
       gameFrame.src = 'game-source.html' + window.location.search + window.location.hash;
 
+      // 게임 엔진과 촉각 코덱은 그대로 두고, 시장성 있는 빛의 스틱 무대만 독립 레이어로 주입한다.
+      // 동일 출처의 game-source.html에만 적용되며 실패해도 기존 게임은 정상 작동한다.
+      gameFrame.addEventListener('load', function () {
+        try {
+          var frameDocument = gameFrame.contentDocument;
+          if (!frameDocument || !frameDocument.head) return;
+
+          if (!frameDocument.getElementById('enhancedStageStyles')) {
+            var stylesheet = frameDocument.createElement('link');
+            stylesheet.id = 'enhancedStageStyles';
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = 'enhanced-stage.css';
+            frameDocument.head.appendChild(stylesheet);
+          }
+
+          if (!frameDocument.getElementById('enhancedStageScript')) {
+            var script = frameDocument.createElement('script');
+            script.id = 'enhancedStageScript';
+            script.src = 'enhanced-stage.js';
+            script.defer = true;
+            frameDocument.body.appendChild(script);
+          }
+        } catch (error) {
+          // 임베드 호스트 정책으로 접근이 막힌 경우에도 원본 게임을 그대로 유지한다.
+          console.warn('[dot-stick] cinematic stage enhancement skipped', error);
+        }
+      });
+
       // game-source.html → wrapper → Tactile Worlds
       // 중첩 iframe 구조에서는 자식의 postMessage가 자동으로 최상위 부모까지 전달되지 않는다.
       window.addEventListener('message', function (event) {
         if (event.source !== gameFrame.contentWindow) return;
 
         var data = event.data;
-        if (!data || data.source !== 'dotarcade') return;
+        if (!data || (data.source !== 'dotarcade' && data.source !== 'dotstick-stage')) return;
 
         if (window.parent !== window) {
           window.parent.postMessage(data, '*');
