@@ -892,10 +892,25 @@
     }
 
     #screenPlay:not(.hidden) {
-      display: grid; place-items: center; width: 100%; min-height: calc(100dvh - 104px);
+      display: grid; grid-template-rows: auto minmax(0, 1fr); width: 100%; min-height: 100dvh;
     }
+    body.is-play .wrap > header { display: none; }
+    .play-topbar {
+      width: min(100%, 960px); margin: 0 auto; padding: var(--space-3) var(--space-4) 0;
+      display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+    }
+    .play-brand { flex: 0 0 auto; }
+    .play-utilities { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: var(--space-2); }
+    .play-utilities .voice-controls {
+      position: static; z-index: auto; width: auto; max-width: none; margin: 0; padding: 4px;
+      display: flex; flex-wrap: nowrap; gap: 3px; background: rgba(3,12,7,.68); border-color: rgba(126,227,138,.2);
+      box-shadow: none; backdrop-filter: blur(10px);
+    }
+    .play-utilities .voice-control { min-height: 32px; padding: 5px 9px; border-radius: 9px; font-size: 11px; }
+    .play-help { min-height: 38px; white-space: nowrap; }
+    .play-utility-card { display: flex; align-items: center; gap: var(--space-2); }
     .stage {
-      display: grid; grid-template-rows: auto minmax(180px, 1fr) auto auto auto auto;
+      display: grid; grid-template-rows: auto minmax(180px, 1fr) auto auto auto;
       justify-items: center; align-items: center; gap: var(--space-3);
       width: min(100%, 680px); max-height: calc(100dvh - 112px); margin-inline: auto;
       padding-block: var(--space-3);
@@ -945,12 +960,18 @@
     .preview-cap {
       position: static; justify-self: start; align-self: start; line-height: 1;
     }
+    .preview-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+    .preview-actions { width: 100%; display: flex; justify-content: center; gap: var(--space-2); }
+    .preview-actions .ui-btn { min-height: 34px; padding-inline: var(--space-3); font-size: 12px; }
     canvas#pins {
       width: auto; height: calc(100% - var(--space-3)); max-width: 100%; max-height: calc(100% - var(--space-3)); margin-top: 0;
       aspect-ratio: 3 / 2; object-fit: contain;
     }
     .count-big { font-size: clamp(36px, 8vh, 66px); }
+    .play-action-group { width: min(100%, 460px); display: grid; gap: var(--space-3); padding: var(--space-3); border: 1px solid rgba(126,227,138,.22); border-radius: 20px; background: rgba(3,13,8,.62); box-shadow: 0 12px 28px rgba(0,0,0,.2); }
+    .play-action-title { margin: 0; color: var(--ink); font-size: 14px; font-weight: 900; text-align: center; }
     .choices { gap: var(--space-3); max-width: 420px; }
+    .play-action-group .choices, .play-action-group .confirm-btn { max-width: none; }
     .choice { min-height: clamp(64px, 10vh, 82px); padding: var(--space-3) var(--space-2); }
     .choice .n { font-size: clamp(28px, 4.8vh, 34px); }
     .choice, .confirm-btn, .result-action, .result-button {
@@ -963,7 +984,6 @@
       font-size: 12px; border-radius: 14px;
     }
     @media (max-height: 820px) {
-      #screenPlay .control-guide { display: none; }
       .stage { grid-template-rows: auto minmax(160px, 1fr) auto auto auto; max-height: calc(100dvh - 96px); }
       .preview-wrap { min-height: 160px; max-height: min(32vh, 240px); }
       .confirm-btn { min-height: 50px; }
@@ -973,6 +993,13 @@
       .preview-wrap { min-height: 130px; max-height: 28vh; }
       .choice { min-height: 58px; }
       .count-cap { display: none; }
+    }
+    @media (max-width: 700px) {
+      .play-topbar { padding-inline: var(--space-3); align-items: flex-start; }
+      .play-brand { display: none; }
+      .play-utilities { width: 100%; justify-content: space-between; }
+      .play-utilities .voice-controls { order: 2; width: 100%; justify-content: center; }
+      .play-utilities .voice-control { flex: 1 1 0; }
     }
     .result-layout { gap: var(--space-5); }
     .result-description { margin-top: var(--space-5); }
@@ -1384,13 +1411,26 @@
       <!-- ── 플레이 화면 ───────────────────────────────────────────── -->
 <section id="screenPlay" class="hidden" aria-labelledby="playH">
         <h2 id="playH" class="sr-only" tabindex="-1">닷 스틱 놀이 진행</h2>
+        <div class="play-topbar">
+          <span class="badge play-brand" aria-hidden="true">
+            <span class="dots"><i></i><i class="off"></i><i></i><i></i><i class="off"></i><i></i></span>
+            DOT INC. · 닷게임즈
+          </span>
+          <div class="play-utilities" aria-label="게임 유틸리티">
+            <button class="ui-btn ui-btn--utility play-help" id="playHelpBtn" type="button">도움말 <span class="keycap" aria-hidden="true">F3</span></button>
+            <div id="playVoiceSlot"></div>
+          </div>
+        </div>
         <div class="stage">
           <div style="text-align:center">
             <span class="turn-tag" id="turnTag">당신 차례</span>
           </div>
 
           <div class="preview-wrap">
-            <span class="preview-cap">닷패드 미리보기 · 60 × 40</span>
+            <div class="preview-head">
+              <span class="preview-cap">닷패드 미리보기</span>
+              <span class="result-tactile__resolution">60 × 40</span>
+            </div>
             <canvas id="pins" width="420" height="280" role="img"
               aria-label="빛나는 스틱 미리보기"></canvas>
             <div class="last-light" aria-hidden="true">
@@ -1414,6 +1454,10 @@
                 <ellipse cx="22" cy="14" rx="7" ry="5" fill="#fffdf3" opacity=".9"/>
               </svg>
             </div>
+            <div class="preview-actions" aria-label="닷패드 미리보기 조작">
+              <button class="ui-btn ui-btn--secondary" id="playConnectBtn" type="button"><span class="dp-status" id="playDpStatus">미연결</span> · 연결</button>
+              <button class="ui-btn ui-btn--ghost" id="playTactileReplayBtn" type="button">촉각 다시 출력 <span class="keycap" aria-hidden="true">F2</span></button>
+            </div>
           </div>
 
           <div style="text-align:center">
@@ -1421,22 +1465,23 @@
             <div class="count-cap">개의 스틱이 남았어요</div>
           </div>
 
-          <div class="choices" role="group" aria-label="가져갈 스틱 개수 선택">
-            <button class="choice" id="choice1" type="button" aria-pressed="true">
-              <span class="n">1</span><span class="sub">개 가져가기</span>
-            </button>
-            <button class="choice" id="choice2" type="button" aria-pressed="false">
-              <span class="n">2</span><span class="sub">개 가져가기</span>
-            </button>
-          </div>
-
-          <button class="confirm-btn" id="takeBtn" type="button">가져가기 (Enter)</button>
+          <section class="play-action-group" aria-labelledby="playActionTitle">
+            <h3 class="play-action-title" id="playActionTitle">몇 개를 가져갈까요?</h3>
+            <div class="choices" role="group" aria-label="가져갈 스틱 개수 선택">
+              <button class="choice" id="choice1" type="button" aria-pressed="true">
+                <span class="n">1</span><span class="sub">개 가져가기</span>
+              </button>
+              <button class="choice" id="choice2" type="button" aria-pressed="false">
+                <span class="n">2</span><span class="sub">개 가져가기</span>
+              </button>
+            </div>
+            <button class="confirm-btn" id="takeBtn" type="button">가져가기 (Enter)</button>
+          </section>
 
           <p class="status-line" id="statusLine"></p>
 
           <div class="control-guide" style="justify-content:center">
-            <span><b>키보드</b> <code>← →</code> 개수 · <code>Enter</code> 가져가기 · <code>F1</code> 다시 듣기 · <code>F2</code> 촉각 다시 · <code>F3</code> 도움말 · <code>F4</code> 새 게임</span>
-            <span><b>닷패드</b> 패닝키 좌·우 개수 · 기능키 3 가져가기 · 기능키 4 다시 듣기</span>
+            <span><code>← →</code> 개수 이동 · <code>Enter</code> 선택 · <code>F2</code> 촉각 다시 · <code>F3</code> 도움말</span>
           </div>
         </div>
       </section>
@@ -1913,7 +1958,7 @@
     }
     function setDpStatus(on, label) {
       var state = on ? 'connected' : (label && label.indexOf('연결 중') !== -1 ? 'connecting' : (label && label.indexOf('실패') !== -1 ? 'error' : 'disconnected'));
-      ['dpStatus', 'introDpStatus'].forEach(function (id) {
+      ['dpStatus', 'introDpStatus', 'playDpStatus'].forEach(function (id) {
         var el = document.getElementById(id);
         if (!el) return;
         el.textContent = label || (on ? '연결됨' : '미연결');
@@ -1985,13 +2030,9 @@
         var accessibilityPanel = document.getElementById('introAccessibilityPanel');
         if (accessibilityPanel) accessibilityPanel.appendChild(controls);
       } else if (screen === 'play') {
-        if (!IS_EMBED) {
-          voiceControlsHome.appendChild(controls);
-          return;
-        }
-        var stage = document.querySelector('#screenPlay .stage');
-        var playGuide = stage && stage.querySelector('.control-guide');
-        if (stage) stage.insertBefore(controls, playGuide || null);
+        var playVoiceSlot = document.getElementById('playVoiceSlot');
+        if (playVoiceSlot) playVoiceSlot.appendChild(controls);
+        else voiceControlsHome.appendChild(controls);
       } else if (screen === 'result') {
         // 게임 결과 행동(다시 도전 등)과 섞이지 않도록, 결과 이야기 영역 맨 위에
         // 문서 흐름 그대로 배치한다(화면 크기와 무관하게 액션/촉각 영역과 절대 겹치지 않음).
@@ -2201,6 +2242,11 @@
     function replayTactileResult() {
       if (lastHex) pushHex(lastHex, true);
       speak(S.tactileMode === 'retry' ? '재도전 촉각 안내를 다시 보냈어요.' : '결과 촉각 그래픽을 다시 보냈어요.', { interrupt: true });
+    }
+
+    function replayTactilePlay() {
+      if (lastHex) pushHex(lastHex, true);
+      speak(connected ? '현재 스틱 촉각 정보를 닷패드로 다시 보냈어요.' : '닷패드가 연결되면 현재 스틱 촉각 정보를 보낼 수 있어요.', { interrupt: true });
     }
 
     // ── 결과 화면 메뉴 이동 (다시 도전 / 난이도 바꾸기 / 다시 듣기 / 촉각 다시 출력) ────
@@ -2428,6 +2474,8 @@
 
     // ── 버튼(마우스/터치) ─────────────────────────────────────────────────
     document.getElementById('connectBtn').addEventListener('click', connectDot);
+    var playConnectBtnEl = document.getElementById('playConnectBtn');
+    if (playConnectBtnEl) playConnectBtnEl.addEventListener('click', connectDot);
     document.getElementById('voiceStopBtn').addEventListener('click', function () { stopSpeech(true); });
     document.getElementById('voiceToggleBtn').addEventListener('click', toggleGameVoice);
     document.getElementById('voiceRateBtn').addEventListener('click', cycleVoiceRate);
@@ -2435,6 +2483,8 @@
     if (introConnectBtnEl) introConnectBtnEl.addEventListener('click', connectDot);
     var introHelpBtnEl = document.getElementById('introHelpBtn');
     if (introHelpBtnEl) introHelpBtnEl.addEventListener('click', openHelp);
+    var playHelpBtnEl = document.getElementById('playHelpBtn');
+    if (playHelpBtnEl) playHelpBtnEl.addEventListener('click', openHelp);
     var introReplayBtnEl = document.getElementById('introReplayBtn');
     if (introReplayBtnEl) introReplayBtnEl.addEventListener('click', speakIntro);
     var accessibilityToggleBtnEl = document.getElementById('accessibilityToggleBtn');
@@ -2464,6 +2514,8 @@
     });
     document.getElementById('replayResultBtn').addEventListener('click', function () { replay(); });
     document.getElementById('tactileReplayBtn').addEventListener('click', function () { replayTactileResult(); });
+    var playTactileReplayBtnEl = document.getElementById('playTactileReplayBtn');
+    if (playTactileReplayBtnEl) playTactileReplayBtnEl.addEventListener('click', replayTactilePlay);
     document.getElementById('choice1').addEventListener('click', function () { setChoice(1); });
     document.getElementById('choice2').addEventListener('click', function () { setChoice(2); });
     document.querySelectorAll('.diff').forEach(function (b) {
@@ -2522,4 +2574,3 @@
   </script>
 </body>
 </html>
-++ b/game-source.html
