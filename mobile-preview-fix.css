@@ -154,6 +154,33 @@
   html.embed-mode .play-screen .preview-actions {
     flex: 0 0 auto;
   }
+
+  /* 세로 모바일 임베드에서는 화면 높이가 가장 귀한 자원이다. 연출용 빛의 스틱
+     무대(.light-stage)가 손 닿는 실제 조작(선택·확정)보다 앞자리를 오래 차지하지
+     않도록 낮은 띠로 줄이고, 촉각 미리보기·선택 버튼이 스크롤 없이 최대한
+     빨리 눈에 들어오게 한다. */
+  html.embed-mode .light-stage,
+  html.embed-mode .play-screen .light-stage {
+    min-height: clamp(64px, 16vw, 108px);
+    padding: 10px 14px;
+    border-radius: 16px;
+  }
+  html.embed-mode .light-stage__label { font-size: 10px; top: 7px; left: 10px; }
+  html.embed-mode .light-sticks { min-height: 0; gap: clamp(4px, 2vw, 9px); }
+  html.embed-mode .light-stick {
+    height: clamp(42px, 13vw, 72px);
+    min-width: 12px;
+    width: clamp(12px, 3.2vw, 20px);
+    flex-basis: clamp(12px, 3.2vw, 20px);
+  }
+
+  /* 닷패드 미리보기 헤더("닷패드 미리보기" · "60 × 40")가 아주 좁은 화면에서
+     겹치지 않고 자연스럽게 줄바꿈되도록 한다. */
+  html.embed-mode #screenPlay .preview-head,
+  html.embed-mode .play-screen .preview-head {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
 }
 
 @media (max-width: 380px) {

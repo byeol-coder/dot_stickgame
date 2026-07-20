@@ -246,10 +246,36 @@ html.embed-mode .play-screen .stage {
   min-height: 0;
   margin: 0 auto;
   display: grid;
-  /* turn, tactile preview, count, choices, confirm, status, voice controls */
-  grid-template-rows: auto minmax(0, 1fr) auto auto auto auto auto;
+  /* turn, light-stage(cinematic), tactile preview, count, choices+confirm, status, guide(숨김) */
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto auto auto;
+  grid-template-areas:
+    "turn"
+    "lights"
+    "preview"
+    "status"
+    "action"
+    "toast"
+    "guide";
   align-content: stretch;
   gap: clamp(3px, .65vh, 7px);
+}
+
+/* enhanced-stage.js가 주입하는 .light-stage(연출용 빛의 스틱 무대)는 원래 이 grid에
+   자리가 없어 이름 없는 셀로 자동 배치되었고, 그 여파로 .status-line("toast")까지
+   같이 밀려나며 레이아웃이 깨졌다(가운데 빈 공간, 요소 겹침의 원인). 임베드에서는
+   촉각 패널(.preview-wrap)이 화면의 주인공이므로, 빛의 스틱은 상단에 낮은 띠로만 노출한다. */
+html.embed-mode .light-stage {
+  grid-area: lights;
+  min-height: clamp(64px, 10vh, 108px);
+  padding: clamp(8px, 1.4vh, 14px) clamp(10px, 2vw, 20px);
+  border-radius: 16px;
+}
+html.embed-mode .light-stage__label { top: 8px; left: 12px; font-size: 10px; }
+html.embed-mode .light-sticks { min-height: 0; gap: clamp(4px, 1.4vw, 10px); }
+html.embed-mode .light-stick {
+  height: clamp(46px, 7vh, 74px);
+  width: clamp(12px, 1.8vw, 20px);
+  flex-basis: clamp(12px, 1.8vw, 20px);
 }
 
 html.embed-mode #screenPlay .preview-wrap,
@@ -308,12 +334,17 @@ html.embed-mode .preview-actions .ui-btn {
   html.embed-mode .play-screen .stage {
     width: min(calc(100% - 32px), 1040px);
     grid-template-columns: minmax(0, 1.3fr) minmax(280px, .8fr);
-    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    /* lights 행을 추가로 확보한다: .light-stage가 이름 없는 셀로 자동 배치되면서
+       오른쪽 좁은 열 아래로 밀려나 눌리고, 그 여파로 나머지 행이 이어서 밀리며
+       화면 대부분이 빈 공간으로 보이는 문제가 있었다. status-line도 미사용
+       "line" 대신 실제로 쓰이는 "toast" 셀에 배치한다. */
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
     grid-template-areas:
-      "turn turn"
+      "turn   turn"
+      "lights lights"
       "preview status"
       "preview action"
-      "preview line";
+      "preview toast";
     column-gap: clamp(18px, 2.2vw, 32px);
     row-gap: clamp(8px, 1.1vh, 12px);
   }
@@ -325,6 +356,17 @@ html.embed-mode .preview-actions .ui-btn {
     max-height: none;
     min-height: min(42vh, 320px);
     align-self: stretch;
+  }
+
+  html.embed-mode .light-stage {
+    min-height: clamp(76px, 12vh, 132px);
+    padding: clamp(10px, 1.6vh, 16px) clamp(14px, 2vw, 24px);
+  }
+  html.embed-mode .light-sticks { min-height: 0; }
+  html.embed-mode .light-stick {
+    height: clamp(52px, 9vh, 92px);
+    width: clamp(16px, 2vw, 26px);
+    flex-basis: clamp(16px, 2vw, 26px);
   }
 }
 
