@@ -432,7 +432,7 @@
       animation: result-title-arrive 620ms cubic-bezier(.19,1,.22,1) both;
     }
     .result-screen[data-result="lose"] .result-title { color: #f3a08f; text-shadow: 0 0 18px rgba(243,160,143,.13), 0 8px 28px rgba(0,0,0,.5); }
-    .result-description { max-width: 43ch; margin: 16px 0 0; color: #d7dfd6; font-size: clamp(14px,1.15vw,17px); line-height: 1.65; text-wrap: pretty; }
+    .result-description { max-width: 43ch; margin: 16px 0 0; color: #d7dfd6; font-size: clamp(14px,1.15vw,17px); line-height: 1.65; word-break: keep-all; overflow-wrap: normal; text-wrap: pretty; }
     .result-secret {
       width: 100%; max-width: 460px; margin-top: 20px; display: flex; align-items: flex-start; gap: 12px;
       padding: 15px 16px; color: #fff0c3; background: linear-gradient(135deg, rgba(78,54,16,.76), rgba(38,27,11,.84));
@@ -446,7 +446,7 @@
       box-shadow: 0 0 18px rgba(255,204,82,.3), inset 0 1px rgba(255,255,255,.5);
     }
     .result-secret strong { display: block; margin-bottom: 3px; color: #ffe69d; font-size: 14px; }
-    .result-secret p { margin: 0; color: #dfcfaa; font-size: 13px; line-height: 1.5; }
+    .result-secret p { margin: 0; color: #dfcfaa; font-size: 13px; line-height: 1.5; word-break: keep-all; overflow-wrap: normal; }
     .result-tactile {
       grid-area: tactile; position: relative; z-index: 2; width: 100%; max-width: 520px; justify-self: end;
       align-self: center; margin: 0; padding: 18px;
@@ -478,11 +478,11 @@
       position: absolute; inset: 22%; z-index: 1; pointer-events: none; border-radius: 50%;
       background: rgba(126,227,138,.11); filter: blur(32px); animation: result-tactile-pulse 2.6s ease-in-out infinite;
     }
-    .result-tactile > p { margin: 11px 4px 0; color: #91a396; font-size: 12px; line-height: 1.5; text-align: center; }
+    .result-tactile > p { margin: 11px 4px 0; color: #91a396; font-size: 12px; line-height: 1.5; text-align: center; word-break: keep-all; overflow-wrap: normal; }
     .result-tactile__replay {
       width: 100%; margin: 12px 0 0; min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px;
       color: var(--glow-soft); background: rgba(126,227,138,.09); border: 1px solid rgba(126,227,138,.3); border-radius: 12px;
-      font: 700 13px/1 var(--font-body); cursor: pointer; transition: border-color .15s ease, background .15s ease, transform .05s ease;
+      font: 700 13px/1 var(--font-body); cursor: pointer; word-break: keep-all; overflow-wrap: normal; transition: border-color .15s ease, background .15s ease, transform .05s ease;
     }
     .result-tactile__replay:hover { border-color: rgba(126,227,138,.7); background: rgba(126,227,138,.16); }
     .result-tactile__replay:active { transform: translateY(1px); }
@@ -917,6 +917,7 @@
     }
     .intro-difficulty__button .ico,
     .difficulty-icon { width: 24px; height: 24px; display: grid; place-items: center; font-size: 19px; line-height: 1; }
+    .difficulty-icon svg { width: 22px; height: 22px; display: block; color: inherit; }
     .intro-difficulty__button:hover { transform: translateY(-1px); border-color: rgba(171,247,194,.34); color: #fff; background: rgba(129,224,158,.08); }
     .intro-difficulty__button[aria-checked="true"] {
       color: #fff4c2; border-color: rgba(255,205,74,.9);
@@ -1543,9 +1544,9 @@
                 <span class="intro-difficulty__hint">화살표로 변경</span>
               </legend>
               <div class="intro-difficulty__options" role="radiogroup" aria-label="난이도 선택">
-                <button class="diff intro-difficulty__button" data-diff="easy"   type="button" role="radio" aria-checked="false"><span class="ico difficulty-icon" aria-hidden="true">🌱</span><span>연습</span></button>
-                <button class="diff intro-difficulty__button" data-diff="normal" type="button" role="radio" aria-checked="true"><span class="ico difficulty-icon" aria-hidden="true">⚔️</span><span>대결</span></button>
-                <button class="diff intro-difficulty__button" data-diff="hard"   type="button" role="radio" aria-checked="false"><span class="ico difficulty-icon" aria-hidden="true">🔥</span><span>고수</span></button>
+                <button class="diff intro-difficulty__button" data-diff="easy"   type="button" role="radio" aria-checked="false"><span class="ico difficulty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8.5"/><path d="M12 12.5C12 9 9.4 6.8 6 6.8c0 3.5 2.6 5.7 6 5.7Z"/><path d="M12 11.5c0-3 2.2-5 5.2-5 0 3-2.2 5-5.2 5Z"/></svg></span><span>연습</span></button>
+                <button class="diff intro-difficulty__button" data-diff="normal" type="button" role="radio" aria-checked="true"><span class="ico difficulty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4.5l10 10"/><path d="M14 6l5-1.5L17.5 10"/><path d="M19.5 4.5l-10 10"/><path d="M10 6L5 4.5 6.5 10"/><path d="M6 17l2.5-2.5M18 17l-2.5-2.5"/></svg></span><span>대결</span></button>
+                <button class="diff intro-difficulty__button" data-diff="hard"   type="button" role="radio" aria-checked="false"><span class="ico difficulty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c1.6 3 4.6 4.7 4.6 8.6A4.6 4.6 0 0 1 12 16.7a4.6 4.6 0 0 1-4.6-4.6c0-1.7.9-3 1.8-3.8.2 1.1.9 1.8 1.8 2.1C10.7 8 10.4 5.7 12 3.5Z"/></svg></span><span>고수</span></button>
               </div>
             </fieldset>
 
@@ -1667,7 +1668,7 @@
             <div class="result-moon" aria-hidden="true"></div>
             <p class="result-story__eyebrow" id="resultEyebrow">THE LAST LIGHT WAS FOUND</p>
             <h2 id="resultH" class="result-title">닷이 먼저 찾았어요!</h2>
-            <p id="resultText" class="result-description">탐험가 닷이 마지막 빛을 먼저 발견했어요.<br />하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.</p>
+            <p id="resultText" class="result-description">탐험가 닷이 마지막 빛을 먼저 발견했어요. <br />하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.</p>
             <aside class="result-secret" aria-labelledby="resultSecretTitle">
               <span class="result-secret__symbol" aria-hidden="true">✦</span>
               <div><strong id="resultSecretTitle">빛의 비밀</strong><p id="resultHint">3의 배수가 열쇠예요.<br />상대에게 3·6·9개의 스틱을 남겨 보세요.</p></div>
@@ -2398,7 +2399,7 @@
       document.getElementById('resultBadge').textContent = '마지막 빛 획득';
       document.getElementById('resultEyebrow').textContent = 'THE LAST LIGHT IS YOURS';
       document.getElementById('resultH').textContent = '마지막 빛을 찾았어요!';
-      document.getElementById('resultText').innerHTML = '당신이 마지막 닷 스틱을 가져왔어요.<br>특별한 빛이 숲 전체에 퍼지기 시작했어요.';
+      document.getElementById('resultText').innerHTML = '당신이 마지막 닷 스틱을 가져왔어요. <br>특별한 빛이 숲 전체에 퍼지기 시작했어요.';
       document.getElementById('resultHint').innerHTML = '이번에 사용한 전략을 기억해 보세요.<br>상대에게 3·6·9개의 스틱을 남기면 유리해요.';
       document.getElementById('tactileDescription').textContent = '승리를 나타내는 트로피 촉각 그래픽을 손끝으로 확인해 보세요.';
       document.getElementById('pinsR').setAttribute('aria-label', '승리를 나타내는 트로피 촉각 그래픽');
@@ -2420,7 +2421,7 @@
       document.getElementById('resultBadge').textContent = '탐험가 닷의 발견';
       document.getElementById('resultEyebrow').textContent = 'THE LAST LIGHT WAS FOUND';
       document.getElementById('resultH').textContent = '닷이 먼저 찾았어요!';
-      document.getElementById('resultText').innerHTML = '탐험가 닷이 마지막 빛을 먼저 발견했어요.<br>하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.';
+      document.getElementById('resultText').innerHTML = '탐험가 닷이 마지막 빛을 먼저 발견했어요. <br>하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.';
       document.getElementById('resultHint').innerHTML = '3의 배수가 열쇠예요.<br>상대에게 3·6·9개의 스틱을 남겨 보세요.';
       document.getElementById('tactileDescription').textContent = '실패를 나타내는 금이 간 방패 촉각 그래픽을 손끝으로 확인해 보세요.';
       document.getElementById('pinsR').setAttribute('aria-label', '실패를 나타내는 금이 간 방패 촉각 그래픽');
