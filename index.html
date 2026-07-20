@@ -59,6 +59,14 @@
             frameDocument.head.appendChild(imageStylesheet);
           }
 
+          if (!frameDocument.getElementById('mobilePreviewFixStyles')) {
+            var mobilePreviewStylesheet = frameDocument.createElement('link');
+            mobilePreviewStylesheet.id = 'mobilePreviewFixStyles';
+            mobilePreviewStylesheet.rel = 'stylesheet';
+            mobilePreviewStylesheet.href = 'mobile-preview-fix.css';
+            frameDocument.head.appendChild(mobilePreviewStylesheet);
+          }
+
           if (!frameDocument.getElementById('enhancedStageScript')) {
             var script = frameDocument.createElement('script');
             script.id = 'enhancedStageScript';
