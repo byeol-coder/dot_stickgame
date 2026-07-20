@@ -374,24 +374,24 @@ html.embed-mode .result-screen {
   height: 100%;
   min-height: 0;
   max-height: 100%;
-  overflow: hidden;
+  overflow: auto;
 }
 
 html.embed-mode .result-layout {
   width: min(100%, 1120px);
-  height: 100%;
-  min-height: 0;
+  height: auto;
+  min-height: 100%;
   margin: 0 auto;
   padding: clamp(7px, 1.2vh, 13px) clamp(8px, 1.5vw, 18px);
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(240px, .9fr);
+  grid-template-columns: minmax(0, 1.05fr) minmax(240px, .85fr);
   grid-template-areas:
     "story tactile"
     "actions tactile";
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
   align-items: center;
-  align-content: stretch;
-  gap: clamp(8px, 1.2vw, 15px);
+  align-content: center;
+  gap: clamp(10px, 1.8vh, 18px) clamp(12px, 2vw, 24px);
 }
 
 html.embed-mode .result-story {
@@ -400,6 +400,8 @@ html.embed-mode .result-story {
   min-width: 0;
   min-height: 0;
   max-width: 520px;
+  display: flex;
+  flex-direction: column;
   align-self: center;
 }
 
@@ -407,11 +409,13 @@ html.embed-mode .result-tactile {
   grid-area: tactile;
   width: 100%;
   min-width: 0;
-  max-height: 100%;
+  max-width: 500px;
+  max-height: none;
   margin: 0;
   padding: clamp(7px, 1vw, 12px);
   align-self: center;
-  overflow: hidden;
+  justify-self: end;
+  overflow: visible;
 }
 
 html.embed-mode .result-actions {
@@ -472,8 +476,7 @@ html.embed-mode .result-description {
   overflow-wrap: normal;
   text-wrap: pretty;
 }
-/* 두 문장은 원래의 문장 경계에서 읽어야 내용이 빠르게 들어온다. */
-html.embed-mode .result-description br { display: revert; }
+html.embed-mode .result-description br { display: none; }
 
 html.embed-mode .result-secret {
   margin-top: clamp(6px, 1vh, 10px);
@@ -484,7 +487,7 @@ html.embed-mode .result-secret > div { min-width: 0; }
 html.embed-mode .result-secret p {
   line-height: 1.4;
   word-break: keep-all;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   text-wrap: pretty;
 }
 html.embed-mode .result-secret p br { display: none; }
@@ -541,7 +544,7 @@ html.embed-mode .result-action small { font-size: 10px; }
 
   html.embed-mode .result-title { max-width: 12ch; font-size: clamp(28px, 7.6vw, 38px); }
   html.embed-mode .result-description { font-size: 12px; }
-  html.embed-mode .result-secret { display: none; }
+  html.embed-mode .result-secret { display: flex; }
   html.embed-mode .result-tactile__header span:not(.result-tactile__resolution) { display: none; }
   html.embed-mode .result-actions { grid-template-columns: 1fr 1fr; }
   html.embed-mode .result-action--primary { grid-column: auto; }
@@ -572,8 +575,6 @@ html.embed-mode .result-action small { font-size: 10px; }
   html.embed-mode #screenPlay .preview-wrap,
   html.embed-mode .play-screen .preview-wrap { padding: 7px; }
   html.embed-mode .count-cap,
-  html.embed-mode .result-description,
-  html.embed-mode .result-secret,
   html.embed-mode .result-tactile > p { display: none; }
   html.embed-mode .choice { min-height: 44px; }
   html.embed-mode .result-title { font-size: clamp(26px, 6.2vh, 34px); }
