@@ -72,7 +72,7 @@ try{
       await frame.locator('#startBtn').click();await frame.waitForSelector('#screenPlay:not(.hidden)',{state:'visible'});await audit(frame,name,'play',height,embed);await page.screenshot({path:path.join(out,`${name}-play.png`),animations:'disabled'});
       await result(frame,'win');await audit(frame,name,'result',height,embed);await page.screenshot({path:path.join(out,`${name}-win.png`),animations:'disabled'});
       await result(frame,'lose');await audit(frame,name,'result',height,embed);await page.screenshot({path:path.join(out,`${name}-lose.png`),animations:'disabled'});
-      if(await frame.evaluate(()=>typeof window.openHelp==='function')){await frame.evaluate(()=>window.openHelp());await frame.waitForSelector('#helpModal:not([hidden])',{state:'visible'});await page.screenshot({path:path.join(out,`${name}-help.png`),animations:'disabled'});await frame.keyboard.press('Escape')}
+      if(await frame.evaluate(()=>typeof window.openHelp==='function')){await frame.evaluate(()=>window.openHelp());await frame.waitForSelector('#helpModal:not([hidden])',{state:'visible'});await page.screenshot({path:path.join(out,`${name}-help.png`),animations:'disabled'});await page.keyboard.press('Escape')}
       failures.push(...runtime.map(e=>`${name}: ${e}`));
     }catch(e){failures.push(`${name}: ${e.stack||e.message}`)}finally{await page.close()}
   }
