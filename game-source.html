@@ -395,18 +395,18 @@
       z-index: -3; box-shadow: inset 0 0 170px rgba(0,0,0,.72), inset 0 -140px 150px rgba(0,0,0,.55);
     }
     .result-layout {
-      width: min(calc(100% - 48px), 1180px); min-height: calc(100dvh - 130px); margin: 0 auto;
-      display: grid; grid-template-columns: minmax(320px,.88fr) minmax(440px,1.12fr);
+      width: min(calc(100% - 48px), 1120px); min-height: calc(100dvh - 112px); margin: 0 auto;
+      display: grid; grid-template-columns: minmax(340px,1fr) minmax(400px,.96fr);
       grid-template-areas: "story tactile" "actions tactile"; align-content: center; align-items: center;
-      column-gap: clamp(32px,5vw,78px); row-gap: 28px;
-      padding: max(90px, env(safe-area-inset-top)) 0 115px;
+      column-gap: clamp(28px,4vw,56px); row-gap: 22px;
+      padding: max(72px, env(safe-area-inset-top)) 0 96px;
     }
-    .result-story { grid-area: story; max-width: 470px; }
+    .result-story { grid-area: story; width: 100%; max-width: 500px; }
     .result-story__badge {
-      width: fit-content; min-height: 34px; display: inline-flex; align-items: center; gap: 9px;
-      padding: 6px 13px; color: #c8dfcc; background: rgba(8,31,20,.64);
-      border: 1px solid rgba(126,227,138,.25); border-radius: 999px;
-      font-size: 12px; font-weight: 800; letter-spacing: .03em; backdrop-filter: blur(13px);
+      width: fit-content; min-height: 32px; display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 12px; color: #c8dfcc; background: rgba(8,31,20,.58);
+      border: 1px solid rgba(126,227,138,.22); border-radius: 999px;
+      font-size: 11px; font-weight: 800; letter-spacing: .035em; backdrop-filter: blur(12px);
     }
     .result-story__badge-dot {
       width: 7px; height: 7px; border-radius: 50%; background: #7ee38a;
@@ -414,46 +414,47 @@
     }
     .result-screen[data-result="lose"] .result-story__badge-dot { background: #84c5ff; box-shadow: 0 0 9px rgba(132,197,255,.8); }
     .result-moon {
-      position: relative; width: 58px; height: 58px; margin: 27px 0 18px; border-radius: 50%;
+      position: relative; width: 52px; height: 52px; margin: 22px 0 15px; border-radius: 50%;
       background: #ffdc63; box-shadow: 0 0 13px rgba(255,220,99,.58), 0 0 32px rgba(255,206,74,.28);
       transform: rotate(-16deg);
     }
     .result-moon::after {
-      content: ''; position: absolute; top: -7px; left: 17px; width: 57px; height: 57px;
+      content: ''; position: absolute; top: -6px; left: 15px; width: 52px; height: 52px;
       border-radius: 50%; background: #05110d;
     }
     .result-screen[data-result="win"] .result-moon::after { display: none; }
-    .result-story__eyebrow { margin: 0 0 10px; color: rgba(205,224,208,.85); font-size: 11px; font-weight: 900; letter-spacing: .16em; }
+    .result-story__eyebrow { margin: 0 0 8px; color: rgba(205,224,208,.68); font-size: 10px; font-weight: 800; letter-spacing: .14em; }
     .result-title {
-      margin: 0; color: var(--amber-hot); font-family: var(--font-display); font-size: clamp(55px,6vw,86px);
-      font-weight: 400; line-height: 1.05; letter-spacing: -.045em;
-      text-shadow: 0 0 22px rgba(255,208,110,.18), 0 10px 32px rgba(0,0,0,.52);
-      animation: result-title-arrive 720ms cubic-bezier(.19,1,.22,1) both;
+      max-width: 11ch; margin: 0; color: #ffe7a3; font-family: var(--font-display);
+      font-size: clamp(42px,4.3vw,62px); font-weight: 800; line-height: 1.1; letter-spacing: -.045em;
+      word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
+      text-shadow: 0 0 18px rgba(255,208,110,.14), 0 8px 28px rgba(0,0,0,.5);
+      animation: result-title-arrive 620ms cubic-bezier(.19,1,.22,1) both;
     }
-    .result-screen[data-result="lose"] .result-title { color: #ff9f8c; text-shadow: 0 0 22px rgba(255,136,114,.15), 0 10px 32px rgba(0,0,0,.52); }
-    .result-description { max-width: 42ch; margin: 24px 0 0; color: #d7dfd6; font-size: clamp(15px,1.3vw,18px); line-height: 1.75; }
+    .result-screen[data-result="lose"] .result-title { color: #f3a08f; text-shadow: 0 0 18px rgba(243,160,143,.13), 0 8px 28px rgba(0,0,0,.5); }
+    .result-description { max-width: 43ch; margin: 16px 0 0; color: #d7dfd6; font-size: clamp(14px,1.15vw,17px); line-height: 1.65; text-wrap: pretty; }
     .result-secret {
-      width: 100%; max-width: 440px; margin-top: 27px; display: flex; align-items: flex-start; gap: 14px;
-      padding: 18px; color: #fff0c3; background: linear-gradient(135deg, rgba(88,60,15,.83), rgba(44,30,10,.89));
-      border: 1px solid rgba(255,204,82,.48); border-radius: 18px;
+      width: 100%; max-width: 460px; margin-top: 20px; display: flex; align-items: flex-start; gap: 12px;
+      padding: 15px 16px; color: #fff0c3; background: linear-gradient(135deg, rgba(78,54,16,.76), rgba(38,27,11,.84));
+      border: 1px solid rgba(255,204,82,.36); border-radius: 16px;
       box-shadow: inset 0 1px rgba(255,255,255,.08), 0 18px 40px rgba(0,0,0,.3), 0 0 35px rgba(255,187,66,.05);
       backdrop-filter: blur(14px);
     }
     .result-secret__symbol {
-      width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center;
-      color: #493207; background: linear-gradient(180deg,#ffdd67,#ffbe39); border-radius: 50%; font-size: 24px;
+      width: 38px; height: 38px; flex: 0 0 38px; display: grid; place-items: center;
+      color: #493207; background: linear-gradient(180deg,#ffdf76,#ffc247); border-radius: 50%; font-size: 20px;
       box-shadow: 0 0 18px rgba(255,204,82,.3), inset 0 1px rgba(255,255,255,.5);
     }
-    .result-secret strong { display: block; margin-bottom: 5px; color: #ffe69d; font-size: 16px; }
-    .result-secret p { margin: 0; color: #dfcfaa; font-size: 14px; line-height: 1.6; }
+    .result-secret strong { display: block; margin-bottom: 3px; color: #ffe69d; font-size: 14px; }
+    .result-secret p { margin: 0; color: #dfcfaa; font-size: 13px; line-height: 1.5; }
     .result-tactile {
-      grid-area: tactile; position: relative; z-index: 2; width: 100%; max-width: 560px; justify-self: end;
-      align-self: center; margin: 0; padding: 21px;
-      background: linear-gradient(145deg, rgba(2,12,8,.88), rgba(3,17,11,.76));
-      border: 1px solid rgba(126,227,138,.3); border-radius: 25px;
-      box-shadow: 0 28px 75px rgba(0,0,0,.5), inset 0 1px rgba(255,255,255,.03); backdrop-filter: blur(18px);
+      grid-area: tactile; position: relative; z-index: 2; width: 100%; max-width: 520px; justify-self: end;
+      align-self: center; margin: 0; padding: 18px;
+      background: linear-gradient(145deg, rgba(2,12,8,.84), rgba(3,17,11,.72));
+      border: 1px solid rgba(126,227,138,.24); border-radius: 22px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.44), inset 0 1px rgba(255,255,255,.025); backdrop-filter: blur(16px);
     }
-    .result-tactile__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 15px; padding: 0; }
+    .result-tactile__header { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; padding: 0; }
     .result-tactile__header strong, .result-tactile__header span { display: block; }
     .result-tactile__header strong { color: #f1f5ef; font-size: 16px; }
     .result-tactile__header div > span { margin-top: 2px; color: #819486; font-size: 12px; }
@@ -464,8 +465,8 @@
     .result-tactile__display {
       position: relative; overflow: hidden; width: 100%; aspect-ratio: 3/2;
       background: radial-gradient(circle at center, rgba(107,255,128,.07), transparent 48%), #061009;
-      border: 1px solid #28422f; border-radius: 16px;
-      box-shadow: inset 0 0 45px rgba(0,0,0,.48), 0 18px 35px rgba(0,0,0,.24);
+      border: 1px solid rgba(72,111,81,.68); border-radius: 14px;
+      box-shadow: inset 0 0 38px rgba(0,0,0,.46), 0 14px 30px rgba(0,0,0,.2);
     }
     .result-tactile__display #pinsR { position: relative; z-index: 2; display: block; width: 100%; height: 100%; object-fit: contain; }
     .result-tactile__scan {
@@ -477,7 +478,7 @@
       position: absolute; inset: 22%; z-index: 1; pointer-events: none; border-radius: 50%;
       background: rgba(126,227,138,.11); filter: blur(32px); animation: result-tactile-pulse 2.6s ease-in-out infinite;
     }
-    .result-tactile > p { margin: 14px 4px 0; color: #8fa294; font-size: 13px; line-height: 1.55; text-align: center; }
+    .result-tactile > p { margin: 11px 4px 0; color: #91a396; font-size: 12px; line-height: 1.5; text-align: center; }
     .result-tactile__replay {
       width: 100%; margin: 12px 0 0; min-height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px;
       color: var(--glow-soft); background: rgba(126,227,138,.09); border: 1px solid rgba(126,227,138,.3); border-radius: 12px;
@@ -491,12 +492,12 @@
       border: 1px solid rgba(126,227,138,.3); border-radius: 6px; font-size: 10px; font-weight: 800;
     }
     .result-actions {
-      grid-area: actions; width: 100%; max-width: 470px; margin: 0;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 11px;
+      grid-area: actions; width: 100%; max-width: 500px; margin: 0;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
     }
     .result-action {
-      min-height: 60px; display: flex; align-items: center; justify-content: center; gap: 11px; padding: 12px 16px;
-      color: #edf4ec; background: rgba(7,25,15,.79); border: 1px solid rgba(126,227,138,.2); border-radius: 15px;
+      min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 15px;
+      color: #edf4ec; background: rgba(7,25,15,.74); border: 1px solid rgba(126,227,138,.18); border-radius: 14px;
       font: inherit; text-align: left; cursor: pointer; backdrop-filter: blur(13px);
       transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
     }
@@ -508,7 +509,7 @@
     .result-action small { margin-top: 2px; color: inherit; opacity: .85; font-size: 12px; }
     .result-action__icon { font-size: 23px; }
     .result-action--primary {
-      grid-column: 1/-1; min-height: 78px; color: #092914;
+      grid-column: 1/-1; min-height: 68px; color: #092914;
       background: linear-gradient(180deg,#bff5c8,#7ee38a); border-color: rgba(255,255,255,.4);
       box-shadow: inset 0 1px rgba(255,255,255,.4);
     }
@@ -524,7 +525,7 @@
     .result-screen[data-result="lose"] .result-action--primary:hover {
       box-shadow: 0 0 24px rgba(255,159,140,.28), inset 0 1px rgba(255,255,255,.5);
     }
-    .result-action--primary strong { font-family: var(--font-display); font-size: 24px; font-weight: 400; }
+    .result-action--primary strong { font-family: var(--font-display); font-size: 20px; font-weight: 800; }
     .result-action--quiet { min-height: 43px; color: #a1b3a4; background: transparent; border-color: transparent; font-size: 13px; }
     /* 결과 화면 조작 안내: 예전에는 화면 하단에 고정(position:fixed)해 떠 있었으나,
        내용이 길어 화면(특히 800~900px 높이 데스크톱)에서 스크롤될 때 액션 버튼과
@@ -570,9 +571,9 @@
       .result-story, .result-actions, .result-tactile { width: 100%; max-width: none; }
       .result-moon { width: 46px; height: 46px; margin-top: 19px; }
       .result-moon::after { width: 46px; height: 46px; left: 14px; }
-      .result-title { font-size: clamp(48px,15vw,68px); }
+      .result-title { max-width: 12ch; font-size: clamp(40px,11vw,56px); line-height: 1.12; }
       .result-description br { display: none; }
-      .result-tactile { padding: 15px; border-radius: 20px; }
+      .result-tactile { padding: 14px; border-radius: 19px; }
       .result-actions { grid-template-columns: 1fr; }
       .result-action, .result-action--primary, .result-action--quiet { grid-column: auto; }
       .result-controls { width: calc(100% - 24px); margin-top: 12px; gap: 5px 11px; border-radius: 18px; }
@@ -1123,11 +1124,11 @@
       .play-utilities .voice-controls { order: 2; width: 100%; justify-content: center; }
       .play-utilities .voice-control { flex: 1 1 0; }
     }
-    .result-layout { gap: var(--space-5); }
-    .result-description { margin-top: var(--space-5); }
-    .result-secret { margin-top: var(--space-5); }
-    .result-actions { gap: var(--space-3); }
-    .result-action { min-height: 64px; }
+    .result-layout { gap: 22px; }
+    .result-description { margin-top: var(--space-4); }
+    .result-secret { margin-top: 20px; }
+    .result-actions { gap: 10px; }
+    .result-action { min-height: 56px; }
     .result-controls { border-radius: 14px; }
     @media (max-height: 820px) and (min-width: 781px) {
       .result-screen { overflow: hidden; }
@@ -1137,11 +1138,11 @@
         column-gap: var(--space-6); row-gap: var(--space-4);
         align-content: center; padding: var(--space-6) 0 var(--space-6);
       }
-      .result-story { max-width: 420px; }
+      .result-story { max-width: 460px; }
       .result-moon { display: none; }
-      .result-story__eyebrow { margin-bottom: var(--space-2); }
-      .result-title { font-size: clamp(46px, 5vw, 64px); line-height: 1.02; letter-spacing: 0; }
-      .result-description { margin-top: var(--space-3); font-size: 14px; line-height: 1.55; }
+      .result-story__eyebrow { margin-bottom: 6px; }
+      .result-title { max-width: 12ch; font-size: clamp(36px, 3.6vw, 44px); line-height: 1.12; letter-spacing: -.035em; }
+      .result-description { margin-top: 10px; font-size: 13px; line-height: 1.45; }
       .result-secret {
         margin-top: var(--space-3); padding: var(--space-3); gap: var(--space-3);
         border-radius: var(--button-radius);
@@ -1164,7 +1165,8 @@
     }
     @media (max-height: 700px) and (min-width: 781px) {
       .result-layout { padding-block: var(--space-4); }
-      .result-description { display: none; }
+      .result-description { margin-top: var(--space-2); font-size: 12px; line-height: 1.4; }
+      .result-description br { display: none; }
       .result-secret { margin-top: var(--space-2); }
       .result-tactile { max-width: 390px; }
       .result-action--quiet { display: none; }
@@ -1180,7 +1182,7 @@
       .result-moon { display: none; }
       .result-story__badge { min-height: 30px; padding: var(--space-1) var(--space-3); }
       .result-story__eyebrow { margin: var(--space-2) 0; }
-      .result-title { font-size: clamp(40px, 11vw, 54px); line-height: 1.02; letter-spacing: 0; }
+      .result-title { max-width: 12ch; font-size: clamp(34px, 9vw, 44px); line-height: 1.12; letter-spacing: -.035em; }
       .result-description { margin-top: var(--space-2); font-size: 13px; line-height: 1.45; }
       .result-secret {
         margin-top: var(--space-2); padding: var(--space-3); gap: var(--space-2);
@@ -1637,7 +1639,7 @@
             <div class="result-story__badge"><span class="result-story__badge-dot" aria-hidden="true"></span><span id="resultBadge">탐험가 닷의 발견</span></div>
             <div class="result-moon" aria-hidden="true"></div>
             <p class="result-story__eyebrow" id="resultEyebrow">THE LAST LIGHT WAS FOUND</p>
-            <h2 id="resultH" class="result-title">닷이 먼저<br />찾았어요!</h2>
+            <h2 id="resultH" class="result-title">닷이 먼저 찾았어요!</h2>
             <p id="resultText" class="result-description">탐험가 닷이 마지막 빛을 먼저 발견했어요.<br />하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.</p>
             <aside class="result-secret" aria-labelledby="resultSecretTitle">
               <span class="result-secret__symbol" aria-hidden="true">✦</span>
@@ -2345,7 +2347,7 @@
       resultScreen.dataset.result = 'win';
       document.getElementById('resultBadge').textContent = '마지막 빛 획득';
       document.getElementById('resultEyebrow').textContent = 'THE LAST LIGHT IS YOURS';
-      document.getElementById('resultH').innerHTML = '마지막 빛을<br>찾았어요!';
+      document.getElementById('resultH').textContent = '마지막 빛을 찾았어요!';
       document.getElementById('resultText').innerHTML = '당신이 마지막 닷 스틱을 가져왔어요.<br>특별한 빛이 숲 전체에 퍼지기 시작했어요.';
       document.getElementById('resultHint').innerHTML = '이번에 사용한 전략을 기억해 보세요.<br>상대에게 3·6·9개의 스틱을 남기면 유리해요.';
       document.getElementById('tactileDescription').textContent = '승리를 나타내는 트로피 촉각 그래픽을 손끝으로 확인해 보세요.';
@@ -2367,7 +2369,7 @@
       resultScreen.dataset.result = 'lose';
       document.getElementById('resultBadge').textContent = '탐험가 닷의 발견';
       document.getElementById('resultEyebrow').textContent = 'THE LAST LIGHT WAS FOUND';
-      document.getElementById('resultH').innerHTML = '닷이 먼저<br>찾았어요!';
+      document.getElementById('resultH').textContent = '닷이 먼저 찾았어요!';
       document.getElementById('resultText').innerHTML = '탐험가 닷이 마지막 빛을 먼저 발견했어요.<br>하지만 이번 탐험에서 빛의 규칙을 알아냈습니다.';
       document.getElementById('resultHint').innerHTML = '3의 배수가 열쇠예요.<br>상대에게 3·6·9개의 스틱을 남겨 보세요.';
       document.getElementById('tactileDescription').textContent = '실패를 나타내는 금이 간 방패 촉각 그래픽을 손끝으로 확인해 보세요.';
