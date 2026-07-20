@@ -1075,10 +1075,11 @@
        촉각 그래픽을 크게 유지한 채 모든 조작 요소를 한 화면에 보여준다. */
     @media (min-width: 900px) and (max-height: 700px) {
       #screenPlay { overflow-y: auto; }
-      .play-topbar { width: min(calc(100% - 32px), 960px); }
+      .play-topbar { width: min(calc(100% - 32px), 960px); box-sizing: border-box; }
       .stage {
         width: min(calc(100% - 32px), 960px);
-        grid-template-columns: minmax(420px, 1.25fr) minmax(320px, .85fr);
+        box-sizing: border-box;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, .85fr);
         grid-template-rows: auto auto auto auto auto;
         grid-template-areas:
           "turn turn"
@@ -1088,16 +1089,32 @@
           "preview guide";
         justify-items: stretch; align-content: center; max-height: none;
         gap: 12px 20px;
+        overflow-x: hidden;
       }
-      .play-turn { grid-area: turn; min-width: 0; }
+      /* 그리드 트랙 폭이 자식의 min-content(큰 숫자·버튼 텍스트)에 밀려 넓어지지
+         않도록, 트랙을 차지하는 모든 자식 체인에 min-width:0을 내려준다.
+         (grid/flex 아이템은 기본값이 min-width:auto라 내용이 안 줄어들면 넘친다) */
+      .play-turn,
+      .preview-wrap,
+      .play-status,
+      .play-action-group,
+      .status-line,
+      #screenPlay .control-guide {
+        min-width: 0;
+      }
+      .play-action-group .choices,
+      .play-action-group .confirm-btn,
+      .play-action-group .choice {
+        min-width: 0;
+      }
       .preview-wrap {
         grid-area: preview; width: 100%; max-width: none; height: 100%;
-        min-width: 0; min-height: 260px; max-height: none; align-self: stretch;
+        min-height: 260px; max-height: none; align-self: stretch;
       }
-      .play-status { grid-area: status; min-width: 0; }
-      .play-action-group { grid-area: action; width: 100%; max-width: none; min-width: 0; }
-      .status-line { grid-area: line; min-width: 0; }
-      #screenPlay .control-guide { grid-area: guide; max-width: none; min-width: 0; }
+      .play-status { grid-area: status; }
+      .play-action-group { grid-area: action; width: 100%; max-width: none; }
+      .status-line { grid-area: line; }
+      #screenPlay .control-guide { grid-area: guide; max-width: none; }
     }
     @media (max-width: 700px) {
       .play-topbar { padding-inline: var(--space-3); align-items: flex-start; }
