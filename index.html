@@ -51,6 +51,14 @@
             frameDocument.head.appendChild(stylesheet);
           }
 
+          if (!frameDocument.getElementById('dotStickImageStyles')) {
+            var imageStylesheet = frameDocument.createElement('link');
+            imageStylesheet.id = 'dotStickImageStyles';
+            imageStylesheet.rel = 'stylesheet';
+            imageStylesheet.href = 'dot-stick-image.css';
+            frameDocument.head.appendChild(imageStylesheet);
+          }
+
           if (!frameDocument.getElementById('enhancedStageScript')) {
             var script = frameDocument.createElement('script');
             script.id = 'enhancedStageScript';
