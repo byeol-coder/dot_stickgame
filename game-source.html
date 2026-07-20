@@ -2082,9 +2082,12 @@
       var padY = Math.max(8, H * 0.04);
       var gridW = W - padX * 2;
       var gridH = H - padY * 2;
-      var cw = gridW / 60, ch = gridH / 40, r = Math.min(cw, ch) * 0.34;
+      // 실제 닷패드 데이터(60×40)는 바꾸지 않고, 화면 미리보기만 더 또렷하게
+      // 보여 준다. 임베드의 작은 패널에서도 스틱의 수와 간격을 읽을 수 있다.
+      var cw = gridW / 60, ch = gridH / 40;
+      var r = Math.min(cw, ch) * (canvas.id === 'pins' ? 0.43 : 0.34);
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#0a130d';
+          ctx.fillStyle = '#07120b';
       ctx.fillRect(0, 0, W, H);
       for (var y = 0; y < 40; y++) {
         for (var x = 0; x < 60; x++) {
@@ -2092,10 +2095,10 @@
           ctx.beginPath();
           ctx.arc(padX + x * cw + cw / 2, padY + y * ch + ch / 2, r, 0, Math.PI * 2);
           if (on) {
-            ctx.fillStyle = '#7ee38a';
-            ctx.shadowColor = 'rgba(126,227,138,0.9)'; ctx.shadowBlur = 6;
+            ctx.fillStyle = '#a8ffc0';
+            ctx.shadowColor = 'rgba(126,227,138,0.95)'; ctx.shadowBlur = canvas.id === 'pins' ? 8 : 6;
           } else {
-            ctx.fillStyle = '#223528'; ctx.shadowBlur = 0;
+            ctx.fillStyle = canvas.id === 'pins' ? '#284431' : '#223528'; ctx.shadowBlur = 0;
           }
           ctx.fill();
         }

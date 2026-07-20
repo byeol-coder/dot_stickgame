@@ -243,13 +243,15 @@ html.embed-mode .play-screen .stage {
 html.embed-mode #screenPlay .preview-wrap,
 html.embed-mode .play-screen .preview-wrap {
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
   height: 100%;
   min-height: 0;
-  max-height: min(25vh, 190px);
+  max-height: min(34vh, 260px);
   padding: clamp(8px, 1.4vh, 12px);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  /* header · tactile graphic · hardware actions: 세 행을 명시해 캔버스가
+     암묵 행에 밀려 작은 점 덩어리로 축소되지 않게 한다. */
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: clamp(4px, .7vh, 8px);
   place-items: center;
   overflow: hidden;
@@ -264,13 +266,54 @@ html.embed-mode .play-screen .preview-cap {
 }
 
 html.embed-mode canvas#pins {
+  display: block;
   width: auto;
-  height: calc(100% - 10px);
+  height: 100%;
   max-width: 100%;
-  max-height: calc(100% - 10px);
+  max-height: 100%;
   margin: 0;
   object-fit: contain;
   aspect-ratio: 3 / 2;
+}
+
+html.embed-mode .preview-actions {
+  width: 100%;
+  min-width: 0;
+  gap: 6px;
+}
+
+html.embed-mode .preview-actions .ui-btn {
+  min-width: 0;
+  min-height: clamp(36px, 5.5vh, 42px);
+  padding-inline: clamp(8px, 1vw, 12px);
+  font-size: clamp(11px, 1.35vh, 13px);
+}
+
+/* 넓고 낮은 Tactile Worlds 모달: 촉각 패널을 화면의 주인공으로 두고,
+   선택·확정 조작은 우측 열에 모아 시선과 조작 흐름을 분리한다. */
+@media (min-width: 900px) and (min-height: 520px) {
+  html.embed-mode #screenPlay .stage,
+  html.embed-mode .play-screen .stage {
+    width: min(calc(100% - 32px), 1040px);
+    grid-template-columns: minmax(0, 1.3fr) minmax(280px, .8fr);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "turn turn"
+      "preview status"
+      "preview action"
+      "preview line";
+    column-gap: clamp(18px, 2.2vw, 32px);
+    row-gap: clamp(8px, 1.1vh, 12px);
+  }
+
+  html.embed-mode #screenPlay .preview-wrap,
+  html.embed-mode .play-screen .preview-wrap {
+    grid-area: preview;
+    max-width: none;
+    max-height: none;
+    min-height: min(42vh, 320px);
+    align-self: stretch;
+  }
 }
 
 html.embed-mode .count-big { font-size: clamp(30px, 6.8vh, 58px); }
