@@ -41,6 +41,9 @@
       --space-6: 32px;
       --space-7: 40px;
       --space-8: 48px;
+      --intro-content-max: 620px;
+      --intro-radius-card: 20px;
+      --intro-radius-button: 24px;
       --intro-pad-x: clamp(var(--space-5), 4vw, var(--space-8));
       --intro-pad-y: clamp(var(--space-4), 3vh, var(--space-6));
       --intro-content-w: clamp(360px, 32vw, 520px);
@@ -733,7 +736,7 @@
       width: 100%; min-height: 0; padding: var(--space-4) var(--intro-pad-x) var(--space-5);
     }
     .intro-content {
-      width: min(100%, var(--intro-content-w)); max-width: none;
+      width: min(100%, var(--intro-content-max, 620px)); max-width: none;
       padding: clamp(var(--space-5), 3.2vw, var(--space-8)); margin: 0;
       display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; gap: 0;
     }
@@ -755,37 +758,46 @@
     }
     .intro-visual-space { min-height: 1px; }
     .intro-eyebrow {
-      margin: 0 0 var(--space-2); color: #b8f3c4; font-size: var(--type-label);
-      font-weight: 900; line-height: 1.25; letter-spacing: .08em; text-transform: uppercase;
-      text-shadow: 0 0 18px rgba(126,227,138,.22);
+      margin: 0 0 var(--space-4); color: #c8ead0; font-size: clamp(16px, 1.3vw, 20px);
+      font-weight: 700; line-height: 1.3; letter-spacing: .02em; text-transform: none;
+      text-shadow: none;
     }
-    .intro-title { margin: 0; display: grid; gap: var(--space-1); line-height: 1; }
+    .intro-title { margin: 0 0 clamp(28px, 3vw, 36px); display: grid; gap: var(--space-1); line-height: 1; }
     .intro-title__ko {
-      font-size: clamp(52px, 5.9vw, 84px); line-height: .9; letter-spacing: 0; font-weight: 900;
+      font-size: clamp(58px, 6.2vw, 88px); line-height: .96; letter-spacing: -.045em; font-weight: 900;
       white-space: nowrap; word-break: keep-all; text-wrap: balance;
       color: #fff2be;
       text-shadow: 0 0 26px rgba(255,207,92,.22), 0 8px 32px rgba(0,0,0,.56);
       animation: none;
     }
     .intro-title__en {
-      margin: 0; font-size: clamp(12px, 1vw, 15px); line-height: 1; letter-spacing: .22em;
-      font-weight: 900; color: rgba(218,234,222,.72);
+      margin: var(--space-2) 0 0; font-size: clamp(14px, 1.2vw, 18px); line-height: 1; letter-spacing: .26em;
+      font-weight: 700; color: rgba(218,234,222,.78);
     }
     .intro-tagline {
-      margin: var(--space-4) 0 0; max-width: 25ch; color: #dfffe5;
-      font-size: clamp(19px, 1.6vw, 26px); font-weight: 850; line-height: 1.45;
+      margin: 0; max-width: 24ch; color: #e0f5df;
+      font-size: clamp(28px, 3vw, 38px); font-weight: 800; line-height: 1.34; letter-spacing: -.025em;
       word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
     }
     .intro-summary {
-      margin: var(--space-2) 0 0; max-width: 42ch; color: #d0decf;
-      font-size: var(--type-body); line-height: 1.72;
+      margin: var(--space-5) 0 0; max-width: 42ch; color: #d0decf;
+      font-size: clamp(17px, 1.5vw, 21px); font-weight: 500; line-height: 1.65; letter-spacing: -.01em;
       word-break: keep-all; overflow-wrap: normal; text-wrap: pretty;
     }
+    .intro-rule-card {
+      display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: center; gap: var(--space-3);
+      width: 100%; margin-top: var(--space-5); padding: var(--space-4) var(--space-5);
+      border: 1px solid rgba(145,211,160,.3); border-radius: var(--intro-radius-card, 20px);
+      background: rgba(21,58,35,.54); color: #e3f5e5;
+    }
+    .intro-rule-card svg { width: 30px; height: 30px; stroke: #a9eeb5; stroke-width: 1.9; fill: none; }
+    .intro-rule-card p { margin: 0; font-size: clamp(15px, 1.25vw, 18px); font-weight: 600; line-height: 1.5; letter-spacing: -.01em; }
     .intro-start {
-      width: 100%; max-width: none; min-height: clamp(62px, 7vh, 72px); margin-top: var(--space-5);
+      position: relative; width: 100%; max-width: none; min-height: clamp(76px, 8vh, 88px); margin-top: var(--space-5);
       padding: 0 var(--space-6); border: 1px solid rgba(194,255,208,.40);
-      border-radius: 20px; font-size: clamp(21px, 1.8vw, 28px);
+      border-radius: var(--intro-radius-button, 24px); font-size: clamp(27px, 2.5vw, 34px);
       color: #06130d; font-weight: 950; gap: var(--space-3);
+      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
       background:
         linear-gradient(180deg, #b8f7c2 0%, #79df8e 48%, #3fae62 100%);
       box-shadow:
@@ -809,12 +821,41 @@
         0 2px 0 rgba(12,76,43,.72),
         inset 0 2px 5px rgba(0,0,0,.12);
     }
+    .intro-start__label { grid-column: 2; }
+    .intro-start__key {
+      grid-column: 3; justify-self: end; min-width: clamp(88px, 8vw, 108px); min-height: 44px;
+      display: inline-flex; align-items: center; justify-content: center; padding: 0 var(--space-3);
+      border: 1px solid rgba(5,37,20,.28); border-radius: 12px; background: rgba(255,255,255,.18);
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,.12); color: #073018; font-size: clamp(17px, 1.4vw, 20px); font-weight: 900;
+    }
     .intro-start .key-hint { all: unset; }
     .intro-start .keycap { margin-left: var(--space-1); }
     .intro-start::after { display: none; }
 
     .intro-difficulty {
       width: 100%; max-width: none; margin: var(--space-5) 0 0; padding: 0; border: 0;
+    }
+    @media (max-height: 780px) {
+      .intro-content { padding-block: var(--space-5); }
+      .intro-title { margin-bottom: var(--space-5); }
+      .intro-summary, .intro-rule-card, .intro-start { margin-top: var(--space-4); }
+      .intro-rule-card { padding: var(--space-3) var(--space-4); }
+      .intro-start { min-height: 70px; }
+      .intro-difficulty { margin-top: var(--space-4); }
+      .intro-difficulty__button { min-height: 56px; }
+    }
+    @media (max-height: 700px) {
+      .intro-content { padding-block: var(--space-4); }
+      .intro-eyebrow { margin-bottom: var(--space-3); }
+      .intro-title { margin-bottom: var(--space-4); }
+      .intro-summary, .intro-rule-card, .intro-start { margin-top: var(--space-3); }
+      .intro-rule-card { grid-template-columns: 26px minmax(0, 1fr); padding: 10px var(--space-3); }
+      .intro-rule-card svg { width: 26px; height: 26px; }
+      .intro-rule-card p { font-size: 14px; }
+      .intro-start { min-height: 64px; }
+      .intro-start__key { min-height: 38px; min-width: 82px; }
+      .intro-difficulty { margin-top: var(--space-3); }
+      .intro-difficulty__button { min-height: 48px; }
     }
     .intro-difficulty__legend {
       width: 100%; display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3);
@@ -1185,10 +1226,11 @@
       .device-status { max-width: 76px; overflow: hidden; text-overflow: ellipsis; }
       .intro-shell { padding-bottom: var(--space-4); }
       .intro-content { padding: var(--space-4); border-radius: 20px; }
-      .intro-title__ko { font-size: clamp(38px, 11vw, 48px); }
+      .intro-title__ko { font-size: clamp(46px, 13vw, 58px); }
       .intro-tagline { max-width: 22ch; }
       .intro-summary { max-width: 32ch; }
-      .intro-start { min-height: 54px; padding-inline: var(--space-4); border-radius: 16px; }
+      .intro-rule-card { padding: var(--space-3) var(--space-4); }
+      .intro-start { min-height: 64px; padding-inline: var(--space-4); border-radius: var(--intro-radius-button); }
       .intro-difficulty__legend { flex-direction: column; align-items: flex-start; gap: var(--space-1); }
       .intro-difficulty__button { min-height: 56px; grid-template-columns: 1fr; justify-items: center; padding-inline: var(--space-2); }
       .intro-difficulty__button[aria-checked="true"]::after { top: 6px; right: 6px; width: 16px; height: 16px; }
@@ -1366,11 +1408,20 @@
               <span class="intro-title__ko">닷 스틱</span>
               <span class="intro-title__en">DOT STICK</span>
             </h1>
-            <p class="intro-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</p>
-            <p class="intro-summary">탐험가 닷과 번갈아 스틱을 가져가며 마지막 빛을 차지하는 단순한 전략 놀이예요.</p>
+            <h2 class="intro-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</h2>
+            <p class="intro-summary">탐험가 닷과 번갈아 스틱을 가져가며 마지막 빛을 차지하는 단순한 전략 놀이입니다.</p>
+
+            <aside class="intro-rule-card" aria-label="게임 규칙">
+              <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                <path d="M6 6v20M16 6v20M26 6v20" stroke-linecap="round" />
+                <path d="M3 8h6M13 8h6M23 8h6" stroke-linecap="round" opacity=".7" />
+              </svg>
+              <p>한 번에 1~2개의 스틱을 가져가며, 마지막 스틱을 가져간 사람이 승리합니다.</p>
+            </aside>
 
             <button class="intro-start" id="startBtn" type="button">
-              게임 시작 <span class="keycap" aria-hidden="true">Enter</span>
+              <span class="intro-start__label">게임 시작</span>
+              <kbd class="intro-start__key" aria-hidden="true">Enter</kbd>
             </button>
 
             <fieldset class="intro-difficulty">
