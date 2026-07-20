@@ -174,6 +174,10 @@
       padding: 0 clamp(20px, 5vw, 48px) clamp(20px, 4vw, 32px);
       max-width: 640px; width: 100%;
     }
+    /* 주의: 이 블록(.intro-eyebrow/.intro-title 등)은 .intro-content 기본값이다.
+       실제 화면에는 .intro-content-panel 클래스가 같은 엘리먼트에 함께 붙어 있어
+       아래쪽(.intro-content-panel 컨텍스트) 재정의가 최종적으로 우선 적용된다.
+       크기·타이포를 바꿀 때는 두 블록을 함께 확인할 것. */
     .intro-eyebrow {
       margin: 0 0 6px; color: var(--glow-soft); font-size: 13px; font-weight: 700;
       letter-spacing: .12em; text-transform: uppercase;
@@ -290,6 +294,10 @@
     .field-label { font-size: 13px; color: var(--ink-dim); width: 100%; margin-bottom: 2px; }
 
     /* ── 핀 미리보기 (닷패드 60×40 == 화면) ─────────────────────────────── */
+    /* 주의: .stage/.preview-wrap/canvas#pins는 여기서 배경·테두리·그림자 같은
+       "기본 부품" 스타일만 정의한다. 실제 레이아웃(그리드 행, 높이, 반응형
+       크기)은 #screenPlay 섹션의 동일 선택자 재정의에서 결정되므로, 크기를
+       바꿀 때는 반드시 그쪽도 함께 확인할 것. */
     .stage { display: flex; flex-direction: column; align-items: center; gap: 14px; }
     .preview-wrap {
       width: 100%; background: rgba(8,18,13,.74); border: 1px solid rgba(126,227,138,.22);
@@ -303,8 +311,13 @@
     canvas#pins { width: 100%; height: auto; display: block; border-radius: 8px; margin-top: 12px; image-rendering: auto; }
     canvas#pinsR { width: 100%; height: auto; display: block; image-rendering: auto; }
 
-        .count-big { font-family: var(--font-display); font-weight: 800; font-size: clamp(40px, 12vw, 82px); line-height: 1; color: var(--glow-soft); text-shadow: 0 0 24px rgba(126,227,138,0.3); }
-    .count-cap { font-size: 14px; color: var(--ink-dim); margin-top: 2px; }
+        .play-turn { text-align: center; }
+    .play-status {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center;
+      column-gap: 6px;
+    }
+    .count-big { display: inline-block; font-family: var(--font-display); font-weight: 800; font-size: clamp(40px, 12vw, 82px); line-height: 1; color: var(--glow-soft); text-shadow: 0 0 24px rgba(126,227,138,0.3); }
+    .count-cap { display: inline-block; font-size: 14px; color: var(--ink-dim); margin: 0; }
     .turn-tag {
       display: inline-block; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 15px;
       border: 1px solid var(--line);
@@ -322,24 +335,33 @@
       display: flex; flex-direction: column; align-items: center; gap: 6px;
     }
     .choice .n { font-size: 34px; line-height: 1; }
-    .choice .sub { font-family: var(--font-body); font-size: 12px; color: var(--ink-dim); font-weight: 600; }
     .choice[aria-pressed="true"] {
-      border-color: var(--amber); background: rgba(255,207,92,0.10); color: var(--amber-hot);
-      box-shadow: 0 0 0 3px rgba(255,207,92,0.18);
+      border-color: var(--amber);
+      background: linear-gradient(180deg, rgba(255,207,92,.14), rgba(255,207,92,.07));
+      color: var(--amber-hot);
+      box-shadow: 0 0 0 2px rgba(255,207,92,.18), inset 0 1px 0 rgba(255,238,170,.12);
     }
-    .choice[aria-pressed="true"] .sub { color: var(--amber); }
     .choice:disabled { opacity: .35; cursor: not-allowed; }
     .choice:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 
     .confirm-btn {
-      font-family: var(--font-display); font-size: 22px; width: 100%; max-width: 420px;
-      background: var(--glow); color: #06210f; border: none; border-radius: 14px;
-            padding: 15px; min-height: 58px; cursor: pointer; font-weight: 700;
+      font-family: var(--font-display); font-size: 19px; width: 100%; max-width: 420px;
+      background: linear-gradient(180deg, #a7e8b0 0%, var(--glow) 55%, #4fae62 100%);
+      color: #06210f; border: none; border-radius: 14px;
+      padding: 14px; min-height: 52px; cursor: pointer; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 20px rgba(0,0,0,.2);
       transition: filter .12s, transform .05s;
+    }
+    .confirm-btn kbd {
+      font-family: var(--font-body); font-size: 13px; font-weight: 700; line-height: 1;
+      color: rgba(6,33,15,.7); background: rgba(6,33,15,.14); border-radius: 6px;
+      padding: 4px 8px;
     }
     .confirm-btn:hover { filter: brightness(1.08); }
     .confirm-btn:active { transform: translateY(1px); }
     .confirm-btn:disabled { background: var(--line); color: var(--ink-dim); cursor: not-allowed; }
+    .confirm-btn:disabled kbd { color: var(--ink-dim); background: rgba(255,255,255,.06); }
     .confirm-btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 
     /* (구버전 결과 화면 카드 스타일은 사용하지 않아 정리했습니다 —
@@ -757,6 +779,8 @@
         linear-gradient(90deg, rgba(126,227,138,.08), transparent 42%);
     }
     .intro-visual-space { min-height: 1px; }
+    /* 여기부터 .intro-content-panel 컨텍스트의 재정의 — 실제 화면에 최종 적용되는 값.
+       위쪽 기본 .intro-content 블록과 이름이 겹치므로 함께 유지보수할 것. */
     .intro-eyebrow {
       margin: 0 0 10px; color: #a9d9b4; font-size: clamp(13px, 1vw, 15px);
       font-weight: 700; line-height: 1.4; letter-spacing: .06em; text-transform: none;
@@ -796,7 +820,7 @@
       position: relative; width: 100%; max-width: none; min-height: clamp(76px, 8vh, 88px); margin-top: var(--space-5);
       padding: 0 var(--space-6); border: 1px solid rgba(194,255,208,.40);
       border-radius: var(--intro-radius-button, 24px); font-size: clamp(27px, 2.5vw, 34px);
-      color: #06130d; font-weight: 950; gap: var(--space-3);
+      color: #06130d; font-weight: 900; gap: var(--space-3);
       display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
       background:
         linear-gradient(180deg, #b8f7c2 0%, #79df8e 48%, #3fae62 100%);
@@ -888,7 +912,7 @@
     .intro-difficulty__button[aria-checked="true"]::after {
       content: '✓'; position: absolute; top: 8px; right: 9px; width: 18px; height: 18px;
       display: grid; place-items: center; color: #07140b; background: var(--amber);
-      border-radius: 50%; font-size: 11px; font-weight: 950;
+      border-radius: 50%; font-size: 11px; font-weight: 900;
     }
 
     .intro-actions {
@@ -932,12 +956,14 @@
       padding: 0 var(--space-2); line-height: 1; letter-spacing: 0;
     }
 
+    /* #screenPlay 전용 레이아웃 재정의 시작 — .stage/.preview-wrap/canvas#pins의
+       실제 크기/그리드 구조는 여기서부터 결정된다 (위쪽 기본 블록과 함께 유지보수). */
     #screenPlay:not(.hidden) {
       display: grid; grid-template-rows: auto minmax(0, 1fr); width: 100%; min-height: 100dvh;
     }
     body.is-play .wrap > header { display: none; }
     .play-topbar {
-      width: min(100%, 960px); margin: 0 auto; padding: var(--space-3) var(--space-4) 0;
+      width: min(100%, 800px); margin: 0 auto; padding: var(--space-3) var(--space-4) 0;
       display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
     }
     .play-brand { flex: 0 0 auto; }
@@ -947,19 +973,19 @@
       display: flex; flex-wrap: nowrap; gap: 3px; background: rgba(3,12,7,.68); border-color: rgba(126,227,138,.2);
       box-shadow: none; backdrop-filter: blur(10px);
     }
-    .play-utilities .voice-control { min-height: 32px; padding: 5px 9px; border-radius: 9px; font-size: 11px; }
-    .play-help { min-height: 38px; white-space: nowrap; }
+    .play-utilities .voice-control { min-height: 40px; padding: 7px 11px; border-radius: 10px; font-size: 12px; }
+    .play-help { min-height: 40px; white-space: nowrap; }
     .play-utility-card { display: flex; align-items: center; gap: var(--space-2); }
     .stage {
       display: grid; grid-template-rows: auto minmax(180px, 1fr) auto auto auto;
       justify-items: center; align-items: center; gap: var(--space-3);
-      width: min(100%, 680px); max-height: calc(100dvh - 112px); margin-inline: auto;
+      width: min(100%, 800px); max-height: calc(100dvh - 112px); margin-inline: auto;
       padding-block: var(--space-3);
     }
     .preview-wrap {
       height: 100%; min-height: 210px; max-height: min(31vh, 300px);
       width: 100%; max-width: 460px; margin-inline: auto; position: relative;
-      display: grid; grid-template-rows: auto minmax(140px, 1fr) auto; place-items: center;
+      display: grid; grid-template-rows: auto minmax(0, 1fr) auto; place-items: center;
       gap: var(--space-2); padding: var(--space-3);
       overflow: hidden;
     }
@@ -1002,11 +1028,11 @@
       position: static; justify-self: start; align-self: start; line-height: 1;
     }
     .preview-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
-    .preview-actions { width: 100%; display: flex; justify-content: center; gap: var(--space-2); }
-    .preview-actions .ui-btn { min-height: 34px; padding-inline: var(--space-3); font-size: 12px; }
+    .preview-actions { width: 100%; display: flex; justify-content: center; gap: var(--space-2); position: relative; z-index: 2; flex-shrink: 0; }
+    .preview-actions .ui-btn { min-height: 40px; padding-inline: var(--space-3); font-size: 12px; }
     canvas#pins {
-      display: block; width: min(100%, 420px); height: 100%; min-height: 140px; max-height: 230px;
-      margin: 0 auto; aspect-ratio: 3 / 2; object-fit: contain;
+      display: block; width: auto; height: 100%; min-width: 0; min-height: 0;
+      max-width: 100%; max-height: 100%; margin: auto; aspect-ratio: 3 / 2; object-fit: contain;
     }
     .count-big { font-size: clamp(36px, 8vh, 66px); }
     .play-action-group { width: min(100%, 460px); display: grid; gap: var(--space-3); padding: var(--space-3); border: 1px solid rgba(126,227,138,.22); border-radius: 20px; background: rgba(3,13,8,.62); box-shadow: 0 12px 28px rgba(0,0,0,.2); }
@@ -1018,7 +1044,7 @@
     .choice, .confirm-btn, .result-action, .result-button {
       border-radius: var(--button-radius);
     }
-    .confirm-btn { min-height: 54px; font-size: 21px; }
+    .confirm-btn { min-height: 50px; font-size: 18px; }
     .status-line { margin: 0; min-height: 24px; }
     #screenPlay .control-guide {
       margin-top: 0; max-width: 680px; justify-content: center;
@@ -1027,7 +1053,7 @@
     @media (max-height: 820px) {
       .stage { grid-template-rows: auto minmax(160px, 1fr) auto auto auto; max-height: calc(100dvh - 96px); }
       .preview-wrap { min-height: 170px; max-height: min(32vh, 240px); }
-      .confirm-btn { min-height: 50px; }
+      .confirm-btn { min-height: 46px; }
     }
     @media (max-height: 760px) {
       .stage { gap: var(--space-2); }
@@ -1040,12 +1066,39 @@
       .stage { grid-template-rows: auto minmax(140px, 1fr) auto auto auto; gap: var(--space-2); }
       .preview-wrap { min-height: 145px; max-height: 28vh; }
       .choice { min-height: 58px; }
-      .count-cap { display: none; }
     }
     @media (max-height: 640px) {
       #screenPlay { height: 100dvh; overflow-y: auto; }
       .preview-wrap { min-height: 140px; }
-      canvas#pins { min-height: 115px; }
+    }
+    /* 넓고 낮은 화면(가로 여백은 남는데 세로가 부족한 경우): 세로로 계속
+       압축/은닉하는 대신 촉각 패널과 조작부를 좌우 2열로 배치해
+       촉각 그래픽을 크게 유지한 채 모든 조작 요소를 한 화면에 보여준다. */
+    @media (min-width: 900px) and (max-height: 700px) {
+      #screenPlay { overflow-y: auto; }
+      .play-topbar { width: min(calc(100% - 32px), 960px); }
+      .stage {
+        width: min(calc(100% - 32px), 960px);
+        grid-template-columns: minmax(420px, 1.25fr) minmax(320px, .85fr);
+        grid-template-rows: auto auto auto auto auto;
+        grid-template-areas:
+          "turn turn"
+          "preview status"
+          "preview action"
+          "preview line"
+          "preview guide";
+        justify-items: stretch; align-content: center; max-height: none;
+        gap: 12px 20px;
+      }
+      .play-turn { grid-area: turn; }
+      .preview-wrap {
+        grid-area: preview; width: 100%; max-width: none; height: 100%;
+        min-height: 260px; max-height: none; align-self: stretch;
+      }
+      .play-status { grid-area: status; }
+      .play-action-group { grid-area: action; width: 100%; max-width: none; }
+      .status-line { grid-area: line; }
+      #screenPlay .control-guide { grid-area: guide; max-width: none; }
     }
     @media (max-width: 700px) {
       .play-topbar { padding-inline: var(--space-3); align-items: flex-start; }
@@ -1132,7 +1185,10 @@
       .result-controls { display: none; }
     }
     @media (max-width: 420px) and (max-height: 760px) {
-      .result-description, .result-secret { display: none; }
+      .result-description { display: none; }
+      .result-secret { margin-top: var(--space-2); padding: var(--space-2); gap: var(--space-2); }
+      .result-secret strong { font-size: 12px; }
+      .result-secret p { font-size: 11px; line-height: 1.3; }
       .result-tactile__display { max-height: 190px; }
     }
 
@@ -1487,7 +1543,7 @@
           </div>
         </div>
         <div class="stage">
-          <div style="text-align:center">
+          <div class="play-turn">
             <span class="turn-tag" id="turnTag">당신 차례</span>
           </div>
 
@@ -1525,22 +1581,23 @@
             </div>
           </div>
 
-          <div style="text-align:center">
-            <div class="count-big" id="countBig">10</div>
-            <div class="count-cap">개의 스틱이 남았어요</div>
+          <div class="play-status">
+            <span class="count-big" id="countBig">10</span><span class="count-cap">개의 스틱이 남았어요</span>
           </div>
 
           <section class="play-action-group" aria-labelledby="playActionTitle">
             <h3 class="play-action-title" id="playActionTitle">몇 개를 가져갈까요?</h3>
             <div class="choices" role="group" aria-label="가져갈 스틱 개수 선택">
-              <button class="choice" id="choice1" type="button" aria-pressed="true">
-                <span class="n">1</span><span class="sub">개 가져가기</span>
+              <button class="choice" id="choice1" type="button" aria-pressed="true" aria-label="스틱 1개 가져가기">
+                <span class="n">1개</span>
               </button>
-              <button class="choice" id="choice2" type="button" aria-pressed="false">
-                <span class="n">2</span><span class="sub">개 가져가기</span>
+              <button class="choice" id="choice2" type="button" aria-pressed="false" aria-label="스틱 2개 가져가기">
+                <span class="n">2개</span>
               </button>
             </div>
-            <button class="confirm-btn" id="takeBtn" type="button">가져가기 (Enter)</button>
+            <button class="confirm-btn" id="takeBtn" type="button">
+              <span>가져가기</span><kbd aria-hidden="true">Enter</kbd>
+            </button>
           </section>
 
           <p class="status-line" id="statusLine"></p>
