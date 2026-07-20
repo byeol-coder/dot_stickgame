@@ -80,6 +80,82 @@
   }
 }
 
+/* Tactile Worlds / shared-link mobile embed uses a fixed-height viewport.
+   The previous embed rules kept the play screen and stage at 100% height with
+   overflow hidden, so the preview card was cropped even when the canvas itself
+   had the correct 3:2 ratio. On portrait mobile, switch the whole play area to
+   a normal vertical document flow and let the inner screen scroll. */
+@media (max-width: 600px) {
+  html.embed-mode,
+  html.embed-mode body,
+  html.embed-mode #app,
+  html.embed-mode .wrap {
+    min-height: 100%;
+  }
+
+  html.embed-mode #screenPlay,
+  html.embed-mode .play-screen {
+    height: 100% !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    padding: 12px 10px max(28px, env(safe-area-inset-bottom));
+  }
+
+  html.embed-mode #screenPlay .stage,
+  html.embed-mode .play-screen .stage {
+    width: 100%;
+    height: auto !important;
+    min-height: 100%;
+    max-height: none !important;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-auto-rows: auto;
+    align-content: start;
+    align-items: stretch;
+    gap: 14px;
+    overflow: visible !important;
+  }
+
+  html.embed-mode #screenPlay .preview-wrap,
+  html.embed-mode .play-screen .preview-wrap {
+    width: 100%;
+    max-width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-self: stretch;
+    place-items: initial;
+    padding: 14px;
+    overflow: visible !important;
+  }
+
+  html.embed-mode #screenPlay canvas#pins,
+  html.embed-mode .play-screen canvas#pins {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    flex: 0 0 auto;
+    aspect-ratio: 3 / 2;
+    object-fit: contain;
+    margin: 12px auto 14px;
+  }
+
+  html.embed-mode #screenPlay .preview-cap,
+  html.embed-mode .play-screen .preview-cap,
+  html.embed-mode #screenPlay .preview-actions,
+  html.embed-mode .play-screen .preview-actions {
+    flex: 0 0 auto;
+  }
+}
+
 @media (max-width: 380px) {
   #screenPlay .preview-wrap {
     width: calc(100% - 4px);
