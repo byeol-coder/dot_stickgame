@@ -1,1 +1,87 @@
-test
+/* Mobile DotPad preview visibility fix.
+   Loaded after the cinematic stage and image skin so it only adjusts presentation.
+   Game logic, the 60 × 40 buffer, TW_TTS and DotPad output remain unchanged. */
+
+@media (max-width: 900px) {
+  #screenPlay .preview-wrap {
+    width: 100%;
+    max-width: 640px;
+    min-width: 0;
+    justify-self: stretch;
+    align-self: auto;
+    margin-inline: auto;
+    padding: clamp(16px, 4vw, 24px);
+    border: 1px solid rgba(190, 255, 209, .28);
+    background: rgba(3, 12, 8, .96);
+    box-shadow:
+      0 18px 42px rgba(0, 0, 0, .42),
+      inset 0 1px rgba(255, 255, 255, .05);
+  }
+
+  #screenPlay .preview-wrap canvas#pins {
+    display: block;
+    width: min(100%, 480px) !important;
+    max-width: none !important;
+    height: auto !important;
+    aspect-ratio: 3 / 2;
+    min-height: 180px;
+    margin: 14px auto 18px;
+    opacity: 1;
+    border: 1px solid rgba(190, 255, 209, .24);
+    border-radius: 14px;
+    background: #07140b;
+    box-shadow:
+      0 0 0 5px rgba(126, 227, 138, .05),
+      inset 0 0 28px rgba(126, 227, 138, .08);
+    image-rendering: pixelated;
+  }
+}
+
+@media (max-width: 560px) {
+  #screenPlay .stage {
+    gap: 14px;
+  }
+
+  #screenPlay .preview-wrap {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  #screenPlay .preview-wrap canvas#pins {
+    width: 100% !important;
+    min-height: clamp(168px, 48vw, 220px);
+    margin-block: 12px 16px;
+  }
+
+  #screenPlay .preview-wrap .preview-head,
+  #screenPlay .preview-wrap .preview-title,
+  #screenPlay .preview-wrap .preview-actions,
+  #screenPlay .preview-wrap .device-row {
+    width: 100%;
+  }
+
+  #screenPlay .preview-wrap .preview-actions,
+  #screenPlay .preview-wrap .device-row {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  #screenPlay .preview-wrap button {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 380px) {
+  #screenPlay .preview-wrap canvas#pins {
+    min-height: 154px;
+  }
+}
+
+@media (forced-colors: active) {
+  #screenPlay .preview-wrap,
+  #screenPlay .preview-wrap canvas#pins {
+    border: 2px solid CanvasText;
+    background: Canvas;
+    box-shadow: none;
+  }
+}
