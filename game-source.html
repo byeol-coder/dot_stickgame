@@ -790,25 +790,27 @@
     /* 여기부터 .intro-content-panel 컨텍스트의 재정의 — 실제 화면에 최종 적용되는 값.
        위쪽 기본 .intro-content 블록과 이름이 겹치므로 함께 유지보수할 것. */
     .intro-eyebrow {
-      margin: 0 0 9px; color: #c8ead0; font-size: clamp(12px, .9vw, 14px);
-      font-weight: 700; line-height: 1.3; letter-spacing: .045em; text-transform: none;
+      display: flex; align-items: center; gap: 10px; margin: 0 0 14px;
+      color: rgba(197,228,204,.74); font-size: clamp(10px, .75vw, 12px);
+      font-weight: 800; line-height: 1.3; letter-spacing: .15em; text-transform: uppercase;
       text-shadow: none;
     }
-    .intro-title { margin: 0 0 16px; display: grid; gap: 5px; line-height: 1; }
+    .intro-eyebrow::before { content: ""; width: 24px; height: 1px; background: rgba(156,239,176,.72); box-shadow: 0 0 8px rgba(126,227,138,.32); }
+    .intro-title { margin: 0 0 19px; display: grid; gap: 8px; line-height: 1; }
     .intro-title__ko {
-      font-size: clamp(40px, 4.4vw, 60px); line-height: 1; letter-spacing: -.035em; font-weight: 900;
+      font-size: clamp(48px, 5vw, 68px); line-height: .94; letter-spacing: -.045em; font-weight: 900;
       white-space: nowrap; word-break: keep-all; text-wrap: balance;
       color: #fff2be;
       text-shadow: 0 0 26px rgba(255,207,92,.22), 0 8px 32px rgba(0,0,0,.56);
       animation: none;
     }
     .intro-title__en {
-      margin: 0; font-size: clamp(11px, .85vw, 13px); line-height: 1.2; letter-spacing: .19em;
-      font-weight: 700; color: rgba(218,234,222,.78);
+      margin: 0; font-size: clamp(10px, .72vw, 12px); line-height: 1.2; letter-spacing: .30em;
+      font-weight: 800; color: rgba(218,234,222,.60);
     }
     .intro-tagline {
-      margin: 0; max-width: 28ch; color: #e0f5df;
-      font-size: clamp(18px, 1.75vw, 24px); font-weight: 700; line-height: 1.4; letter-spacing: -.018em;
+      margin: 0; max-width: 26ch; color: #d9eadb;
+      font-size: clamp(19px, 1.9vw, 26px); font-weight: 700; line-height: 1.42; letter-spacing: -.025em;
       word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
     }
     .intro-summary {
@@ -1228,8 +1230,8 @@
       .intro-shell { padding-top: var(--space-2); padding-bottom: var(--space-3); align-items: end; }
       .intro-content { padding: var(--space-5); border-radius: 22px; }
       .intro-content-panel { position: relative; }
-      .intro-title__ko { font-size: clamp(36px, 4.2vw, 50px); }
-      .intro-tagline { margin-top: var(--space-2); font-size: clamp(17px, 1.7vw, 21px); }
+      .intro-title__ko { font-size: clamp(40px, 4.5vw, 56px); }
+      .intro-tagline { margin-top: var(--space-2); font-size: clamp(18px, 1.8vw, 23px); }
       .intro-summary { line-height: 1.5; }
       .intro-start { min-height: 58px; margin-top: var(--space-3); }
       .intro-difficulty { margin-top: var(--space-3); }
@@ -1319,8 +1321,12 @@
       .device-status { max-width: 76px; overflow: hidden; text-overflow: ellipsis; }
       .intro-shell { padding-bottom: var(--space-4); }
       .intro-content { padding: var(--space-4); border-radius: 20px; }
-      .intro-title__ko { font-size: clamp(34px, 9.5vw, 44px); }
-      .intro-tagline { max-width: 25ch; font-size: clamp(17px, 5vw, 21px); }
+      .intro-eyebrow { margin-bottom: 10px; font-size: 10px; letter-spacing: .12em; }
+      .intro-eyebrow::before { width: 18px; }
+      .intro-title { margin-bottom: 15px; gap: 6px; }
+      .intro-title__ko { font-size: clamp(39px, 10vw, 50px); }
+      .intro-title__en { font-size: 9px; letter-spacing: .25em; }
+      .intro-tagline { max-width: 24ch; font-size: clamp(18px, 5.2vw, 23px); }
       .intro-summary { max-width: 34ch; font-size: 14px; }
       .intro-rule-card { padding: 10px var(--space-3); }
       .intro-start { min-height: 58px; padding-inline: var(--space-3); border-radius: 20px; }
