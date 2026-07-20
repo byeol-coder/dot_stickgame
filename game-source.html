@@ -855,7 +855,10 @@
         0 2px 0 rgba(12,76,43,.72),
         inset 0 2px 5px rgba(0,0,0,.12);
     }
-    .intro-start__label { grid-column: 2; }
+    .intro-start__label {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      white-space: nowrap;
+    }
     .intro-start__key {
       grid-column: 3; justify-self: end; min-width: clamp(76px, 7vw, 96px); min-height: 40px;
       display: inline-flex; align-items: center; justify-content: center; padding: 0 var(--space-3);
