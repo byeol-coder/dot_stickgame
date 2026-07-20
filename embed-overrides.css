@@ -291,7 +291,7 @@ html.embed-mode .choice .n { font-size: clamp(24px, 4.2vh, 31px); }
 
 html.embed-mode .confirm-btn {
   max-width: 520px;
-  min-height: clamp(42px, 6.5vh, 50px);
+  min-height: clamp(44px, 6.5vh, 50px);
   padding: 7px 12px;
   font-size: clamp(18px, 2.8vh, 21px);
 }
@@ -422,7 +422,7 @@ html.embed-mode .result-tactile > p {
 }
 
 html.embed-mode .result-action {
-  min-height: clamp(38px, 5.8vh, 48px);
+  min-height: clamp(44px, 5.8vh, 48px);
   padding: 6px 9px;
 }
 
