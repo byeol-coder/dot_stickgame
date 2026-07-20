@@ -17,5 +17,5 @@ button:focus-visible,[tabindex]:focus-visible{outline:3px solid #fff2a8;outline-
 .ui-btn:hover,.btn:hover,.voice-control:hover{border-color:var(--ui-line-strong);background:rgba(17,43,28,.94)}
 .keycap,kbd,.control-guide code,.intro-start__key,.result-tactile__replay-hint{min-width:34px;min-height:28px;display:inline-grid;place-items:center;padding:3px 8px;border:1px solid rgba(183,241,199,.34);border-bottom-width:2px;border-radius:7px;background:rgba(3,12,7,.48);color:var(--ui-mint-soft);font:800 12px/1 var(--font-body);letter-spacing:0;box-shadow:inset 0 1px rgba(255,255,255,.05)}
 .modal__panel{border-radius:var(--ui-r-lg);background:rgba(8,23,14,.98)}.modal__title{font-weight:900;letter-spacing:-.025em}.modal__table th,.modal__table td{padding:10px 12px}
-body.high-contrast .intro-content-panel,body.high-contrast .preview-wrap,body.high-contrast .play-action-group,body.high-contrast .result-tactile{background:#020704;border-color:#d7ffdc}
+html.hc-mode .intro-content-panel,html.hc-mode .preview-wrap,html.hc-mode .play-action-group,html.hc-mode .result-tactile{background:#020704;border-color:#d7ffdc}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
