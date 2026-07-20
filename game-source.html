@@ -758,25 +758,25 @@
     }
     .intro-visual-space { min-height: 1px; }
     .intro-eyebrow {
-      margin: 0 0 12px; color: #c8ead0; font-size: clamp(14px, 1vw, 16px);
-      font-weight: 700; line-height: 1.3; letter-spacing: .04em; text-transform: none;
+      margin: 0 0 10px; color: #a9d9b4; font-size: clamp(13px, 1vw, 15px);
+      font-weight: 700; line-height: 1.4; letter-spacing: .06em; text-transform: none;
       text-shadow: none;
     }
-    .intro-title { margin: 0 0 22px; display: grid; gap: 8px; line-height: 1; }
+    .intro-title { margin: 0; display: grid; gap: 7px; line-height: 1; }
     .intro-title__ko {
-      font-size: clamp(44px, 5vw, 68px); line-height: .98; letter-spacing: -.035em; font-weight: 900;
+      font-size: clamp(52px, 5vw, 72px); line-height: .98; letter-spacing: -.045em; font-weight: 900;
       white-space: nowrap; word-break: keep-all; text-wrap: balance;
-      color: #fff2be;
-      text-shadow: 0 0 26px rgba(255,207,92,.22), 0 8px 32px rgba(0,0,0,.56);
+      color: #fff1bd;
+      text-shadow: 0 8px 30px rgba(0,0,0,.42), 0 0 22px rgba(255,207,92,.12);
       animation: none;
     }
     .intro-title__en {
-      margin: 0; font-size: clamp(12px, 1vw, 15px); line-height: 1.2; letter-spacing: .20em;
-      font-weight: 700; color: rgba(218,234,222,.78);
+      margin: 0; font-size: clamp(11px, .9vw, 14px); line-height: 1.2; letter-spacing: .24em;
+      font-weight: 700; color: rgba(210,229,214,.62);
     }
     .intro-tagline {
-      margin: 0; max-width: 25ch; color: #e0f5df;
-      font-size: clamp(22px, 2.2vw, 30px); font-weight: 750; line-height: 1.35; letter-spacing: -.02em;
+      margin: 26px 0 0; max-width: 18ch; color: #e1f2e3;
+      font-size: clamp(23px, 2vw, 30px); font-weight: 700; line-height: 1.38; letter-spacing: -.025em;
       word-break: keep-all; overflow-wrap: normal; text-wrap: balance;
     }
     .intro-summary {
@@ -837,7 +837,7 @@
     }
     @media (max-height: 780px) {
       .intro-content { padding-block: var(--space-5); }
-      .intro-title { margin-bottom: var(--space-5); }
+      .intro-tagline { margin-top: 20px; }
       .intro-summary, .intro-rule-card, .intro-start { margin-top: var(--space-4); }
       .intro-rule-card { padding: var(--space-3) var(--space-4); }
       .intro-start { min-height: 70px; }
@@ -846,8 +846,8 @@
     }
     @media (max-height: 700px) {
       .intro-content { padding-block: var(--space-4); }
-      .intro-eyebrow { margin-bottom: var(--space-3); }
-      .intro-title { margin-bottom: var(--space-4); }
+      .intro-eyebrow { margin-bottom: var(--space-2); }
+      .intro-tagline { margin-top: var(--space-4); }
       .intro-summary, .intro-rule-card, .intro-start { margin-top: var(--space-3); }
       .intro-rule-card { grid-template-columns: 26px minmax(0, 1fr); padding: 10px var(--space-3); }
       .intro-rule-card svg { width: 26px; height: 26px; }
@@ -1238,8 +1238,10 @@
       .device-status { max-width: 76px; overflow: hidden; text-overflow: ellipsis; }
       .intro-shell { padding-bottom: var(--space-4); }
       .intro-content { padding: var(--space-4); border-radius: 20px; }
-      .intro-title__ko { font-size: clamp(40px, 11vw, 52px); }
-      .intro-tagline { max-width: 22ch; font-size: clamp(20px, 6vw, 25px); }
+      .intro-title { gap: 5px; }
+      .intro-title__ko { font-size: clamp(42px, 11vw, 54px); }
+      .intro-title__en { font-size: 11px; }
+      .intro-tagline { max-width: 18ch; margin-top: 18px; font-size: clamp(20px, 5.8vw, 25px); }
       .intro-summary { max-width: 32ch; font-size: 15px; }
       .intro-rule-card { padding: var(--space-3) var(--space-4); }
       .intro-start { min-height: 64px; padding-inline: var(--space-4); border-radius: var(--intro-radius-button); }
@@ -1415,12 +1417,12 @@
 
         <main class="intro-shell">
           <div class="intro-content intro-content-panel">
-            <p class="intro-eyebrow">전략 놀이 · 촉각 게임</p>
+            <p class="intro-eyebrow">촉각 전략 게임 · 10개의 빛</p>
             <h1 class="intro-title" id="titleH1">
               <span class="intro-title__ko">닷 스틱</span>
               <span class="intro-title__en">DOT STICK</span>
             </h1>
-            <h2 class="intro-tagline">빛을 모아, 마지막 한 줄기까지 가져오세요.</h2>
+            <h2 class="intro-tagline">마지막 빛을 차지하세요.</h2>
             <p class="intro-summary">탐험가 닷과 번갈아 스틱을 가져가며 마지막 빛을 차지하는 단순한 전략 놀이입니다.</p>
 
             <aside class="intro-rule-card" aria-label="게임 규칙">
