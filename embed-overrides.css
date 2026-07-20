@@ -105,7 +105,7 @@ html.embed-mode .intro-title__ko {
   letter-spacing: -.035em;
 }
 html.embed-mode .intro-tagline {
-  /* "줄기까지"처럼 한 단어가 쪼개지지 않게, 단어 단위로 두 줄을 균형 있게 맞춘다. */
+  /* "한 줄기까지 가져오세요"를 한 의미 단위로 유지해 부자연스러운 줄바꿈을 막는다. */
   max-width: 23ch;
   margin-top: clamp(6px, 1vh, 10px);
   font-size: clamp(15px, 1.8vh, 17px);
@@ -115,6 +115,7 @@ html.embed-mode .intro-tagline {
   overflow-wrap: normal;
   text-wrap: balance;
 }
+html.embed-mode .intro-tagline__phrase { white-space: nowrap; }
 
 html.embed-mode .intro-summary {
   max-width: 48ch;
@@ -418,7 +419,25 @@ html.embed-mode .result-actions {
   width: 100%;
   max-width: none;
   margin: 0;
-  gap: 5px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(7px, 1vw, 12px);
+}
+
+/* 결과 뒤의 두 다음 행동은 동등한 선택지로 바로 비교할 수 있게 나란히 둔다.
+   다시 듣기는 보조 행동이라 다음 줄 전체 너비를 사용한다. */
+html.embed-mode .result-action--primary,
+html.embed-mode .result-action--secondary {
+  grid-column: auto;
+  min-height: clamp(62px, 9vh, 78px);
+  padding: clamp(8px, 1.2vh, 12px);
+}
+html.embed-mode .result-action--primary strong,
+html.embed-mode .result-action--secondary strong {
+  font-size: clamp(15px, 2vh, 19px);
+}
+html.embed-mode .result-action--quiet {
+  grid-column: 1 / -1;
+  min-height: 34px;
 }
 
 html.embed-mode .result-actions > .voice-controls {
@@ -433,7 +452,8 @@ html.embed-mode .result-story__eyebrow { margin-bottom: 3px; }
 
 html.embed-mode .result-title {
   width: 100%;
-  max-width: 13ch;
+  /* 두 결과 제목 모두 의미 단위로만 끊기고, 가능한 한 한 줄로 읽힌다. */
+  max-width: 14ch;
   margin: 0 0 7px;
   font-size: clamp(32px, 5.2vh, 42px);
   font-weight: 800;
@@ -452,7 +472,8 @@ html.embed-mode .result-description {
   overflow-wrap: normal;
   text-wrap: pretty;
 }
-html.embed-mode .result-description br { display: none; }
+/* 두 문장은 원래의 문장 경계에서 읽어야 내용이 빠르게 들어온다. */
+html.embed-mode .result-description br { display: revert; }
 
 html.embed-mode .result-secret {
   margin-top: clamp(6px, 1vh, 10px);
@@ -493,7 +514,8 @@ html.embed-mode .result-action {
   padding: 6px 9px;
 }
 
-html.embed-mode .result-action--primary { min-height: clamp(44px, 6.8vh, 54px); }
+html.embed-mode .result-action--primary,
+html.embed-mode .result-action--secondary { min-height: clamp(44px, 6.8vh, 54px); }
 html.embed-mode .result-action small { font-size: 10px; }
 
 @media (max-height: 640px) {
@@ -517,13 +539,21 @@ html.embed-mode .result-action small { font-size: 10px; }
     gap: 6px;
   }
 
-  html.embed-mode .result-title { max-width: 11ch; font-size: clamp(28px, 7.6vw, 38px); }
+  html.embed-mode .result-title { max-width: 12ch; font-size: clamp(28px, 7.6vw, 38px); }
   html.embed-mode .result-description { font-size: 12px; }
   html.embed-mode .result-secret { display: none; }
   html.embed-mode .result-tactile__header span:not(.result-tactile__resolution) { display: none; }
   html.embed-mode .result-actions { grid-template-columns: 1fr 1fr; }
-  html.embed-mode .result-action--primary { grid-column: 1 / -1; }
+  html.embed-mode .result-action--primary { grid-column: auto; }
   html.embed-mode .result-action--quiet { grid-column: 1 / -1; }
+}
+
+@media (max-width: 440px) {
+  /* 아이콘과 한글 라벨을 충분한 크기로 유지할 수 없는 폭에서는 세로 배치한다. */
+  html.embed-mode .result-actions { grid-template-columns: 1fr; }
+  html.embed-mode .result-action--primary,
+  html.embed-mode .result-action--secondary,
+  html.embed-mode .result-action--quiet { grid-column: auto; }
 }
 
 @media (max-width: 520px) {
