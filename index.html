@@ -32,6 +32,39 @@
       'use strict';
 
       var gameFrame = document.getElementById('gameFrame');
+      var polishStyles = [
+        'styles/ui-polish-base.css',
+        'styles/ui-polish-intro.css',
+        'styles/ui-polish-intro-controls.css',
+        'styles/ui-polish-play.css',
+        'styles/ui-polish-result.css'
+      ];
+
+      function loadPolishStyles() {
+        var frameDocument;
+
+        try {
+          frameDocument = gameFrame.contentDocument;
+        } catch (error) {
+          return;
+        }
+
+        if (!frameDocument || !frameDocument.head) return;
+
+        polishStyles.forEach(function (href, index) {
+          var id = 'dot-stick-ui-polish-' + index;
+          if (frameDocument.getElementById(id)) return;
+
+          var link = frameDocument.createElement('link');
+          link.id = id;
+          link.rel = 'stylesheet';
+          link.href = href;
+          link.dataset.uiPolish = 'true';
+          frameDocument.head.appendChild(link);
+        });
+      }
+
+      gameFrame.addEventListener('load', loadPolishStyles);
 
       // TW가 index.html에 전달한 embed/preview/lang 등의 값을 실제 게임 문서에도 전달한다.
       gameFrame.src = 'game-source.html' + window.location.search + window.location.hash;
