@@ -120,12 +120,17 @@
     overflow: visible !important;
   }
 
+  /* height:auto인 flex 컬럼 안에서 aspect-ratio 캔버스(#pins)의 auto 트랙 사전 측정값이
+     실제 렌더 높이보다 훨씬 작게 잡혀(헤더 한 줄 높이 수준, 약 40px) preview-wrap이
+     찌그러지고, overflow:visible이라 캔버스가 박스 밖(다음 섹션인 선택 카드 위)으로
+     흘러넘쳐 겹쳐 보이는 문제가 있었다. min-height를 폭 기반으로 확보해 캔버스
+     (3:2 비율) + 헤더 + 하드웨어 버튼 행이 항상 들어갈 공간을 보장한다. */
   html.embed-mode #screenPlay .preview-wrap,
   html.embed-mode .play-screen .preview-wrap {
     width: 100%;
     max-width: 100%;
     height: auto !important;
-    min-height: 0 !important;
+    min-height: min(108vw, 480px) !important;
     max-height: none !important;
     display: flex;
     flex-direction: column;
