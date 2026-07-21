@@ -26,6 +26,12 @@
   --sr-btn-h: 48px;
   --sr-card-bg: rgba(7, 17, 12, .86);
   --sr-focus: 3px solid #fff2a8;
+  /* 닷패드 미리보기 카드가 스틱 무대 칸 우하단에 절대배치로 떠 있는데(fix3),
+     스틱이 많아 행이 꽉 차면 카드가 마지막 1~2개 스틱을 가려버렸다. 스틱이
+     차지하는 실제 폭을 카드 폭만큼 오른쪽에서 미리 줄여, 스틱이 애초에 그
+     자리를 넘어오지 않게 한다. 카드 폭(width)·여백(right) 값과 반드시
+     같이 맞춰서 바꿔야 한다. */
+  --sr-preview-reserve: calc(min(52vw, 244px) + clamp(10px, 2vw, 20px) + 14px);
 }
 
 /* prefers-reduced-motion에서 이 레이어가 추가하는 transition/transform도 모두 끈다 */
@@ -72,7 +78,8 @@ html.embed-mode #screenPlay .stage, html.embed-mode .play-screen .stage {
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  padding: clamp(18px, 3.2vh, 34px) clamp(12px, 3vw, 30px) clamp(22px, 4.4vh, 44px) !important;
+  /* top / right(카드 폭만큼 예약) / bottom / left */
+  padding: clamp(18px, 3.2vh, 34px) var(--sr-preview-reserve) clamp(22px, 4.4vh, 44px) clamp(12px, 3vw, 30px) !important;
 }
 .light-stage::before { opacity: .6; }
 .light-stage__label {
@@ -370,6 +377,9 @@ html.embed-mode #screenPlay .preview-wrap, html.embed-mode .play-screen .preview
    5. 반응형 — 좁은 폭/짧은 높이에서도 무대+액션이 스크롤 없이 우선 노출
    ════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 640px) {
+  /* 이 폭에서는 카드가 min(40vw,168px)로 좁아지므로, 스틱이 예약해 둘
+     오른쪽 여백도 그에 맞춰 함께 줄인다(:root 값과 어긋나면 다시 겹친다). */
+  :root { --sr-preview-reserve: calc(min(40vw, 168px) + clamp(10px, 2vw, 20px) + 12px); }
   .light-sticks { min-height: clamp(150px, 34vh, 320px) !important; }
   .light-stick {
     height: clamp(130px, 36vh, 320px) !important;
@@ -393,6 +403,14 @@ html.embed-mode #screenPlay .preview-wrap, html.embed-mode .play-screen .preview
 
 /* 아주 좁은 화면에서는 미리보기 카드가 스틱 무대를 가리지 않도록 하단 중앙, 더 작게 */
 @media (max-width: 420px) {
+  /* 카드가 우측이 아니라 하단 중앙으로 옮겨가므로, 오른쪽에 예약해 뒀던
+     여백은 다시 원래대로 되돌리고 대신 아래쪽에 카드 높이만큼 여백을 준다
+     (카드 높이는 내용에 따라 달라지는 auto라 정확한 값 대신 넉넉하게 잡음 —
+     실제 화면에서 스틱 바닥이 여전히 가려지면 이 값을 늘려야 한다). */
+  .light-stage {
+    padding-right: clamp(12px, 3vw, 30px) !important;
+    padding-bottom: 190px !important;
+  }
   #screenPlay .preview-wrap, .play-screen .preview-wrap,
   html.embed-mode #screenPlay .preview-wrap, html.embed-mode .play-screen .preview-wrap {
     right: 50% !important;
