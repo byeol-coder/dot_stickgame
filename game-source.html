@@ -1671,7 +1671,8 @@
         document.documentElement.classList.add('embed-mode');
   }
     </script>
-<link rel="stylesheet" href="embed-overrides.css" />
+<!-- 임베드 호스트/CDN이 이전 레이아웃을 오래 캐시하지 않도록 배포 단위를 명시한다. -->
+<link rel="stylesheet" href="embed-overrides.css?v=stage-center-2" />
 </head>
 <body>
   <!-- 플레이 화면 전용 분위기 배경 — 인트로·결과 화면에는 이미 삽화가 있지만
