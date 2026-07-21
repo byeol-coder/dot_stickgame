@@ -719,6 +719,7 @@
       transition: border-color .15s ease, background .15s ease, color .15s ease, filter .15s ease, box-shadow .15s ease;
     }
     .ui-btn:hover { border-color: rgba(126,227,138,.72); background: rgba(23,43,29,.82); }
+    .ui-btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
     .ui-btn:active { filter: brightness(.93); }
     .ui-btn:disabled { opacity: .45; cursor: not-allowed; }
     .ui-btn--secondary { background: rgba(10,19,13,.58); color: var(--ink); }
@@ -1300,13 +1301,24 @@
     /* 탐험가 닷 고민 중 — 상대가 살아있는 캐릭터처럼 느껴지게 */
     .turn-tag.is-thinking { animation: turn-thinking 1.2s ease-in-out infinite; }
     @keyframes turn-thinking { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+    /* 턴 배너 등장 — 차례가 바뀔 때만 톡 튀어나온다 (renderPlay가 JS로 부여) */
+    .turn-tag.is-enter { animation: turn-enter .4s cubic-bezier(.2,.9,.3,1.25) both; }
+    @keyframes turn-enter {
+      0% { opacity: 0; transform: translateY(-6px) scale(.92); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* 패배 — 빛이 훅 꺼지고 잔불(haze)만 어렴풋이 남는다 */
+    .stick-stage.is-extinguished .lstick { animation: none; filter: saturate(.4) brightness(.5); transition: filter .8s ease; }
+    .stick-stage.is-extinguished .lstick__halo,
+    .stick-stage.is-extinguished .lstick__flame { opacity: 0; transition: opacity .8s ease; animation: none; }
+    .stick-stage.is-extinguished .stick-stage__haze { opacity: .35; }
     /* 상태 줄 토스트 — 로그가 한 줄씩 살아나며 들어온다 */
     .status-line.is-new { animation: status-in .45s ease both; }
     @keyframes status-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     /* 접근성 — 모션 최소화: 섬광/파티클/흔들림 전부 제거, 상태 전환만 유지 */
     @media (prefers-reduced-motion: reduce) {
       .lstick, .lstick__halo, .stick-stage__flash, .stick-spark,
-      .turn-tag.is-thinking, .status-line.is-new { animation: none !important; transition: none !important; }
+      .turn-tag.is-thinking, .turn-tag.is-enter, .status-line.is-new { animation: none !important; transition: none !important; }
       .stick-spark { display: none; }
       .lstick.is-taken { opacity: 0; }
       .lstick.is-armed { transform: none; }
@@ -2719,11 +2731,16 @@
       pushHex(hex || gridToHex(g));
     }
 
+    var prevRenderedTurn = null;
     function renderPlay() {
       document.getElementById('countBig').textContent = S.sticks;
       var tag = document.getElementById('turnTag');
       if (S.turn === 'you') { tag.textContent = '당신 차례'; tag.className = 'turn-tag you'; }
       else { tag.textContent = '탐험가 닷 차례'; tag.className = 'turn-tag dot'; }
+      // 차례가 실제로 바뀐 렌더에서만 등장 애니메이션(매 렌더 재생 방지)
+      if (prevRenderedTurn !== S.turn && !motionReduced()) tag.classList.add('is-enter');
+      prevRenderedTurn = S.turn;
+      if (stickStageEl && S.sticks > 0) stickStageEl.classList.remove('is-extinguished');
 
       var maxT = Math.min(2, S.sticks);
       if (S.choice > maxT) S.choice = maxT;
@@ -2808,6 +2825,8 @@
       stageTake(take, 'dot'); // 닷은 낮고 부드러운 소리·초록 불티로 구분
       if (S.sticks <= 0) {
         renderPlay();
+        // 빛이 훅 꺼지고 잔불만 남는다 — 푸른 페이드 섬광과 하강음이 짝
+        if (stickStageEl) stickStageEl.classList.add('is-extinguished');
         stageFlash('lose'); sfx.lose();
         setStatus('탐험가 닷이 ' + take + '개를 가져갔어요.');
         await speak('탐험가 닷이 마지막 ' + take + '개를 가져갔어요.', { liveText: '탐험가 닷이 마지막 스틱을 가져감.' });
