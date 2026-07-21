@@ -36,28 +36,14 @@
       // TW가 index.html에 전달한 embed/preview/lang 등의 값을 실제 게임 문서에도 전달한다.
       gameFrame.src = 'game-source.html' + window.location.search + window.location.hash;
 
-      // 게임 엔진과 촉각 코덱은 그대로 두고, 시장성 있는 빛의 스틱 무대만 독립 레이어로 주입한다.
-      // 동일 출처의 game-source.html에만 적용되며 실패해도 기존 게임은 정상 작동한다.
+      // 빛의 스틱 무대는 game-source.html에 직접 통합되어 있다(통합 구현 채택).
+      // 오버레이(enhanced-stage.js/css, dot-stick-image.css) 주입은 이중 렌더·이중 효과음을
+      // 막기 위해 비활성화한다 — 파일 자체는 비교/롤백을 위해 저장소에 남겨 둔다.
+      // 모바일 미리보기 표현 보정(mobile-preview-fix.css)만 계속 주입한다.
       gameFrame.addEventListener('load', function () {
         try {
           var frameDocument = gameFrame.contentDocument;
           if (!frameDocument || !frameDocument.head) return;
-
-          if (!frameDocument.getElementById('enhancedStageStyles')) {
-            var stylesheet = frameDocument.createElement('link');
-            stylesheet.id = 'enhancedStageStyles';
-            stylesheet.rel = 'stylesheet';
-            stylesheet.href = 'enhanced-stage.css';
-            frameDocument.head.appendChild(stylesheet);
-          }
-
-          if (!frameDocument.getElementById('dotStickImageStyles')) {
-            var imageStylesheet = frameDocument.createElement('link');
-            imageStylesheet.id = 'dotStickImageStyles';
-            imageStylesheet.rel = 'stylesheet';
-            imageStylesheet.href = 'dot-stick-image.css';
-            frameDocument.head.appendChild(imageStylesheet);
-          }
 
           if (!frameDocument.getElementById('mobilePreviewFixStyles')) {
             var mobilePreviewStylesheet = frameDocument.createElement('link');
@@ -65,14 +51,6 @@
             mobilePreviewStylesheet.rel = 'stylesheet';
             mobilePreviewStylesheet.href = 'mobile-preview-fix.css';
             frameDocument.head.appendChild(mobilePreviewStylesheet);
-          }
-
-          if (!frameDocument.getElementById('enhancedStageScript')) {
-            var script = frameDocument.createElement('script');
-            script.id = 'enhancedStageScript';
-            script.src = 'enhanced-stage.js';
-            script.defer = true;
-            frameDocument.body.appendChild(script);
           }
         } catch (error) {
           // 임베드 호스트 정책으로 접근이 막힌 경우에도 원본 게임을 그대로 유지한다.
