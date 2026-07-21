@@ -462,7 +462,7 @@ html.embed-mode .result-story {
   width: 100%;
   min-width: 0;
   min-height: 0;
-  max-width: 520px;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
   align-self: center;
@@ -531,13 +531,15 @@ html.embed-mode .result-title {
 }
 
 html.embed-mode .result-description {
-  max-width: 32ch;
+  /* 결과의 보조 문구는 넓은 모달에서도 긴 한 줄이 되지 않게 제한한다.
+     제목 아래에서 2~3줄로 읽히도록 해 촉각 패널과 경쟁하지 않는다. */
+  max-width: 25ch;
   margin: 0;
   font-size: clamp(12px, 1.65vh, 14px);
   line-height: 1.55;
   word-break: keep-all;
   overflow-wrap: normal;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 html.embed-mode .result-description br { display: none; }
 
