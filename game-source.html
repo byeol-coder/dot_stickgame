@@ -1009,7 +1009,10 @@
     .play-help { min-height: 40px; white-space: nowrap; }
     .play-utility-card { display: flex; align-items: center; gap: var(--space-2); }
     .stage {
-      display: grid; grid-template-rows: auto minmax(150px, 1fr) auto auto auto auto;
+      /* 무대 행을 1fr로 두면 높이가 확정되지 않은 그리드에서 스틱의 100% 높이가
+         다음 행까지 넘칠 수 있다. 연출은 이 상자 안에서만 끝내고, 미리보기·조작은
+         항상 그 아래의 독립 행에서 시작한다. */
+      display: grid; grid-template-rows: auto clamp(170px, 25vh, 250px) auto auto auto auto;
       justify-items: center; align-items: center; gap: var(--space-3);
       width: min(100%, 800px); max-height: calc(100dvh - 112px); margin-inline: auto;
       padding-block: var(--space-3);
@@ -1170,9 +1173,9 @@
        장식 레이어이므로 aria-hidden — 의미 정보는 캔버스 aria-label과
        countBig, 라이브 영역이 담당한다. */
     .stick-stage {
-      position: relative; width: 100%; max-width: 560px; height: 100%; min-height: 170px;
+      position: relative; width: 100%; max-width: 560px; height: 100%; min-height: 0;
       display: flex; align-items: flex-end; justify-content: center;
-      padding-bottom: 10px; pointer-events: none;
+      padding: 12px 18px 10px; pointer-events: none; overflow: clip; isolation: isolate;
     }
     .stick-stage__haze {
       position: absolute; left: 0; right: 0; bottom: -6%; height: 78%; pointer-events: none;
@@ -1184,12 +1187,12 @@
     }
     .stick-row {
       position: relative; z-index: 1; display: flex; align-items: flex-end;
-      gap: clamp(8px, 1.6vw, 14px); height: 100%;
+      gap: clamp(8px, 1.6vw, 14px); height: 100%; max-height: 220px;
     }
     .lstick {
       --sw: clamp(12px, 1.9vh, 18px);
       position: relative; width: var(--sw);
-      height: min(100%, clamp(120px, 24vh, 220px));
+      height: min(100%, clamp(112px, 21vh, 190px));
       display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
       transition: width .45s ease, margin-left .45s ease, filter .25s ease, transform .25s ease;
     }
