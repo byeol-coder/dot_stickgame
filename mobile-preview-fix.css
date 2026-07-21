@@ -46,6 +46,29 @@
 }
 
 @media (max-width: 560px) {
+  html:not(.embed-mode) #screenPlay .stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto clamp(170px, 30vh, 250px) auto auto auto auto auto;
+    grid-template-areas:
+      "turn"
+      "hero"
+      "status"
+      "action"
+      "line"
+      "preview"
+      "guide";
+    align-content: start;
+    max-height: none;
+  }
+
+  html:not(.embed-mode) #screenPlay .play-turn { grid-area: turn; }
+  html:not(.embed-mode) #screenPlay .stick-stage { grid-area: hero; }
+  html:not(.embed-mode) #screenPlay .play-status { grid-area: status; }
+  html:not(.embed-mode) #screenPlay .play-action-group { grid-area: action; }
+  html:not(.embed-mode) #screenPlay .status-line { grid-area: line; }
+  html:not(.embed-mode) #screenPlay .preview-wrap { grid-area: preview; }
+  html:not(.embed-mode) #screenPlay .control-guide { grid-area: guide; }
+
   #screenPlay .stage {
     gap: 14px;
   }
