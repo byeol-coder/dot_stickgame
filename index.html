@@ -34,7 +34,10 @@
       var gameFrame = document.getElementById('gameFrame');
 
       // TW가 index.html에 전달한 embed/preview/lang 등의 값을 실제 게임 문서에도 전달한다.
-      gameFrame.src = 'game-source.html' + window.location.search + window.location.hash;
+      // 임베드 호스트가 iframe 문서를 캐시하는 경우에도 최신 레이아웃을 받도록
+      // 배포 버전을 함께 전달한다. 기존 embed/preview/lang 파라미터는 보존한다.
+      var query = window.location.search;
+      gameFrame.src = 'game-source.html' + query + (query ? '&' : '?') + 'v=stage-center-2' + window.location.hash;
 
       // 빛의 스틱 무대는 game-source.html에 직접 통합되어 있다(통합 구현 채택).
       // 오버레이(enhanced-stage.js/css, dot-stick-image.css) 주입은 이중 렌더·이중 효과음을
@@ -49,7 +52,7 @@
             var mobilePreviewStylesheet = frameDocument.createElement('link');
             mobilePreviewStylesheet.id = 'mobilePreviewFixStyles';
             mobilePreviewStylesheet.rel = 'stylesheet';
-            mobilePreviewStylesheet.href = 'mobile-preview-fix.css';
+            mobilePreviewStylesheet.href = 'mobile-preview-fix.css?v=stage-center-2';
             frameDocument.head.appendChild(mobilePreviewStylesheet);
           }
         } catch (error) {
