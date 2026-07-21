@@ -308,8 +308,8 @@ html.embed-mode .preview-actions .ui-btn {
   font-size: clamp(11px, 1.35vh, 13px);
 }
 
-/* 넓고 낮은 Tactile Worlds 모달: 촉각 패널을 화면의 주인공으로 두고,
-   선택·확정 조작은 우측 열에 모아 시선과 조작 흐름을 분리한다. */
+/* 넓고 낮은 Tactile Worlds 모달: 스틱은 턴 표지 바로 아래의 짧은 히어로
+   블록에 두고, 선택·확정 조작은 우측 열에 모아 시선과 조작 흐름을 분리한다. */
 @media (min-width: 900px) and (min-height: 520px) {
   html.embed-mode #screenPlay .stage,
   html.embed-mode .play-screen .stage {
@@ -330,8 +330,20 @@ html.embed-mode .preview-actions .ui-btn {
   html.embed-mode .play-screen .stick-stage {
     grid-area: hero;
     max-width: none;
-    min-height: 180px;
-    align-self: stretch;
+    /* hero 영역은 오른쪽의 상태·선택·안내 행까지 세로로 이어진다. stretch를
+       쓰면 스틱 행이 그 영역 맨 아래에 붙으므로, 상단에 독립된 무대 높이를
+       주고 그 안에서만 중앙 정렬한다. */
+    height: clamp(190px, 27vh, 260px);
+    min-height: 0;
+    align-self: start;
+    align-items: center;
+    overflow: clip;
+  }
+
+  html.embed-mode #screenPlay .stick-stage .stick-row,
+  html.embed-mode .play-screen .stick-stage .stick-row {
+    height: min(100%, 210px);
+    align-self: center;
   }
 
   html.embed-mode #screenPlay .preview-wrap,
