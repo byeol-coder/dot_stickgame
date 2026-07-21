@@ -74,6 +74,24 @@
             script.defer = true;
             frameDocument.body.appendChild(script);
           }
+
+          // 플레이 화면 시각 위계 재구성(스틱 무대를 주역으로, 닷패드 미리보기는
+          // 보조 카드로, 음성 컨트롤은 통합 메뉴로) — 위 레이어들 다음에 적용한다.
+          if (!frameDocument.getElementById('stageRedesignStyles')) {
+            var redesignStylesheet = frameDocument.createElement('link');
+            redesignStylesheet.id = 'stageRedesignStyles';
+            redesignStylesheet.rel = 'stylesheet';
+            redesignStylesheet.href = 'stage-redesign.css';
+            frameDocument.head.appendChild(redesignStylesheet);
+          }
+
+          if (!frameDocument.getElementById('stageRedesignScript')) {
+            var redesignScript = frameDocument.createElement('script');
+            redesignScript.id = 'stageRedesignScript';
+            redesignScript.src = 'stage-redesign.js';
+            redesignScript.defer = true;
+            frameDocument.body.appendChild(redesignScript);
+          }
         } catch (error) {
           // 임베드 호스트 정책으로 접근이 막힌 경우에도 원본 게임을 그대로 유지한다.
           console.warn('[dot-stick] cinematic stage enhancement skipped', error);
