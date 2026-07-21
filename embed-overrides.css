@@ -395,10 +395,30 @@ html.embed-mode .preview-actions .ui-btn {
   }
   html.embed-mode #screenPlay .preview-wrap:not(.is-collapsed),
   html.embed-mode .play-screen .preview-wrap:not(.is-collapsed) {
+    width: min(100%, 440px);
     height: min(210px, 24vh) !important;
     min-height: 170px !important;
     max-height: 210px !important;
+    justify-self: center;
     overflow: hidden;
+  }
+  html.embed-mode #screenPlay .preview-wrap:not(.is-collapsed) canvas#pins,
+  html.embed-mode .play-screen .preview-wrap:not(.is-collapsed) canvas#pins {
+    width: min(100%, 220px) !important;
+    height: auto !important;
+    max-height: 108px !important;
+    margin: auto;
+  }
+  html.embed-mode #screenPlay .preview-wrap:not(.is-collapsed) .preview-actions,
+  html.embed-mode .play-screen .preview-wrap:not(.is-collapsed) .preview-actions {
+    justify-content: center;
+    gap: 6px;
+  }
+  html.embed-mode #screenPlay .preview-wrap:not(.is-collapsed) .preview-actions .ui-btn,
+  html.embed-mode .play-screen .preview-wrap:not(.is-collapsed) .preview-actions .ui-btn {
+    min-height: 34px;
+    padding-inline: 9px;
+    font-size: 11px;
   }
   html.embed-mode #screenPlay .play-action-group,
   html.embed-mode .play-screen .play-action-group {
