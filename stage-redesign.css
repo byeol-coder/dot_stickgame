@@ -182,7 +182,12 @@ html.embed-mode #screenPlay .play-action-group, html.embed-mode .play-screen .pl
 #screenPlay .preview-wrap, .play-screen .preview-wrap,
 html.embed-mode #screenPlay .preview-wrap, html.embed-mode .play-screen .preview-wrap {
   grid-area: unset !important; /* .stage 그리드 흐름에서 완전히 빼서 우하단 카드로 띄운다 */
-  position: absolute !important;
+  /* position:absolute였을 때는 .stage(최대 880px)가 기준이라, 화면이 .stage보다
+     넓으면 카드의 "우하단"이 .stage 우하단 = 액션 카드 우측 끝과 거의 같은
+     자리가 되어 "2개"/확정 버튼을 가려버렸다(실측: 액션 카드 우측 끝 720px,
+     카드 좌측 640px로 약 80px 겹침). 뷰포트 기준 고정으로 바꿔 화면 자체의
+     우하단 모서리에 띄운다. */
+  position: fixed !important;
   right: clamp(10px, 2vw, 20px);
   bottom: clamp(10px, 2vh, 20px);
   left: auto !important;

@@ -140,32 +140,51 @@
     label.textContent = '선택한 ' + amount + '개 가져가기';
   }
 
+  var choicesWatched = false;
   function watchChoices() {
+    updateConfirmLabel();
+    if (choicesWatched) return;
+    choicesWatched = true;
     ['choice1', 'choice2'].forEach(function (id) {
       var el = doc.getElementById(id);
       if (!el || !window.MutationObserver) return;
       new MutationObserver(updateConfirmLabel).observe(el, { attributes: true, attributeFilter: ['aria-pressed'] });
     });
-    updateConfirmLabel();
   }
 
   // ── 부팅: #screenPlay/#playVoiceSlot/.voice-controls/.preview-wrap이 실제로
-  //         DOM에 준비될 때까지 몇 차례 재시도한다(enhanced-stage.js와 동일 패턴) ──
+  //         DOM에 준비될 때까지 재시도한다 ──
+  // 이전 버전은 100ms x 40회(4초) 후 무조건 포기했는데, 사용자가 타이틀
+  // 화면에 4초 넘게 머물다가 "게임 시작"을 누르면(흔한 경우) 그 시점엔 이미
+  // 재시도가 멈춰 있어 음성 설정 메뉴가 영영 만들어지지 않는 버그가 있었다.
+  // 화면 전환을 즉시 감지하는 MutationObserver를 우선 쓰고, 그것으로도
+  // 놓치는 예외적인 경우를 대비해 시간 제한 없는 폴링을 보조 안전망으로 둔다.
   function build() {
     var a = buildVoiceMenu();
     var b = buildPreviewExpand();
     mergeStatusIntoAction();
     if (doc.getElementById('choice1')) watchChoices();
-    return a && b;
+    if (a && b) built = true;
+    return built;
   }
 
   function boot() {
-    if (build()) { built = true; return; }
-    var attempts = 0;
+    build();
+    if (built) return;
+
+    if (window.MutationObserver) {
+      var mo = new MutationObserver(function () {
+        if (built) { mo.disconnect(); return; }
+        build();
+        if (built) mo.disconnect();
+      });
+      mo.observe(doc.body, { childList: true, subtree: true });
+    }
+
     var timer = window.setInterval(function () {
-      attempts += 1;
-      if (build() || attempts > 40) window.clearInterval(timer);
-    }, 100);
+      if (built) { window.clearInterval(timer); return; }
+      build();
+    }, 300);
   }
 
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot, { once: true });
