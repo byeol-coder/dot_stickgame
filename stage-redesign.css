@@ -196,8 +196,8 @@ html.embed-mode #screenPlay .preview-wrap, html.embed-mode .play-screen .preview
   bottom: clamp(10px, 2vh, 20px);
   left: auto !important;
   top: auto !important;
-  width: min(46vw, 220px) !important;
-  max-width: 220px !important;
+  width: min(52vw, 244px) !important;
+  max-width: 244px !important;
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
@@ -215,20 +215,43 @@ html.embed-mode #screenPlay .preview-wrap, html.embed-mode .play-screen .preview
   gap: 6px !important;
   overflow: hidden !important;
 }
-#screenPlay .preview-wrap .preview-cap, .play-screen .preview-wrap .preview-cap { font-size: 10px; }
-#screenPlay .preview-wrap .result-tactile__resolution { font-size: 10px; padding: 2px 6px; }
+/* 카드를 220px로 줄이면서 "닷패드 미리보기" · "크게 보기" · "미연결" ·
+   "촉각 다시 출력" 같은 라벨이 개별 버튼/텍스트 안에서 글자 단위로 줄바꿈되어
+   "미리보 / 기"처럼 깨져 보이는 문제가 있었다. 각 라벨은 통째로 줄바꿈 없이
+   유지하고(white-space: nowrap), 대신 한 줄에 다 안 들어가면 버튼 단위로
+   다음 줄로 넘어가게 한다(flex-wrap: wrap) — 글자가 아니라 버튼이 줄바꿈된다. */
+#screenPlay .preview-wrap .preview-head, .play-screen .preview-wrap .preview-head {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+#screenPlay .preview-wrap .preview-cap, .play-screen .preview-wrap .preview-cap {
+  font-size: 10px;
+  white-space: nowrap;
+}
+#screenPlay .preview-wrap .result-tactile__resolution, .play-screen .preview-wrap .result-tactile__resolution {
+  font-size: 10px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+.sr-expand-btn { white-space: nowrap; }
 #screenPlay .preview-wrap canvas#pins, .play-screen canvas#pins {
   width: 100% !important;
   height: auto !important;
   max-height: 100% !important;
 }
 #screenPlay .preview-wrap .preview-actions, .play-screen .preview-wrap .preview-actions {
+  flex-wrap: wrap;
+  row-gap: 4px;
   gap: 4px !important;
 }
 #screenPlay .preview-wrap .preview-actions .ui-btn {
   min-height: 30px !important;
   font-size: 10px !important;
   padding-inline: 6px !important;
+  white-space: nowrap !important;
+}
+#screenPlay .preview-wrap .device-status, .play-screen .preview-wrap .device-status {
+  white-space: nowrap;
 }
 
 /* "크게 보기" 토글 버튼 (stage-redesign.js가 preview-head에 삽입) */
