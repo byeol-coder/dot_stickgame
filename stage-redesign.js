@@ -157,8 +157,13 @@
   // 이전 버전은 100ms x 40회(4초) 후 무조건 포기했는데, 사용자가 타이틀
   // 화면에 4초 넘게 머물다가 "게임 시작"을 누르면(흔한 경우) 그 시점엔 이미
   // 재시도가 멈춰 있어 음성 설정 메뉴가 영영 만들어지지 않는 버그가 있었다.
-  // 화면 전환을 즉시 감지하는 MutationObserver를 우선 쓰고, 그것으로도
-  // 놓치는 예외적인 경우를 대비해 시간 제한 없는 폴링을 보조 안전망으로 둔다.
+  //
+  // 한 번 여기에 body 전체를 subtree까지 관찰하는 MutationObserver를 달아
+  // "즉시 감지"를 시도했었는데, 타이틀 화면의 반딧불이/반짝임 연출이 실제
+  // DOM 요소를 계속 추가·삭제하는 방식이라 그 관찰이 초당 수십~수백 번씩
+  // 발동해 build()를 계속 재실행시켰고, 그 결과 메인 스레드가 바빠져서
+  // "게임 시작" 버튼 클릭 반응이 씹히는 실제 버그로 이어졌다. 그래서 다시
+  // 가벼운 폴링만 남기고, 다만 "포기하지는 않도록" 제한 횟수만 없앤다.
   function build() {
     var a = buildVoiceMenu();
     var b = buildPreviewExpand();
@@ -172,19 +177,10 @@
     build();
     if (built) return;
 
-    if (window.MutationObserver) {
-      var mo = new MutationObserver(function () {
-        if (built) { mo.disconnect(); return; }
-        build();
-        if (built) mo.disconnect();
-      });
-      mo.observe(doc.body, { childList: true, subtree: true });
-    }
-
     var timer = window.setInterval(function () {
       if (built) { window.clearInterval(timer); return; }
       build();
-    }, 300);
+    }, 250);
   }
 
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot, { once: true });
