@@ -378,28 +378,34 @@ html.embed-mode .preview-actions .ui-btn {
      먼저 끝나고, 그 다음에 닷패드 화면과 하드웨어 조작이 나타나게 한다. */
   html.embed-mode #screenPlay.preview-open,
   html.embed-mode .play-screen.preview-open {
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
   }
   html.embed-mode #screenPlay .stage.has-expanded-preview,
   html.embed-mode .play-screen .stage.has-expanded-preview {
-    height: auto;
-    min-height: 100%;
-    grid-template-rows: auto minmax(180px, 240px) auto auto auto;
-    padding-bottom: 18px;
+    height: 100%;
+    min-height: 0;
+    grid-template-columns: minmax(340px, 500px) minmax(300px, 380px);
+    grid-template-rows: auto minmax(170px, 1fr) auto auto;
+    grid-template-areas:
+      "turn status"
+      "hero hero"
+      "action preview"
+      "line line";
+    column-gap: clamp(18px, 2.4vw, 28px);
+    padding-bottom: 0;
   }
   html.embed-mode #screenPlay .stage.has-expanded-preview .stick-stage,
   html.embed-mode .play-screen .stage.has-expanded-preview .stick-stage {
-    height: min(220px, 28vh);
+    height: min(210px, 27vh);
   }
   html.embed-mode #screenPlay .preview-wrap:not(.is-collapsed),
   html.embed-mode .play-screen .preview-wrap:not(.is-collapsed) {
-    width: min(100%, 440px);
-    height: min(210px, 24vh) !important;
-    min-height: 170px !important;
-    max-height: 210px !important;
+    width: min(100%, 380px);
+    height: min(188px, 23vh) !important;
+    min-height: 160px !important;
+    max-height: 188px !important;
     justify-self: center;
+    align-self: center;
     overflow: hidden;
   }
   html.embed-mode #screenPlay .preview-wrap:not(.is-collapsed) canvas#pins,
