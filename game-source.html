@@ -3235,6 +3235,12 @@
       if (!wrap || !toggle) return;
       function setCollapsed(collapsed, silent) {
         wrap.classList.toggle('is-collapsed', collapsed);
+        // 펼친 닷패드 미리보기는 고정 높이 임베드에서 선택 카드와 같은 공간을
+        // 경쟁하지 않도록, 플레이 화면을 스크롤 가능한 문서 흐름으로 전환한다.
+        var playScreen = document.getElementById('screenPlay');
+        var stage = wrap.closest('.stage');
+        if (playScreen) playScreen.classList.toggle('preview-open', !collapsed);
+        if (stage) stage.classList.toggle('has-expanded-preview', !collapsed);
         toggle.setAttribute('aria-expanded', String(!collapsed));
         toggle.textContent = collapsed ? '미리보기 펼치기' : '미리보기 접기';
         if (!silent) speak(collapsed ? '닷패드 미리보기를 접었어요.' : '닷패드 미리보기를 펼쳤어요.', { interrupt: true });
