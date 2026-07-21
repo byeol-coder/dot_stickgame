@@ -372,6 +372,43 @@ html.embed-mode .preview-actions .ui-btn {
     border-color: rgba(126,227,138,.28);
     background: transparent;
   }
+
+  /* 미리보기를 펼칠 때는 하단 패널을 떠 있는 오버레이로 쓰지 않는다.
+     플레이 영역을 스크롤 가능한 흐름으로 바꿔 선택·가져가기 카드가 항상
+     먼저 끝나고, 그 다음에 닷패드 화면과 하드웨어 조작이 나타나게 한다. */
+  html.embed-mode #screenPlay.preview-open,
+  html.embed-mode .play-screen.preview-open {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  html.embed-mode #screenPlay .stage.has-expanded-preview,
+  html.embed-mode .play-screen .stage.has-expanded-preview {
+    height: auto;
+    min-height: 100%;
+    grid-template-rows: auto minmax(180px, 240px) auto auto auto;
+    padding-bottom: 18px;
+  }
+  html.embed-mode #screenPlay .stage.has-expanded-preview .stick-stage,
+  html.embed-mode .play-screen .stage.has-expanded-preview .stick-stage {
+    height: min(220px, 28vh);
+  }
+  html.embed-mode #screenPlay .preview-wrap:not(.is-collapsed),
+  html.embed-mode .play-screen .preview-wrap:not(.is-collapsed) {
+    height: min(210px, 24vh) !important;
+    min-height: 170px !important;
+    max-height: 210px !important;
+    overflow: hidden;
+  }
+  html.embed-mode #screenPlay .play-action-group,
+  html.embed-mode .play-screen .play-action-group {
+    padding: 10px;
+    gap: 8px;
+  }
+  html.embed-mode #screenPlay .play-action-group .choice,
+  html.embed-mode .play-screen .play-action-group .choice { min-height: 58px; }
+  html.embed-mode #screenPlay .play-action-group .confirm-btn,
+  html.embed-mode .play-screen .play-action-group .confirm-btn { min-height: 46px; }
   /* 차례와 남은 수를 화면 양끝이 아닌 같은 시선선에 둬서 하나의 게임
      상태로 읽히게 한다. */
   html.embed-mode .play-turn { justify-self: end; margin-right: clamp(10px, 2vw, 26px); }
@@ -462,7 +499,7 @@ html.embed-mode .result-story {
   width: 100%;
   min-width: 0;
   min-height: 0;
-  max-width: 520px;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
   align-self: center;
@@ -531,13 +568,15 @@ html.embed-mode .result-title {
 }
 
 html.embed-mode .result-description {
-  max-width: 32ch;
+  /* 결과의 보조 문구는 넓은 모달에서도 긴 한 줄이 되지 않게 제한한다.
+     제목 아래에서 2~3줄로 읽히도록 해 촉각 패널과 경쟁하지 않는다. */
+  max-width: 25ch;
   margin: 0;
   font-size: clamp(12px, 1.65vh, 14px);
   line-height: 1.55;
   word-break: keep-all;
   overflow-wrap: normal;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 html.embed-mode .result-description br { display: none; }
 
