@@ -181,13 +181,17 @@ html.embed-mode #screenPlay .play-action-group, html.embed-mode .play-screen .pl
    ════════════════════════════════════════════════════════════════════════ */
 #screenPlay .preview-wrap, .play-screen .preview-wrap,
 html.embed-mode #screenPlay .preview-wrap, html.embed-mode .play-screen .preview-wrap {
-  grid-area: unset !important; /* .stage 그리드 흐름에서 완전히 빼서 우하단 카드로 띄운다 */
-  /* position:absolute였을 때는 .stage(최대 880px)가 기준이라, 화면이 .stage보다
-     넓으면 카드의 "우하단"이 .stage 우하단 = 액션 카드 우측 끝과 거의 같은
-     자리가 되어 "2개"/확정 버튼을 가려버렸다(실측: 액션 카드 우측 끝 720px,
-     카드 좌측 640px로 약 80px 겹침). 뷰포트 기준 고정으로 바꿔 화면 자체의
-     우하단 모서리에 띄운다. */
-  position: fixed !important;
+  /* .light-stage와 같은 그리드 영역("lights")을 그대로 유지한다. absolute로
+     빠진 그리드 아이템이라도 grid-area가 지정돼 있으면, CSS Grid 명세상
+     "그 그리드 영역의 패딩 박스"가 containing block이 된다 — 즉 이 카드는
+     항상 스틱 무대 칸 안에서만 우하단에 뜨고, 그 아래 액션 카드 행으로는
+     절대 넘어가지 않는다.
+     (이전에는 grid-area:unset + position:fixed로 뷰포트 우하단에 띄웠는데,
+     뷰포트가 .stage 폭(880px)보다 아주 많이 넓을 때만 안전했고, 임베드에서
+     흔한 1000px 안팎 폭에서는 액션 카드의 "2개"/확정 버튼과 다시 겹쳤다
+     — 실측 카드 좌측 722px vs 확정 버튼 우측 778px, 56px 겹침.) */
+  grid-area: lights !important;
+  position: absolute !important;
   right: clamp(10px, 2vw, 20px);
   bottom: clamp(10px, 2vh, 20px);
   left: auto !important;
