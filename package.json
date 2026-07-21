@@ -1,0 +1,11 @@
+{
+  "name": "dot-stickgame",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node smoke-stage.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

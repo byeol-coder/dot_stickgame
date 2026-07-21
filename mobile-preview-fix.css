@@ -203,3 +203,17 @@
     box-shadow: none;
   }
 }
+/* ── 통합 스틱 무대 채택에 따른 조정 ─────────────────────────────────────
+   빛의 스틱 무대(#stickStage)가 game-source.html에 직접 통합되면서 닷패드
+   미리보기는 기본 접힘(.is-collapsed) 보조 패널이 되었다. 위 규칙들이 ID
+   선택자 특이도로 display/min-height를 되살려 접힌 상태에서 빈 카드나
+   캔버스가 다시 나타나지 않도록, 접힘 상태를 최우선으로 존중한다. */
+#screenPlay .preview-wrap.is-collapsed,
+html.embed-mode #screenPlay .preview-wrap.is-collapsed,
+html.embed-mode .play-screen .preview-wrap.is-collapsed {
+  min-height: 0 !important;
+}
+#screenPlay .preview-wrap.is-collapsed canvas#pins,
+#screenPlay .preview-wrap.is-collapsed .last-light {
+  display: none !important;
+}

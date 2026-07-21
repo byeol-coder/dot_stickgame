@@ -719,6 +719,7 @@
       transition: border-color .15s ease, background .15s ease, color .15s ease, filter .15s ease, box-shadow .15s ease;
     }
     .ui-btn:hover { border-color: rgba(126,227,138,.72); background: rgba(23,43,29,.82); }
+    .ui-btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
     .ui-btn:active { filter: brightness(.93); }
     .ui-btn:disabled { opacity: .45; cursor: not-allowed; }
     .ui-btn--secondary { background: rgba(10,19,13,.58); color: var(--ink); }
@@ -1008,18 +1009,27 @@
     .play-help { min-height: 40px; white-space: nowrap; }
     .play-utility-card { display: flex; align-items: center; gap: var(--space-2); }
     .stage {
-      display: grid; grid-template-rows: auto minmax(180px, 1fr) auto auto auto;
+      display: grid; grid-template-rows: auto minmax(150px, 1fr) auto auto auto auto;
       justify-items: center; align-items: center; gap: var(--space-3);
       width: min(100%, 800px); max-height: calc(100dvh - 112px); margin-inline: auto;
       padding-block: var(--space-3);
     }
+    /* 미리보기 강등: 전맹 사용자의 본체는 손끝의 닷패드이므로, 화면 미리보기는
+       동행자·교사용 보조 모니터 포지션. 기본 접힘 — 헤더와 연결/재출력 버튼만 남긴다.
+       접힌 canvas에도 drawCanvas는 계속 그려지므로(display:none이어도 동작)
+       펼치는 순간 최신 상태가 바로 보인다. */
     .preview-wrap {
-      height: 100%; min-height: 210px; max-height: min(31vh, 300px);
+      height: auto; min-height: 0; max-height: none;
       width: 100%; max-width: 460px; margin-inline: auto; position: relative;
-      display: grid; grid-template-rows: auto minmax(0, 1fr) auto; place-items: center;
-      gap: var(--space-2); padding: var(--space-3);
+      display: grid; grid-template-rows: auto minmax(0, auto) auto; place-items: center;
+      gap: var(--space-2); padding: var(--space-2) var(--space-3);
       overflow: hidden;
     }
+    .preview-wrap.is-collapsed canvas#pins,
+    .preview-wrap.is-collapsed .last-light { display: none; }
+    .preview-wrap:not(.is-collapsed) canvas#pins { max-height: min(24vh, 200px); }
+    .preview-head__side { display: flex; align-items: center; gap: var(--space-2); }
+    .preview-toggle { min-height: 32px; padding: 4px 10px; font-size: 12px; }
     .last-light {
       position: absolute; inset: 0; z-index: 3; display: grid; place-items: center;
       pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility .45s ease;
@@ -1082,24 +1092,21 @@
       font-size: 12px; border-radius: 14px;
     }
     @media (max-height: 820px) {
-      .stage { grid-template-rows: auto minmax(160px, 1fr) auto auto auto; max-height: calc(100dvh - 96px); }
-      .preview-wrap { min-height: 170px; max-height: min(32vh, 240px); }
+      .stage { grid-template-rows: auto minmax(130px, 1fr) auto auto auto auto; max-height: calc(100dvh - 96px); }
       .confirm-btn { min-height: 46px; }
     }
     @media (max-height: 760px) {
       .stage { gap: var(--space-2); }
-      .preview-wrap { min-height: 155px; }
       #screenPlay .control-guide { display: none; }
       .count-big { font-size: clamp(38px, 7vh, 54px); }
     }
     @media (max-height: 700px) {
-      .stage { grid-template-rows: auto minmax(140px, 1fr) auto auto auto; gap: var(--space-2); }
-      .preview-wrap { min-height: 145px; max-height: 28vh; }
+      .stage { grid-template-rows: auto minmax(110px, 1fr) auto auto auto auto; gap: var(--space-2); }
+      .stick-stage { min-height: 110px; }
       .choice { min-height: 58px; }
     }
     @media (max-height: 640px) {
       #screenPlay { height: 100dvh; overflow-y: auto; }
-      .preview-wrap { min-height: 140px; }
     }
     /* 넓고 낮은 화면(가로 여백은 남는데 세로가 부족한 경우): 세로로 계속
        압축/은닉하는 대신 촉각 패널과 조작부를 좌우 2열로 배치해
@@ -1111,12 +1118,12 @@
         width: min(calc(100% - 32px), 960px);
         box-sizing: border-box;
         grid-template-columns: minmax(0, 1.25fr) minmax(0, .85fr);
-        grid-template-rows: auto auto auto auto auto;
+        grid-template-rows: auto minmax(0, 1fr) auto auto auto;
         grid-template-areas:
           "turn turn"
-          "preview status"
-          "preview action"
-          "preview line"
+          "hero status"
+          "hero action"
+          "hero line"
           "preview guide";
         justify-items: stretch; align-content: center; max-height: none;
         gap: 12px 20px;
@@ -1126,6 +1133,7 @@
          않도록, 트랙을 차지하는 모든 자식 체인에 min-width:0을 내려준다.
          (grid/flex 아이템은 기본값이 min-width:auto라 내용이 안 줄어들면 넘친다) */
       .play-turn,
+      .stick-stage,
       .preview-wrap,
       .play-status,
       .play-action-group,
@@ -1138,9 +1146,10 @@
       .play-action-group .choice {
         min-width: 0;
       }
+      .stick-stage { grid-area: hero; max-width: none; align-self: stretch; min-height: 200px; }
       .preview-wrap {
-        grid-area: preview; width: 100%; max-width: none; height: 100%;
-        min-height: 260px; max-height: none; align-self: stretch;
+        grid-area: preview; width: 100%; max-width: none; height: auto;
+        min-height: 0; max-height: none; align-self: end;
       }
       .play-status { grid-area: status; }
       .play-action-group { grid-area: action; width: 100%; max-width: none; }
@@ -1154,6 +1163,171 @@
       .play-utilities .voice-controls { order: 2; width: 100%; justify-content: center; }
       .play-utilities .voice-control { flex: 1 1 0; }
     }
+    /* ── 빛의 스틱 무대 — 화면의 주인공 오브젝트 ──────────────────────────
+       촉각 미리보기(닷패드 원본)는 보조 패널로 내리고, 손으로 세는 '빛나는
+       스틱'을 실물 크기 오브젝트로 무대 중앙에 세운다. 모든 시각 이벤트는
+       음성(speak)·효과음(sfx)·닷패드 촉각(pushHex)과 1:1 대응쌍을 가진다.
+       장식 레이어이므로 aria-hidden — 의미 정보는 캔버스 aria-label과
+       countBig, 라이브 영역이 담당한다. */
+    .stick-stage {
+      position: relative; width: 100%; max-width: 560px; height: 100%; min-height: 170px;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 10px; pointer-events: none;
+    }
+    .stick-stage__haze {
+      position: absolute; left: 0; right: 0; bottom: -6%; height: 78%; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 100%, rgba(126,227,138,.16), rgba(126,227,138,.05) 45%, transparent 72%);
+      filter: blur(6px); transition: opacity .6s ease;
+    }
+    .stick-stage.is-last-light .stick-stage__haze {
+      background: radial-gradient(ellipse at 50% 100%, rgba(255,207,92,.22), rgba(255,207,92,.07) 45%, transparent 72%);
+    }
+    .stick-row {
+      position: relative; z-index: 1; display: flex; align-items: flex-end;
+      gap: clamp(8px, 1.6vw, 14px); height: 100%;
+    }
+    .lstick {
+      --sw: clamp(12px, 1.9vh, 18px);
+      position: relative; width: var(--sw);
+      height: min(100%, clamp(120px, 24vh, 220px));
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+      transition: width .45s ease, margin-left .45s ease, filter .25s ease, transform .25s ease;
+    }
+    /* 5개 묶음 간격 — 촉각 미리보기의 stickPositions() 배열과 같은 리듬 */
+    .lstick:nth-child(5n+1):not(:first-child) { margin-left: clamp(14px, 3vw, 26px); }
+    .lstick__body {
+      flex: none; width: var(--sw); height: 72%; border-radius: 999px;
+      background: linear-gradient(180deg, #fdfff6 0%, #d5ffd9 18%, var(--glow) 55%, #58b96b 100%);
+      box-shadow:
+        0 0 6px rgba(191,245,200,.9),
+        0 0 18px rgba(126,227,138,.55),
+        0 0 42px rgba(126,227,138,.28);
+    }
+    .lstick__flame {
+      position: absolute; top: 5%; left: 50%; width: calc(var(--sw) * 2.3); aspect-ratio: 1;
+      transform: translateX(-50%); border-radius: 50%; pointer-events: none;
+      background: radial-gradient(circle, rgba(255,255,255,.85) 0%, rgba(191,245,200,.5) 34%, rgba(126,227,138,0) 70%);
+      filter: blur(2px);
+    }
+    .lstick__halo {
+      position: absolute; top: -4%; left: 50%; width: calc(var(--sw) * 3.6); aspect-ratio: 1;
+      transform: translateX(-50%); border-radius: 50%; pointer-events: none;
+      background: radial-gradient(circle, rgba(126,227,138,.35), rgba(126,227,138,0) 66%);
+      filter: blur(6px);
+      animation: lstick-flicker var(--fdur, 2.6s) ease-in-out var(--fd, 0s) infinite;
+    }
+    .lstick__base {
+      flex: none; width: calc(var(--sw) * 1.5); height: 7px; margin-top: 6px;
+      border-radius: 4px; background: #1b2c22; border: 1px solid #2c4433;
+    }
+    @keyframes lstick-flicker {
+      0%, 100% { opacity: .55; transform: translateX(-50%) scale(.94); }
+      40% { opacity: .95; transform: translateX(-50%) scale(1.05); }
+      62% { opacity: .7; transform: translateX(-50%) scale(.98); }
+    }
+    /* 선택 예고(anticipation) — 개수 선택/호버 시 가져가게 될 스틱이 미리
+       밝아진다. 저시력 사용자에게는 "결정하면 이만큼 사라진다"는 실질 정보. */
+    .lstick.is-armed { filter: brightness(1.28) saturate(1.1); transform: translateY(-4px); }
+    .lstick.is-armed .lstick__halo { animation-duration: 1.1s; }
+    .lstick.is-armed .lstick__body {
+      box-shadow: 0 0 8px rgba(255,246,214,.9), 0 0 22px rgba(191,245,200,.7), 0 0 52px rgba(126,227,138,.4);
+    }
+    /* 가져가기 — 위로 빨려 올라가는 섬광, 남은 스틱은 부드럽게 자리를 좁힌다 */
+    .lstick.is-taken {
+      width: 0 !important; margin-left: 0 !important; pointer-events: none;
+      animation: lstick-take .58s cubic-bezier(.3,.4,.4,1) forwards;
+    }
+    @keyframes lstick-take {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      30% { opacity: 1; transform: translateY(-14px) scale(1.08); filter: brightness(1.6); }
+      100% { opacity: 0; transform: translateY(-78px) scale(.7); }
+    }
+    .lstick.is-taken--dot { animation-name: lstick-take-dot; }
+    @keyframes lstick-take-dot {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translate(-30px, -52px) scale(.6); filter: saturate(.6) brightness(.9); }
+    }
+    /* 섬광 오버레이 — 가져간 순간 120~320ms의 radial flash */
+    .stick-stage__flash {
+      position: absolute; inset: -12%; z-index: 2; pointer-events: none; opacity: 0; border-radius: 24px;
+      background: radial-gradient(circle at 50% 62%, rgba(255,253,243,.95), rgba(255,230,163,.45) 38%, transparent 70%);
+      mix-blend-mode: screen;
+    }
+    .stick-stage__flash.is-on { animation: stage-flash .32s ease-out; }
+    .stick-stage__flash.is-win { animation: stage-flash-win 1s ease-out; }
+    .stick-stage__flash.is-lose {
+      background: radial-gradient(circle at 50% 62%, rgba(132,197,255,.5), rgba(82,137,192,.2) 40%, transparent 70%);
+      animation: stage-flash-lose 1s ease-out;
+    }
+    @keyframes stage-flash { 0% { opacity: 0; } 18% { opacity: .9; } 100% { opacity: 0; } }
+    @keyframes stage-flash-win {
+      0% { opacity: 0; transform: scale(.9); } 22% { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 0; transform: scale(1.25); }
+    }
+    @keyframes stage-flash-lose { 0% { opacity: 0; } 25% { opacity: .7; } 100% { opacity: 0; } }
+    /* 불티 파티클 — CSS transform/opacity만 사용(60fps 안전) */
+    .stick-spark {
+      position: absolute; bottom: 26%; z-index: 3; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--amber-hot); box-shadow: 0 0 8px rgba(255,207,92,.9);
+      pointer-events: none; opacity: 0;
+      animation: spark-fly .85s cubic-bezier(.2,.7,.5,1) var(--sd, 0s) forwards;
+    }
+    .stick-spark--dot { background: var(--glow-soft); box-shadow: 0 0 8px rgba(126,227,138,.9); }
+    @keyframes spark-fly {
+      0% { opacity: 0; transform: translate(0, 0) scale(1); }
+      12% { opacity: 1; }
+      100% { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, -60px)) scale(.4); }
+    }
+    /* 마지막 빛 — 스틱이 앰버로 변하고 심장박동 pulse (기존 preview is-last와 대응) */
+    .stick-stage.is-last-light .lstick { --sw: clamp(16px, 2.4vh, 24px); }
+    .stick-stage.is-last-light .lstick__body {
+      background: linear-gradient(180deg, #fffdf3 0%, var(--amber-hot) 46%, var(--amber) 100%);
+      box-shadow: 0 0 10px rgba(255,246,214,.95), 0 0 30px rgba(255,207,92,.7), 0 0 70px rgba(255,207,92,.35);
+    }
+    .stick-stage.is-last-light .lstick__flame {
+      background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,230,163,.55) 36%, rgba(255,207,92,0) 70%);
+    }
+    .stick-stage.is-last-light .lstick__halo {
+      width: calc(var(--sw) * 5);
+      background: radial-gradient(circle, rgba(255,207,92,.5), rgba(255,207,92,0) 66%);
+      animation: last-heartbeat 1.25s ease-in-out infinite;
+    }
+    @keyframes last-heartbeat {
+      0%, 100% { opacity: .55; transform: translateX(-50%) scale(.92); }
+      18% { opacity: 1; transform: translateX(-50%) scale(1.12); }
+      34% { opacity: .7; transform: translateX(-50%) scale(1); }
+      48% { opacity: .95; transform: translateX(-50%) scale(1.08); }
+    }
+    /* 탐험가 닷 고민 중 — 상대가 살아있는 캐릭터처럼 느껴지게 */
+    .turn-tag.is-thinking { animation: turn-thinking 1.2s ease-in-out infinite; }
+    @keyframes turn-thinking { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+    /* 턴 배너 등장 — 차례가 바뀔 때만 톡 튀어나온다 (renderPlay가 JS로 부여) */
+    .turn-tag.is-enter { animation: turn-enter .4s cubic-bezier(.2,.9,.3,1.25) both; }
+    @keyframes turn-enter {
+      0% { opacity: 0; transform: translateY(-6px) scale(.92); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* 패배 — 빛이 훅 꺼지고 잔불(haze)만 어렴풋이 남는다 */
+    .stick-stage.is-extinguished .lstick { animation: none; filter: saturate(.4) brightness(.5); transition: filter .8s ease; }
+    .stick-stage.is-extinguished .lstick__halo,
+    .stick-stage.is-extinguished .lstick__flame { opacity: 0; transition: opacity .8s ease; animation: none; }
+    .stick-stage.is-extinguished .stick-stage__haze { opacity: .35; }
+    /* 상태 줄 토스트 — 로그가 한 줄씩 살아나며 들어온다 */
+    .status-line.is-new { animation: status-in .45s ease both; }
+    @keyframes status-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    /* 접근성 — 모션 최소화: 섬광/파티클/흔들림 전부 제거, 상태 전환만 유지 */
+    @media (prefers-reduced-motion: reduce) {
+      .lstick, .lstick__halo, .stick-stage__flash, .stick-spark,
+      .turn-tag.is-thinking, .turn-tag.is-enter, .status-line.is-new { animation: none !important; transition: none !important; }
+      .stick-spark { display: none; }
+      .lstick.is-taken { opacity: 0; }
+      .lstick.is-armed { transform: none; }
+    }
+    /* 고대비 모드 — glow 레이어를 걷어내고 실루엣 대비만 남긴다 */
+    html.hc-mode .stick-stage__haze, html.hc-mode .lstick__halo,
+    html.hc-mode .lstick__flame, html.hc-mode .stick-stage__flash { display: none; }
+    html.hc-mode .lstick__body { box-shadow: none; outline: 2px solid var(--color-white); }
+
     .result-controls { border-radius: 14px; }
     @media (max-height: 820px) and (min-width: 781px) {
       .result-screen { overflow: auto; }
@@ -1607,10 +1781,22 @@
             <span class="turn-tag" id="turnTag">당신 차례</span>
           </div>
 
+          <!-- 빛의 스틱 무대: 게임의 주인공 오브젝트. 장식 레이어라 aria-hidden —
+               같은 정보는 countBig·캔버스 aria-label·live 영역·음성이 담당한다. -->
+          <div class="stick-stage" id="stickStage" aria-hidden="true">
+            <span class="stick-stage__haze"></span>
+            <div class="stick-row" id="stickRow"></div>
+            <span class="stick-stage__flash" id="stickFlash"></span>
+          </div>
+
           <div class="preview-wrap">
             <div class="preview-head">
               <span class="preview-cap">닷패드 미리보기</span>
-              <span class="result-tactile__resolution">60 × 40</span>
+              <span class="preview-head__side">
+                <span class="result-tactile__resolution">60 × 40</span>
+                <button class="ui-btn ui-btn--ghost preview-toggle" id="previewToggleBtn" type="button"
+                  aria-expanded="false" aria-controls="pins">미리보기 펼치기</button>
+              </span>
             </div>
             <canvas id="pins" width="420" height="280" role="img"
               aria-label="빛나는 스틱 미리보기"></canvas>
@@ -2300,6 +2486,229 @@
       return optimalTake(n);
     }
 
+    // ── 효과음 + 빛의 스틱 무대: 시각·청각·촉각 삼중 대응쌍 ────────────────
+    // 원칙: 화면의 모든 이벤트(예고·가져가기·마지막 빛·승패)는
+    //   시각(스틱 무대 CSS) = 청각(sfx/TTS) = 촉각(pushHex) 으로 함께 표현한다.
+    var reducedMotionMq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    function motionReduced() { return !!(reducedMotionMq && reducedMotionMq.matches); }
+    function waitMs(ms) { return new Promise(function (resolve) { setTimeout(resolve, ms); }); }
+
+    // WebAudio 효과음 — TTS(게임 음성)와 별개 채널. 전맹 사용자에게 효과음은
+    // 장식이 아니라 상태 정보이므로 '게임 음성 끄기'와 무관하게 유지하되,
+    // 음성 안내를 가리지 않도록 전체 볼륨을 낮게 잡는다.
+    var sfx = (function () {
+      var ctx = null, master = null, hbTimer = null;
+      function ac() {
+        if (ctx) return ctx;
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        try {
+          ctx = new AC();
+          master = ctx.createGain();
+          master.gain.value = 0.5;
+          master.connect(ctx.destination);
+        } catch (e) { ctx = null; }
+        return ctx;
+      }
+      function unlock() {
+        var c = ac();
+        if (c && c.state === 'suspended') c.resume().catch(function () {});
+      }
+      function tone(freq, dur, opts) {
+        var c = ac(); if (!c || c.state !== 'running') return;
+        opts = opts || {};
+        var t0 = c.currentTime + (opts.delay || 0);
+        var osc = c.createOscillator(), g = c.createGain();
+        osc.type = opts.type || 'sine';
+        osc.frequency.setValueAtTime(freq, t0);
+        if (opts.slideTo) osc.frequency.exponentialRampToValueAtTime(opts.slideTo, t0 + dur);
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(opts.gain || 0.08, t0 + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(g); g.connect(master);
+        osc.start(t0); osc.stop(t0 + dur + 0.02);
+      }
+      function noise(dur, opts) {
+        var c = ac(); if (!c || c.state !== 'running') return;
+        opts = opts || {};
+        var t0 = c.currentTime + (opts.delay || 0);
+        var len = Math.max(1, Math.floor(c.sampleRate * dur));
+        var buf = c.createBuffer(1, len, c.sampleRate);
+        var data = buf.getChannelData(0);
+        for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / len);
+        var src = c.createBufferSource(); src.buffer = buf;
+        var bp = c.createBiquadFilter();
+        bp.type = 'bandpass'; bp.frequency.value = opts.freq || 1200; bp.Q.value = opts.q || 4;
+        var g = c.createGain(); g.gain.value = opts.gain || 0.12;
+        src.connect(bp); bp.connect(g); g.connect(master);
+        src.start(t0);
+      }
+      return {
+        unlock: unlock,
+        // 개수 선택/예고 — 아주 짧은 틱
+        arm: function () { tone(660, 0.05, { type: 'triangle', gain: 0.045 }); },
+        // 플레이어 가져가기 — 나무 스냅(노이즈) + 위로 솟는 whoosh
+        take: function () {
+          noise(0.1, { gain: 0.14, freq: 1900, q: 6 });
+          tone(480, 0.2, { type: 'triangle', gain: 0.07, slideTo: 900, delay: 0.02 });
+        },
+        // 탐험가 닷 가져가기 — 더 낮고 부드럽게(누가 가져갔는지 소리만으로 구분)
+        dotTake: function () {
+          noise(0.09, { gain: 0.09, freq: 850, q: 4 });
+          tone(300, 0.22, { type: 'sine', gain: 0.055, slideTo: 200, delay: 0.02 });
+        },
+        // 탐험가 닷 고민 시작 — 낮은 웅얼거림 한 번
+        think: function () { tone(150, 0.28, { type: 'sine', gain: 0.035, slideTo: 120 }); },
+        // 마지막 빛 — 심장박동 루프(저볼륨). 시각의 last-heartbeat와 같은 주기.
+        heartbeatStart: function () {
+          if (hbTimer) return;
+          var thump = function () {
+            tone(72, 0.13, { type: 'sine', gain: 0.05 });
+            tone(64, 0.11, { type: 'sine', gain: 0.035, delay: 0.19 });
+          };
+          thump();
+          hbTimer = setInterval(thump, 1250);
+        },
+        heartbeatStop: function () {
+          if (hbTimer) { clearInterval(hbTimer); hbTimer = null; }
+        },
+        win: function () {
+          [523, 659, 784, 1047].forEach(function (f, i) {
+            tone(f, 0.32, { type: 'triangle', gain: 0.07, delay: i * 0.11 });
+          });
+        },
+        lose: function () {
+          tone(330, 0.4, { type: 'sine', gain: 0.06, slideTo: 220 });
+          tone(196, 0.55, { type: 'sine', gain: 0.05, slideTo: 150, delay: 0.22 });
+        }
+      };
+    })();
+
+    // ── 스틱 무대 렌더러 ───────────────────────────────────────────────────
+    var stickStageEl = document.getElementById('stickStage');
+    var stickRowEl = document.getElementById('stickRow');
+    var stickFlashEl = document.getElementById('stickFlash');
+
+    function makeStickEl() {
+      var el = document.createElement('div');
+      el.className = 'lstick';
+      // 스틱마다 촛불처럼 위상이 어긋난 깜빡임(살아있는 느낌)
+      el.style.setProperty('--fdur', (2.1 + Math.random() * 1.4).toFixed(2) + 's');
+      el.style.setProperty('--fd', (-Math.random() * 2.5).toFixed(2) + 's');
+      el.innerHTML = '<span class="lstick__halo"></span><span class="lstick__flame"></span>'
+        + '<span class="lstick__body"></span><span class="lstick__base"></span>';
+      return el;
+    }
+    function liveStickEls() {
+      if (!stickRowEl) return [];
+      return Array.prototype.filter.call(stickRowEl.children, function (el) {
+        return !el.classList.contains('is-taken');
+      });
+    }
+    function buildStage(count) {
+      if (!stickRowEl) return;
+      stickRowEl.innerHTML = '';
+      for (var i = 0; i < count; i++) stickRowEl.appendChild(makeStickEl());
+    }
+    // renderPlay마다 호출되는 안전망: 애니메이션 경로가 개수를 놓친 경우
+    // (재시작/레이스/복원)에도 실제 DOM 스틱 수를 S.sticks에 맞춘다.
+    function stageSync(count) {
+      if (!stickRowEl) return;
+      if (liveStickEls().length !== count) buildStage(count);
+    }
+    // 선택 예고: 가져가게 될 오른쪽 끝 n개가 미리 밝아진다.
+    // 저시력 사용자에게 "결정하면 이만큼 사라진다"를 결정 전에 보여주는 정보 레이어.
+    function stageArm(n) {
+      var live = liveStickEls();
+      live.forEach(function (el) { el.classList.remove('is-armed'); });
+      for (var i = 0; i < n && i < live.length; i++) {
+        live[live.length - 1 - i].classList.add('is-armed');
+      }
+    }
+    function spawnSparks(centers, byDot) {
+      if (!stickStageEl || motionReduced()) return;
+      centers.forEach(function (cx) {
+        for (var i = 0; i < 3; i++) {
+          var sp = document.createElement('span');
+          sp.className = 'stick-spark' + (byDot ? ' stick-spark--dot' : '');
+          sp.style.left = cx + 'px';
+          sp.style.setProperty('--dx', ((Math.random() * 44) - 22).toFixed(0) + 'px');
+          sp.style.setProperty('--dy', (-(38 + Math.random() * 54)).toFixed(0) + 'px');
+          sp.style.setProperty('--sd', (Math.random() * 0.12).toFixed(2) + 's');
+          stickStageEl.appendChild(sp);
+          (function (node) {
+            setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, 1100);
+          })(sp);
+        }
+      });
+    }
+    // 가져가기 연출: 오른쪽 끝 n개가 위로 빨려 올라가며 불티를 남긴다.
+    // 위치 측정은 .is-taken(width 0 전환)을 붙이기 전에 끝내야 한다.
+    function stageTake(n, who) {
+      var live = liveStickEls();
+      var taken = live.slice(Math.max(0, live.length - n));
+      if (!taken.length) return;
+      var centers = [];
+      if (stickStageEl && !motionReduced()) {
+        var stageRect = stickStageEl.getBoundingClientRect();
+        taken.forEach(function (el) {
+          var r = el.getBoundingClientRect();
+          centers.push(r.left - stageRect.left + r.width / 2);
+        });
+      }
+      taken.forEach(function (el) {
+        el.classList.remove('is-armed');
+        el.classList.add('is-taken');
+        if (who === 'dot') el.classList.add('is-taken--dot');
+      });
+      if (who === 'dot') sfx.dotTake(); else sfx.take();
+      if (motionReduced()) {
+        taken.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
+        return;
+      }
+      spawnSparks(centers, who === 'dot');
+      if (who !== 'dot') stageFlash('');
+      setTimeout(function () {
+        taken.forEach(function (el) { if (el.parentNode) el.parentNode.removeChild(el); });
+      }, 680);
+    }
+    function stageFlash(kind) {
+      if (!stickFlashEl || motionReduced()) return;
+      stickFlashEl.className = 'stick-stage__flash';
+      void stickFlashEl.offsetWidth; // 애니메이션 재시작
+      stickFlashEl.classList.add(kind === 'win' ? 'is-win' : kind === 'lose' ? 'is-lose' : 'is-on');
+    }
+    // 마지막 빛: 무대는 앰버 심장박동, 소리는 저볼륨 심장박동 루프.
+    function stageLastLight(on) {
+      if (stickStageEl) stickStageEl.classList.toggle('is-last-light', !!on);
+      if (on) sfx.heartbeatStart(); else sfx.heartbeatStop();
+    }
+    // 닷 고민 중 표시: renderPlay가 className을 통째로 다시 쓰므로
+    // 다음 renderPlay에서 자동으로 해제된다.
+    function setThinking(on) {
+      var tag = document.getElementById('turnTag');
+      if (!tag) return;
+      tag.classList.toggle('is-thinking', !!on);
+      if (on) tag.textContent = '탐험가 닷이 고민 중…';
+    }
+    // 마지막 빛 촉각 강조: 연속 점멸은 실물 핀 갱신이 느리고 소음이 커서
+    // 진입 시 1회 깜빡임(꺼짐 프레임 → 복원)으로 제한한다.
+    var lastLightTactileShown = false;
+    function tactileLastLightPulse(myGen) {
+      if (!connected) return;
+      setTimeout(function () {
+        if (gameGen !== myGen || S.screen !== 'play' || S.sticks !== 1) return;
+        var g = emptyGrid();
+        g[38][1] = true; // 선택 마커(마지막엔 항상 1개)
+        if (S.turn === 'dot') g[1][1] = true; else g[1][58] = true;
+        pushHex(gridToHex(g), true); // 스틱 꺼짐 프레임
+        setTimeout(function () {
+          if (gameGen !== myGen || S.screen !== 'play' || S.sticks !== 1) return;
+          renderTactile(); // 스틱 켜짐 프레임 복원 — 한 번의 깜빡임
+        }, 380);
+      }, 550);
+    }
+
     // ── 렌더 ───────────────────────────────────────────────────────────────
     function renderTactile() {
       var g = emptyGrid();
@@ -2322,11 +2731,16 @@
       pushHex(hex || gridToHex(g));
     }
 
+    var prevRenderedTurn = null;
     function renderPlay() {
       document.getElementById('countBig').textContent = S.sticks;
       var tag = document.getElementById('turnTag');
       if (S.turn === 'you') { tag.textContent = '당신 차례'; tag.className = 'turn-tag you'; }
       else { tag.textContent = '탐험가 닷 차례'; tag.className = 'turn-tag dot'; }
+      // 차례가 실제로 바뀐 렌더에서만 등장 애니메이션(매 렌더 재생 방지)
+      if (prevRenderedTurn !== S.turn && !motionReduced()) tag.classList.add('is-enter');
+      prevRenderedTurn = S.turn;
+      if (stickStageEl && S.sticks > 0) stickStageEl.classList.remove('is-extinguished');
 
       var maxT = Math.min(2, S.sticks);
       if (S.choice > maxT) S.choice = maxT;
@@ -2343,6 +2757,15 @@
         '남은 스틱 ' + S.sticks + '개, ' + (S.turn === 'you' ? '당신' : '탐험가 닷') + ' 차례, 현재 선택 ' + S.choice + '개' + (S.sticks === 1 ? ', 마지막 빛이 중앙에 나타났습니다' : ''));
       var previewWrap = document.querySelector('#screenPlay .preview-wrap');
       if (previewWrap) previewWrap.classList.toggle('is-last', S.sticks === 1);
+
+      // 스틱 무대: 개수 동기화 → 선택 예고 → 마지막 빛(심장박동) 순으로 갱신.
+      stageSync(S.sticks);
+      stageArm(canAct ? S.choice : 0);
+      var isLastLight = S.sticks === 1 && !S.winner;
+      stageLastLight(isLastLight);
+      if (isLastLight && !lastLightTactileShown) tactileLastLightPulse(gameGen);
+      lastLightTactileShown = isLastLight;
+
       renderTactile();
     }
 
@@ -2362,6 +2785,7 @@
       if (n < 1) n = 1;
       S.choice = n;
       renderPlay();
+      sfx.arm(); // 시각 예고(stageArm)와 짝을 이루는 청각 틱
       var remain = S.sticks - n;
       speak(n + '개 선택. 가져가면 ' + remain + '개가 남아요.', { interrupt: true, liveText: n + '개 선택' });
     }
@@ -2371,7 +2795,15 @@
       var myGen = gameGen;
       var take = Math.min(S.choice, S.sticks);
       S.sticks -= take;
-      if (S.sticks <= 0) { endGame('you'); return; }
+      stageTake(take, 'you'); // 시각(빨려 올라가는 섬광)·청각(스냅+whoosh) 동시
+      if (S.sticks <= 0) {
+        // 마지막 빛을 가져간 순간: 승리 섬광과 팡파르를 짧게 보여준 뒤 결과로.
+        S.busy = true; renderPlay();
+        stageFlash('win'); sfx.win();
+        await waitMs(motionReduced() ? 150 : 750);
+        if (gameGen === myGen && S.screen === 'play') endGame('you');
+        return;
+      }
       S.busy = true; renderPlay();
       setStatus('당신이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요.');
       await speak('당신이 ' + take + '개를 가져갔어요. ' + S.sticks + '개 남았어요.', { liveText: '당신이 ' + take + '개 가져감. ' + S.sticks + '개 남음.' });
@@ -2382,9 +2814,20 @@
       if (myGen == null) myGen = gameGen;
       if (gameGen !== myGen) return;
       S.turn = 'dot'; renderPlay();
+      // 탐험가 닷이 '고민'하는 잠깐의 틈 — 상대가 살아있는 캐릭터처럼 느껴지게.
+      // 시각(점멸 태그)·청각(낮은 웅얼거림) 짝. 세대 토큰으로 재시작 레이스를 막는다.
+      setThinking(true); sfx.think();
+      await waitMs(motionReduced() ? 450 : 700 + Math.random() * 500);
+      setThinking(false);
+      if (gameGen !== myGen || S.screen !== 'play') return;
       var take = Math.min(aiChoose(S.sticks), S.sticks);
       S.sticks -= take;
+      stageTake(take, 'dot'); // 닷은 낮고 부드러운 소리·초록 불티로 구분
       if (S.sticks <= 0) {
+        renderPlay();
+        // 빛이 훅 꺼지고 잔불만 남는다 — 푸른 페이드 섬광과 하강음이 짝
+        if (stickStageEl) stickStageEl.classList.add('is-extinguished');
+        stageFlash('lose'); sfx.lose();
         setStatus('탐험가 닷이 ' + take + '개를 가져갔어요.');
         await speak('탐험가 닷이 마지막 ' + take + '개를 가져갔어요.', { liveText: '탐험가 닷이 마지막 스틱을 가져감.' });
         if (gameGen === myGen && S.screen === 'play') endGame('dot');
@@ -2455,12 +2898,20 @@
     function endGame(winner) {
       S.winner = winner;
       S.busy = false;
+      sfx.heartbeatStop(); // 결과 화면으로 넘어가며 마지막 빛 심장박동 정지
+      lastLightTactileShown = false;
       show('result');
       if (winner === 'you') showWinResult();
       else showLoseResult();
     }
 
-    function setStatus(t) { document.getElementById('statusLine').textContent = t; }
+    function setStatus(t) {
+      var el = document.getElementById('statusLine');
+      el.textContent = t;
+      // 상태 줄 토스트: 로그가 한 줄씩 살아나며 들어온다 (모션 최소화 시 생략)
+      el.classList.remove('is-new');
+      if (!motionReduced() && t) { void el.offsetWidth; el.classList.add('is-new'); }
+    }
 
     // 결과 화면 촉각 그래픽 재출력: F2 키와 "닷패드로 다시 출력" 버튼이 공유하는 로직.
     function replayTactileResult() {
@@ -2742,6 +3193,49 @@
     if (playTactileReplayBtnEl) playTactileReplayBtnEl.addEventListener('click', replayTactilePlay);
     document.getElementById('choice1').addEventListener('click', function () { setChoice(1); });
     document.getElementById('choice2').addEventListener('click', function () { setChoice(2); });
+
+    // ── 선택 예고 배선: 버튼 위에 올리거나 포커스만 해도 가져가게 될 스틱이
+    //    미리 밝아진다(결정 전 결과 예고). 벗어나면 현재 선택값으로 복귀.
+    //    음성 짝은 setChoice의 "n개 선택, 가져가면 X개" 안내가 담당한다.
+    (function () {
+      function canPreview() { return S.screen === 'play' && S.turn === 'you' && !S.busy && S.sticks > 0; }
+      function restoreArm() { stageArm(canPreview() ? S.choice : 0); }
+      [1, 2].forEach(function (n) {
+        var btn = document.getElementById('choice' + n);
+        function preview() { if (canPreview() && !btn.disabled) stageArm(Math.min(n, S.sticks)); }
+        btn.addEventListener('mouseenter', preview);
+        btn.addEventListener('focus', preview);
+        btn.addEventListener('mouseleave', restoreArm);
+        btn.addEventListener('blur', restoreArm);
+      });
+    })();
+
+    // ── 닷패드 미리보기 접기/펼치기: 전맹 사용자의 본체는 손끝의 닷패드이므로
+    //    화면 미리보기는 기본 접힘(동행자·교사용 보조 모니터). 접혀 있어도
+    //    drawCanvas는 계속 그려지므로 펼치는 순간 최신 상태가 보인다.
+    (function () {
+      var wrap = document.querySelector('#screenPlay .preview-wrap');
+      var toggle = document.getElementById('previewToggleBtn');
+      if (!wrap || !toggle) return;
+      function setCollapsed(collapsed, silent) {
+        wrap.classList.toggle('is-collapsed', collapsed);
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+        toggle.textContent = collapsed ? '미리보기 펼치기' : '미리보기 접기';
+        if (!silent) speak(collapsed ? '닷패드 미리보기를 접었어요.' : '닷패드 미리보기를 펼쳤어요.', { interrupt: true });
+      }
+      toggle.addEventListener('click', function () {
+        setCollapsed(!wrap.classList.contains('is-collapsed'));
+      });
+      setCollapsed(true, true);
+    })();
+
+    // 브라우저 정책상 AudioContext는 사용자 제스처 이후에만 동작한다.
+    ['pointerdown', 'keydown'].forEach(function (evt) {
+      window.addEventListener(evt, function unlockOnce() {
+        sfx.unlock();
+        window.removeEventListener(evt, unlockOnce);
+      }, { once: true });
+    });
     document.querySelectorAll('.diff').forEach(function (b) {
       b.addEventListener('click', function () { setDiff(b.dataset.diff); });
     });
